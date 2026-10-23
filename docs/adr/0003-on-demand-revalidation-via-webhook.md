@@ -1,0 +1,3 @@
+# On-demand revalidation via Sanity webhook, tag-based
+
+Carried forward from v1 ADR 0003, amended. Content changes are picked up by a Sanity webhook that calls a Next.js revalidation route, not by time-based revalidation (a staleness window for no benefit) or rebuild-on-publish (wasted build minutes, slower propagation). The amendment is the mechanism: v2 targets Next 16 with Cache Components, so the route invalidates by cache tag instead of calling `revalidatePath` per route, and the webhook payload maps document types to tags. The extra plumbing (a webhook secret and a revalidation route) is the same as in v1.

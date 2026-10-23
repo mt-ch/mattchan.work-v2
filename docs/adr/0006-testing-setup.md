@@ -1,0 +1,3 @@
+# Testing: Vitest and Testing Library for units, Playwright for server pages
+
+v2 uses Vitest with React Testing Library and jsdom for unit and component tests, and a thin Playwright smoke suite for async Server Components and whole pages. Vitest cannot render async Server Components (Next's testing guide says to use end-to-end tests for them), and v1 had no end-to-end coverage. The philosophy carries over from v1 ADR 0006: assert behaviour, not markup. A test should fail only when something a visitor sees, or a caller receives, regresses; checks that a class name is present or that the DOM nests a certain way are not worth keeping.
