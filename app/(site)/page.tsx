@@ -49,7 +49,7 @@ export default function HomePage() {
       }
       bottom={
         <>
-          <p className="font-mono text-caption">
+          <p className="text-caption font-mono">
             Frontend engineer based in the United Kingdom. Specialising in
             building scalable, product-focused applications since 2020.
           </p>

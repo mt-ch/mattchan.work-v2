@@ -1,0 +1,181 @@
+:root {
+  /* Colors. Figma paint styles, plus the unstyled dark surface. */
+  --white: #fcfaf8;
+  --black: #1a1a1a;
+  --grey-dark: #202224;
+  --grey-mid: #706a68;
+  --grey-light: #d0d3d7;
+  --grey-lightest: #edeff3;
+  --ink: #101010;
+
+  --brand: #ff3f0b;
+  --accent: #ffc9e6;
+
+  /* Typography
+   * Two-ratio system: 1.333 (Perfect Fourth) between caption/small/body/subheading,
+   * 1.6 between subheading/heading/display/hero. Every step scales 1.3x from the
+   * 480px to 2560px viewport, so the ratio between steps holds at any width. */
+  --type-hero-size: #{fluid-space(102, 136)};
+  --type-display-size: #{fluid-space(64, 85)};
+  --type-heading-size: #{fluid-space(40, 53)};
+  --type-subheading-size: #{fluid-space(25, 33)};
+  --type-body-size: #{fluid-space(19, 25)};
+  --type-small-size: #{fluid-space(14, 19)};
+  --type-caption-size: #{fluid-space(11, 14)};
+
+  /* Mono-specific sizes */
+  --type-mono-small-size: #{fluid-space(13, 15)};
+  --type-mono-caption-size: #{fluid-space(11, 13)};
+  --type-mono-code-size: #{fluid-space(13, 15)};
+
+  /* Line heights */
+  --leading-hero: 1;
+  --leading-display: 1;
+  --leading-heading: 1.05;
+  --leading-subheading: 1.15;
+  --leading-body: 1.45;
+  --leading-small: 1.35;
+  --leading-caption: 1.3;
+  --leading-code: 1.5;
+
+  /* Letter spacing */
+  --tracking-hero: -0.025em;
+  --tracking-display: -0.02em;
+  --tracking-heading: -0.0125em;
+  --tracking-subheading: -0.0075em;
+  --tracking-body: 0em;
+  --tracking-small: 0em;
+  --tracking-caption: -0.005em;
+  --tracking-code: 0em;
+
+  /* Spacing */
+  --space-2xs: #{fluid-space(4, 4)};
+  --space-xs: #{fluid-space(8, 8)};
+  --space-sm: #{fluid-space(12, 16)};
+  --space-md: #{fluid-space(20, 24)};
+  --space-lg: #{fluid-space(32, 40)};
+  --space-xl: #{fluid-space(48, 64)};
+  --space-2xl: #{fluid-space(72, 96)};
+  --space-3xl: #{fluid-space(96, 128)};
+  --space-4xl: #{fluid-space(128, 176)};
+  --space-5xl: #{fluid-space(160, 224)};
+  --space-6xl: #{fluid-space(208, 288)};
+
+  /* Layout */
+  --layout-page-x: #{fluid-space(20, 48)};
+  --layout-section-y: #{fluid-space(72, 128)};
+  --layout-grid-gap: #{fluid-space(16, 32)};
+
+  /* Radius */
+  --radius-scale: 0;
+  --radius-card: calc(0.5rem * var(--radius-scale));
+
+  /* Semantic. Dark is the default theme; light is the alternate. */
+  --background: var(--black);
+  --surface: var(--grey-dark);
+  --surface-sunken: var(--ink);
+  --foreground: var(--white);
+  --muted: var(--grey-mid);
+  --border: var(--grey-dark);
+  --inverse-background: var(--white);
+  --inverse-foreground: var(--black);
+  color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --background: var(--white);
+  --surface: var(--grey-lightest);
+  --surface-sunken: var(--grey-light);
+  --foreground: var(--black);
+  --muted: var(--grey-mid);
+  --border: var(--grey-light);
+  --inverse-background: var(--black);
+  --inverse-foreground: var(--white);
+  color-scheme: light;
+}
+
+@theme {
+  /* Colors */
+  --color-white: var(--white);
+  --color-black: var(--black);
+  --color-grey-dark: var(--grey-dark);
+  --color-grey-mid: var(--grey-mid);
+  --color-grey-light: var(--grey-light);
+  --color-grey-lightest: var(--grey-lightest);
+  --color-ink: var(--ink);
+  --color-brand: var(--brand);
+  --color-accent: var(--accent);
+
+  /* Semantic */
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-inverse-background: var(--inverse-background);
+  --color-inverse-foreground: var(--inverse-foreground);
+
+  /* Typography */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --text-hero: var(--type-hero-size);
+  --text-hero--line-height: var(--leading-hero);
+  --text-hero--letter-spacing: var(--tracking-hero);
+
+  --text-display: var(--type-display-size);
+  --text-display--line-height: var(--leading-display);
+  --text-display--letter-spacing: var(--tracking-display);
+
+  --text-heading: var(--type-heading-size);
+  --text-heading--line-height: var(--leading-heading);
+  --text-heading--letter-spacing: var(--tracking-heading);
+
+  --text-subheading: var(--type-subheading-size);
+  --text-subheading--line-height: var(--leading-subheading);
+  --text-subheading--letter-spacing: var(--tracking-subheading);
+
+  --text-body: var(--type-body-size);
+  --text-body--line-height: var(--leading-body);
+  --text-body--letter-spacing: var(--tracking-body);
+
+  --text-small: var(--type-small-size);
+  --text-small--line-height: var(--leading-small);
+  --text-small--letter-spacing: var(--tracking-small);
+
+  --text-caption: var(--type-caption-size);
+  --text-caption--line-height: var(--leading-caption);
+  --text-caption--letter-spacing: var(--tracking-caption);
+
+  --text-mono-small: var(--type-mono-small-size);
+  --text-mono-small--line-height: var(--leading-small);
+  --text-mono-small--letter-spacing: var(--tracking-caption);
+
+  --text-mono-caption: var(--type-mono-caption-size);
+  --text-mono-caption--line-height: var(--leading-caption);
+  --text-mono-caption--letter-spacing: var(--tracking-caption);
+
+  --text-mono-code: var(--type-mono-code-size);
+  --text-mono-code--line-height: var(--leading-code);
+  --text-mono-code--letter-spacing: var(--tracking-code);
+
+  /* Spacing */
+  --spacing-2xs: var(--space-2xs);
+  --spacing-xs: var(--space-xs);
+  --spacing-sm: var(--space-sm);
+  --spacing-md: var(--space-md);
+  --spacing-lg: var(--space-lg);
+  --spacing-xl: var(--space-xl);
+  --spacing-2xl: var(--space-2xl);
+  --spacing-3xl: var(--space-3xl);
+  --spacing-4xl: var(--space-4xl);
+  --spacing-5xl: var(--space-5xl);
+  --spacing-6xl: var(--space-6xl);
+
+  --spacing-page-x: var(--layout-page-x);
+  --spacing-section-y: var(--layout-section-y);
+  --spacing-grid-gap: var(--layout-grid-gap);
+
+  --radius-card: var(--radius-card);
+}

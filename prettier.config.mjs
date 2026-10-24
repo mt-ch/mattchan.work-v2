@@ -13,7 +13,7 @@ const config = {
   arrowParens: "always",
   endOfLine: "lf",
 
-  tailwindStylesheet: "./app/globals.css",
+  // tailwindStylesheet: "./app/globals.scss",
   tailwindFunctions: ["cn", "clsx"],
 };
 
