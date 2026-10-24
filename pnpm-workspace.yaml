@@ -2,6 +2,7 @@ allowBuilds:
   unrs-resolver: true
   esbuild: true
   sharp: true
+  "@parcel/watcher": false
 minimumReleaseAgeExclude:
   - "@next/env@16.4.3"
   - "@next/swc-darwin-arm64@16.4.3"
