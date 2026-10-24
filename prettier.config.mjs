@@ -13,8 +13,8 @@ const config = {
   arrowParens: "always",
   endOfLine: "lf",
 
-  // The plugin cannot read the Sass entry (app/globals.scss).
-  tailwindStylesheet: "./styles/prettier.css",
+  // Tailwind CSS v4 (theme + @theme live in this entry file)
+  // tailwindStylesheet: "./src/app/globals.scss",
   tailwindFunctions: ["cn", "clsx"],
 };
 

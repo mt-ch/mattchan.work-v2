@@ -1,3 +1,0 @@
-/* Tailwind entry for prettier-plugin-tailwindcss only. The plugin can't
-   compile Sass, so this stands in for app/globals.scss when sorting classes. */
-@import "tailwindcss";

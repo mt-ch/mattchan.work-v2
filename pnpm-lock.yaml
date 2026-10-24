@@ -7,6 +7,21 @@ settings:
 importers:
   .:
     dependencies:
+      "@blobatar/react":
+        specifier: ^2.7.0
+        version: 2.7.0(blobatar@2.7.0(react@19.3.1))(react@19.3.1)
+      "@fortawesome/fontawesome-svg-core":
+        specifier: ^7.3.1
+        version: 7.3.1
+      "@fortawesome/free-brands-svg-icons":
+        specifier: ^7.3.1
+        version: 7.3.1
+      "@fortawesome/free-solid-svg-icons":
+        specifier: ^7.3.1
+        version: 7.3.1
+      "@fortawesome/react-fontawesome":
+        specifier: ^3.5.0
+        version: 3.5.0(@fortawesome/fontawesome-svg-core@7.3.1)(react@19.3.1)
       "@sanity/vision":
         specifier: ^6.20.0
         version: 6.20.0(66489f12a7c8d283e88c6a770378f2f7)
@@ -1095,6 +1110,15 @@ packages:
       }
     engines: { node: ">=6.9.0" }
 
+  "@blobatar/react@2.7.0":
+    resolution:
+      {
+        integrity: sha512-rysDM1+2qoeIwIezVw/em+ZxOMyqqjqJOGNEvtOOU1nFp0jmzyEjlXtJTDM6xPKamq59pq6wcG9+mHIUZV572A==,
+      }
+    peerDependencies:
+      blobatar: 2.x
+      react: ">=18"
+
   "@bramus/specificity@2.4.3":
     resolution:
       {
@@ -1419,6 +1443,44 @@ packages:
       {
         integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==,
       }
+
+  "@fortawesome/fontawesome-common-types@7.3.1":
+    resolution:
+      {
+        integrity: sha512-k0C0sdHmZtAo6dRDtd1Z/qcpyHbL0CKsjV8seMY/21xGhY5Wsv0XRmiI/xEEH4y2c9b1+jvgNs/3EqhV27yUEA==,
+      }
+    engines: { node: ">=6" }
+
+  "@fortawesome/fontawesome-svg-core@7.3.1":
+    resolution:
+      {
+        integrity: sha512-BoxVN3PKnMbgStHhjoaky/oWdxHomDqmBVA24IA3KEmssFGeI7u9YT/BJceOjIum/t6TpPa/vcMKaVYQeIQ/3Q==,
+      }
+    engines: { node: ">=6" }
+
+  "@fortawesome/free-brands-svg-icons@7.3.1":
+    resolution:
+      {
+        integrity: sha512-8eiNzycuFhy3mZsi5EVO8JpO3H8l7/kSCl4Gk4iUew9hJuzYFqAAD6kqgeEup3+YZ9hL+5cjjorGzrRLkYuURg==,
+      }
+    engines: { node: ">=6" }
+
+  "@fortawesome/free-solid-svg-icons@7.3.1":
+    resolution:
+      {
+        integrity: sha512-v0BLa0eqg7ubvVWeNSHVBs8fWH/GJicERZoJaxJ3FE/lj67VSqzoMg9pzfZVOfLMX10y0pGwQAuxoRVVH2patg==,
+      }
+    engines: { node: ">=6" }
+
+  "@fortawesome/react-fontawesome@3.5.0":
+    resolution:
+      {
+        integrity: sha512-63mlRr6fiBbJ0wjr1Cf6dsDGtP2lNvk9lnatKgxs/fIkhslsZT291hIUzJkuUkI9yr69ZvWnWfgb2qXm4QyVaA==,
+      }
+    engines: { node: ">=20" }
+    peerDependencies:
+      "@fortawesome/fontawesome-svg-core": ~6 || ~7
+      react: ^18.0.0 || ^19.0.0
 
   "@humanfs/core@0.19.2":
     resolution:
@@ -11084,6 +11146,11 @@ snapshots:
       "@babel/helper-string-parser": 7.29.7
       "@babel/helper-validator-identifier": 7.29.7
 
+  "@blobatar/react@2.7.0(blobatar@2.7.0(react@19.3.1))(react@19.3.1)":
+    dependencies:
+      blobatar: 2.7.0(react@19.3.1)
+      react: 19.3.1
+
   "@bramus/specificity@2.4.3":
     dependencies:
       css-tree: 3.2.1
@@ -11312,6 +11379,25 @@ snapshots:
       react-dom: 19.3.1(react@19.3.1)
 
   "@floating-ui/utils@0.2.12": {}
+
+  "@fortawesome/fontawesome-common-types@7.3.1": {}
+
+  "@fortawesome/fontawesome-svg-core@7.3.1":
+    dependencies:
+      "@fortawesome/fontawesome-common-types": 7.3.1
+
+  "@fortawesome/free-brands-svg-icons@7.3.1":
+    dependencies:
+      "@fortawesome/fontawesome-common-types": 7.3.1
+
+  "@fortawesome/free-solid-svg-icons@7.3.1":
+    dependencies:
+      "@fortawesome/fontawesome-common-types": 7.3.1
+
+  "@fortawesome/react-fontawesome@3.5.0(@fortawesome/fontawesome-svg-core@7.3.1)(react@19.3.1)":
+    dependencies:
+      "@fortawesome/fontawesome-svg-core": 7.3.1
+      react: 19.3.1
 
   "@humanfs/core@0.19.2":
     dependencies:

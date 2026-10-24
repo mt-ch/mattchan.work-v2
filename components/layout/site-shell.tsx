@@ -11,14 +11,18 @@ export function SiteShell({
   bottom?: React.ReactNode;
 }) {
   return (
-    <div className="mx-auto flex min-h-screen max-w-[1440px] flex-col gap-grid-gap p-sm md:flex-row md:p-4">
-      <aside className="flex flex-col gap-md md:sticky md:top-4 md:order-2 md:h-[calc(100vh-2rem)] md:w-[459px] md:shrink-0">
-        <IdentityCard />
-        <IconButtonRow />
-        <div>{middle}</div>
-        <div className="mt-auto flex flex-col gap-sm">{bottom}</div>
+    <div className="gap-grid-gap p-xs mx-auto grid min-h-screen grid-cols-12">
+      <aside className="gap-md relative col-span-12 flex flex-col justify-between lg:sticky lg:order-2 lg:col-span-4 lg:shrink-0">
+        <div className="gap-2xs flex flex-col">
+          <IdentityCard />
+          <IconButtonRow />
+        </div>
+        <div className="absolute top-1/2 left-0 w-full -translate-y-1/2">
+          {middle}
+        </div>
+        <div className="gap-sm flex flex-col">{bottom}</div>
       </aside>
-      <main className="flex flex-1 flex-col gap-grid-gap md:order-1">
+      <main className="gap-grid-gap col-span-12 flex flex-1 flex-col lg:order-1 lg:col-span-8">
         {children}
       </main>
     </div>

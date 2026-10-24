@@ -43,13 +43,13 @@ export default function HomePage() {
   return (
     <SiteShell
       middle={
-        <div className="hidden md:block">
+        <div className="hidden lg:block">
           <ProjectList projects={projects} />
         </div>
       }
       bottom={
         <>
-          <p className="text-caption font-mono">
+          <p className="text-small text-foreground">
             Frontend engineer based in the United Kingdom. Specialising in
             building scalable, product-focused applications since 2020.
           </p>

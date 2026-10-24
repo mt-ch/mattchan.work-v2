@@ -19,12 +19,11 @@ const projects = [
 ];
 
 describe("ProjectList", () => {
-  it("shows each project's name, year and discipline as a link to its Work page", () => {
+  it("shows each project's name and discipline as a link to its Work page", () => {
     render(<ProjectList projects={projects} />);
 
     const link = screen.getByRole("link", { name: /The Home Hospital/ });
     expect(link).toHaveAttribute("href", "/work/the-home-hospital");
-    expect(link).toHaveTextContent("2026");
     expect(link).toHaveTextContent("Branding + Development");
   });
 

@@ -15,7 +15,7 @@ export function ProjectList({
   activeSlug?: string;
 }) {
   return (
-    <ul className="text-mono-caption font-mono">
+    <ul className="text-small text-foreground gap-xs flex flex-col font-normal">
       {projects.map((project) => {
         const active = project.slug === activeSlug;
         return (
@@ -23,13 +23,15 @@ export function ProjectList({
             <Link
               href={`/work/${project.slug}`}
               aria-current={active ? "page" : undefined}
-              className="gap-grid-gap px-sm py-xs hover:bg-inverse-background hover:text-inverse-foreground aria-[current=page]:bg-inverse-background aria-[current=page]:text-inverse-foreground grid grid-cols-[1fr_auto_1fr]"
+              className="p-sm bg-surface hover:bg-inverse-background hover:text-inverse-foreground aria-[current=page]:bg-inverse-background aria-[current=page]:text-inverse-foreground flex items-center justify-between rounded-md"
             >
               <span>{project.name}</span>
-              <span>{project.year}</span>
-              <span className="text-right">
-                {project.discipline.join(" + ")}
-              </span>
+              <div className="text-muted">
+                {/* <span>{project.year}</span> */}
+                <span className="text-right">
+                  {project.discipline.join(" + ")}
+                </span>
+              </div>
             </Link>
           </li>
         );
