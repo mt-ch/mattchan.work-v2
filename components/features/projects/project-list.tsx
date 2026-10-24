@@ -15,7 +15,7 @@ export function ProjectList({
   activeSlug?: string;
 }) {
   return (
-    <ul className="font-mono text-caption">
+    <ul className="font-mono text-mono-caption">
       {projects.map((project) => {
         const active = project.slug === activeSlug;
         return (
