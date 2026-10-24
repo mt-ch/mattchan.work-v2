@@ -33,13 +33,6 @@ export const textBlock = defineType({
       initialValue: "default",
     }),
     defineField({
-      name: "mockup",
-      title: "Phone mockup",
-      description: "Render the tile as a phone-mockup tile.",
-      type: "boolean",
-      initialValue: false,
-    }),
-    defineField({
       name: "layout",
       title: "Layout",
       type: "string",

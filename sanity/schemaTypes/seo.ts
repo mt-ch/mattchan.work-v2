@@ -2,7 +2,7 @@ import { defineField, defineType } from "sanity";
 
 // Reusable per-page SEO controls. Embedded in documents (currently `project`)
 // inside a collapsed "SEO" field group. Every field is optional — blank fields
-// fall back through the three-tier chain in lib/seo/resolveSeo.
+// fall back through the page, About and site-default tiers.
 export const seo = defineType({
   name: "seo",
   title: "SEO",
