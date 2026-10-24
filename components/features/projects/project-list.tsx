@@ -15,7 +15,7 @@ export function ProjectList({
   activeSlug?: string;
 }) {
   return (
-    <ul className="font-mono text-mono-caption">
+    <ul className="text-mono-caption font-mono">
       {projects.map((project) => {
         const active = project.slug === activeSlug;
         return (
@@ -23,7 +23,7 @@ export function ProjectList({
             <Link
               href={`/work/${project.slug}`}
               aria-current={active ? "page" : undefined}
-              className="grid grid-cols-[1fr_auto_1fr] gap-grid-gap px-sm py-xs hover:bg-inverse-background hover:text-inverse-foreground aria-[current=page]:bg-inverse-background aria-[current=page]:text-inverse-foreground"
+              className="gap-grid-gap px-sm py-xs hover:bg-inverse-background hover:text-inverse-foreground aria-[current=page]:bg-inverse-background aria-[current=page]:text-inverse-foreground grid grid-cols-[1fr_auto_1fr]"
             >
               <span>{project.name}</span>
               <span>{project.year}</span>

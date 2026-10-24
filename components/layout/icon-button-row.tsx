@@ -10,13 +10,13 @@ const paths: Record<(typeof siteLinks)[number]["label"], string> = {
 
 export function IconButtonRow() {
   return (
-    <ul className="flex gap-xs">
+    <ul className="gap-xs flex">
       {siteLinks.map(({ label, href }) => (
         <li key={label}>
           <a
             href={href}
             aria-label={label}
-            className="flex size-10 items-center justify-center bg-surface hover:bg-inverse-background hover:text-inverse-foreground"
+            className="bg-surface hover:bg-inverse-background hover:text-inverse-foreground flex size-10 items-center justify-center"
           >
             <svg
               aria-hidden
