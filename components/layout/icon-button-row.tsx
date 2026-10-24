@@ -36,7 +36,7 @@ export function IconButtonRow() {
             aria-label={label}
             className="bg-surface hover:bg-inverse-background hover:text-inverse-foreground p-sm flex w-full items-center justify-center rounded-md"
           >
-            <FontAwesomeIcon icon={icon} className="size-4.5" />
+            <FontAwesomeIcon icon={icon} className="size-[calc(var(--space-sm)*1.2)]" />
           </a>
         </li>
       ))}
