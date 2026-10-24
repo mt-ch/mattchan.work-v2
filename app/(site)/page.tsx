@@ -1,6 +1,9 @@
-import { Availability } from "./_components/availability";
-import { ProjectList, type ProjectListItem } from "./_components/project-list";
-import { SiteShell } from "./_components/site-shell";
+import { Availability } from "@/components/ui/availability";
+import {
+  ProjectList,
+  type ProjectListItem,
+} from "@/components/features/projects/project-list";
+import { SiteShell } from "@/components/layout/site-shell";
 
 // TODO(#12): replace with Featured Projects and About from Sanity.
 const projects: ProjectListItem[] = [
