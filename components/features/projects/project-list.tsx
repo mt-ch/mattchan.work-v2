@@ -3,7 +3,7 @@ import Link from "next/link";
 export type ProjectListItem = {
   slug: string;
   name: string;
-  year: number;
+  year?: number;
   discipline: string[];
 };
 
