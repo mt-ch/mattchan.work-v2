@@ -7,6 +7,7 @@ import { defineQuery } from "groq";
 export const projectsQuery = defineQuery(`
   *[_type == "project"] | order(order asc) {
     _id,
+    _updatedAt,
     title,
     slug,
     summary,
@@ -17,7 +18,8 @@ export const projectsQuery = defineQuery(`
       "metadata": asset->metadata { lqip, dimensions }
     },
     "coverVideoUrl": coverVideo.asset->url,
-    order
+    order,
+    seo { noIndex }
   }
 `);
 
@@ -76,6 +78,7 @@ export const projectBySlugQuery = defineQuery(`
 export const aboutQuery = defineQuery(`
   *[_type == "about"][0] {
     _id,
+    _updatedAt,
     name,
     headline,
     bio,

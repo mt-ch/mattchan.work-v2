@@ -1,3 +1,6 @@
+import type { Metadata } from "next";
+import type { Image } from "sanity";
+
 import {
   bioToText,
   toProjectListItems,
@@ -13,6 +16,24 @@ import { toStreamTiles } from "@/components/features/landing/stream-data";
 import { SiteShell } from "@/components/layout/site-shell";
 import { Availability } from "@/components/ui/availability";
 import { getAbout, getProjects } from "@/lib/sanity";
+import { buildMetadata } from "@/lib/seo/buildMetadata";
+import { resolveSeo, type SeoObject } from "@/lib/seo/resolveSeo";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const about = await getAbout();
+  const seo = resolveSeo(
+    {
+      title: about?.siteName ?? about?.name,
+      seo: about?.seo as SeoObject | null,
+    },
+    {
+      siteName: about?.siteName ?? about?.name,
+      defaultMetaDescription: about?.defaultMetaDescription,
+      defaultOgImage: about?.defaultOgImage as Image | null | undefined,
+    },
+  );
+  return buildMetadata(seo, "/");
+}
 
 export default async function HomePage() {
   const [about, projects] = await Promise.all([getAbout(), getProjects()]);
