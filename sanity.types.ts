@@ -87,6 +87,13 @@ export type Seo = {
   noIndex?: boolean;
 };
 
+export type SanityFileAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
+};
+
 export type Project = {
   _id: string;
   _type: "project";
@@ -103,6 +110,11 @@ export type Project = {
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
     _type: "image";
+  };
+  coverVideo?: {
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
   };
   story?: Array<
     | ({
@@ -143,13 +155,6 @@ export type Slug = {
   _type: "slug";
   current?: string;
   source?: string;
-};
-
-export type SanityFileAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
 };
 
 export type About = {
@@ -305,11 +310,11 @@ export type AllSanitySchemaTypes =
   | ImageBlock
   | TextBlock
   | Seo
+  | SanityFileAssetReference
   | Project
   | SanityImageCrop
   | SanityImageHotspot
   | Slug
-  | SanityFileAssetReference
   | About
   | SanityImagePaletteSwatch
   | SanityImagePalette
@@ -322,7 +327,7 @@ export type AllSanitySchemaTypes =
 
 // Source: lib/sanity/queries.ts
 // Variable: projectsQuery
-// Query: *[_type == "project"] | order(order asc) {    _id,    title,    slug,    summary,    discipline,    dateCompleted,    coverImage {      ...,      "metadata": asset->metadata { lqip, dimensions }    },    order  }
+// Query: *[_type == "project"] | order(order asc) {    _id,    title,    slug,    summary,    discipline,    dateCompleted,    coverImage {      ...,      "metadata": asset->metadata { lqip, dimensions }    },    "coverVideoUrl": coverVideo.asset->url,    order  }
 export type ProjectsQueryResult = Array<{
   _id: string;
   title: string | null;
@@ -341,6 +346,7 @@ export type ProjectsQueryResult = Array<{
       dimensions: SanityImageDimensions | null;
     } | null;
   } | null;
+  coverVideoUrl: string | null;
   order: number | null;
 }>;
 
@@ -534,7 +540,7 @@ export type AboutQueryResult = {
 // Query TypeMap
 declare global {
   interface SanityQueries {
-    '\n  *[_type == "project"] | order(order asc) {\n    _id,\n    title,\n    slug,\n    summary,\n    discipline,\n    dateCompleted,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    order\n  }\n': ProjectsQueryResult;
+    '\n  *[_type == "project"] | order(order asc) {\n    _id,\n    title,\n    slug,\n    summary,\n    discipline,\n    dateCompleted,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    "coverVideoUrl": coverVideo.asset->url,\n    order\n  }\n': ProjectsQueryResult;
     '\n  *[_type == "project" && _id != $currentId] | order(order asc) [0...2] {\n    _id,\n    title,\n    slug,\n    discipline,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    order\n  }\n': OtherProjectsQueryResult;
     '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    summary,\n    discipline,\n    dateCompleted,\n    links,\n    order,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    story[] {\n      ...,\n      _type == "imageBlock" => {\n        ...,\n        image {\n          ...,\n          "metadata": asset->metadata { lqip, dimensions }\n        },\n        secondImage {\n          ...,\n          "metadata": asset->metadata { lqip, dimensions }\n        }\n      }\n    },\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage,\n      ogImageAlt,\n      noIndex\n    }\n  }\n': ProjectBySlugQueryResult;
     '\n  *[_type == "about"][0] {\n    _id,\n    name,\n    headline,\n    bio,\n    availability {\n      status,\n      isAvailable\n    },\n    "resumeUrl": resumeFile.asset->url,\n    email,\n    githubUrl,\n    linkedinUrl,\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage,\n      ogImageAlt,\n      noIndex\n    },\n    siteName,\n    titleTemplate,\n    defaultMetaDescription,\n    defaultOgImage\n  }\n': AboutQueryResult;

@@ -7,6 +7,8 @@ export type StreamTile = {
   width: number;
   height: number;
   blurDataURL?: string;
+  /** Optional muted looping cover video; `src` is its poster. */
+  videoSrc?: string;
 };
 
 type ProjectInput = {
@@ -16,6 +18,7 @@ type ProjectInput = {
     asset?: unknown;
     metadata: { lqip: string | null } | null;
   } | null;
+  coverVideoUrl?: string | null;
 };
 
 export const TILE_WIDTH = 1600;
@@ -40,6 +43,7 @@ export function toStreamTiles(projects: ProjectInput[]): StreamTile[] {
         width: TILE_WIDTH,
         height: TILE_HEIGHT,
         blurDataURL: cover.metadata?.lqip ?? undefined,
+        videoSrc: project.coverVideoUrl ?? undefined,
       },
     ];
   });

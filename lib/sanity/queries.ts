@@ -16,6 +16,7 @@ export const projectsQuery = defineQuery(`
       ...,
       "metadata": asset->metadata { lqip, dimensions }
     },
+    "coverVideoUrl": coverVideo.asset->url,
     order
   }
 `);
