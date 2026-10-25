@@ -41,3 +41,15 @@ describe("toStreamTiles", () => {
     expect(without.videoSrc).toBeUndefined();
   });
 });
+
+describe("toStreamTiles discipline", () => {
+  it("carries disciplines, defaulting to none", () => {
+    const base = { title: "A", slug: { current: "a" }, coverImage: cover };
+    const [withDiscipline, without] = toStreamTiles([
+      { ...base, discipline: ["Design", "AI"] },
+      base,
+    ]);
+    expect(withDiscipline.discipline).toEqual(["Design", "AI"]);
+    expect(without.discipline).toEqual([]);
+  });
+});

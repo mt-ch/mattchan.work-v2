@@ -7,12 +7,14 @@ export type StreamTile = {
   width: number;
   height: number;
   blurDataURL?: string;
+  discipline: string[];
   /** Optional muted looping cover video; `src` is its poster. */
   videoSrc?: string;
 };
 
 type ProjectInput = {
   title: string | null;
+  discipline?: string[] | null;
   slug: { current?: string } | null;
   coverImage: {
     asset?: unknown;
@@ -33,6 +35,7 @@ export function toStreamTiles(projects: ProjectInput[]): StreamTile[] {
       {
         slug: project.slug.current,
         title: project.title,
+        discipline: project.discipline ?? [],
         // Sanity crops to 16:9 around the Studio hotspot, so no excess pixels.
         src: urlFor(cover as Parameters<typeof urlFor>[0])
           .width(TILE_WIDTH)
