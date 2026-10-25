@@ -21,13 +21,11 @@ export function SiteShell({
 }) {
   return (
     <div
-      className={`gap-sm px-sm mx-auto grid grid-cols-12 ${
-        fixed
-          ? "h-dvh grid-rows-[auto_minmax(0,1fr)] overflow-hidden lg:grid-rows-1"
-          : "min-h-screen"
+      className={`gap-sm px-sm mx-auto flex flex-col justify-between lg:grid lg:grid-cols-12 ${
+        fixed ? "h-dvh overflow-hidden lg:grid-rows-1" : "min-h-screen"
       }`}
     >
-      <aside className="gap-md py-sm relative col-span-12 flex flex-col justify-between lg:sticky lg:order-2 lg:col-span-4 lg:shrink-0">
+      <aside className="gap-md py-sm relative col-span-12 flex h-full flex-col justify-between lg:sticky lg:order-2 lg:col-span-4 lg:shrink-0">
         <div className="gap-2xs flex flex-col">
           <IdentityCard {...identity} />
           <IconButtonRow links={links} />
@@ -35,9 +33,9 @@ export function SiteShell({
         <div className="absolute top-1/2 left-0 w-full -translate-y-1/2">
           {middle}
         </div>
-        <div className="gap-sm flex flex-col">{bottom}</div>
+        <div className="gap-sm my-auto flex flex-col lg:my-0">{bottom}</div>
       </aside>
-      <main className="gap-sm col-span-12 flex flex-1 flex-col lg:order-1 lg:col-span-8">
+      <main className="lg:gap-sm pb-sm lg:order-1 lg:col-span-8 lg:flex lg:flex-1 lg:flex-col lg:pb-0">
         {children}
       </main>
     </div>

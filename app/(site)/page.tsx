@@ -8,6 +8,7 @@ import {
   ActiveProjectProvider,
 } from "@/components/features/landing/active-project";
 import { ImageStream } from "@/components/features/landing/image-stream";
+import { MobileCarousel } from "@/components/features/landing/mobile-carousel";
 import { toStreamTiles } from "@/components/features/landing/stream-data";
 import { SiteShell } from "@/components/layout/site-shell";
 import { Availability } from "@/components/ui/availability";
@@ -51,6 +52,7 @@ export default async function HomePage() {
         }
       >
         <ImageStream tiles={tiles} />
+        <MobileCarousel tiles={tiles} />
       </SiteShell>
     </ActiveProjectProvider>
   );
