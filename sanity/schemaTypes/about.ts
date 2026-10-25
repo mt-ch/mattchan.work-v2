@@ -67,29 +67,14 @@ export const about = defineType({
       validation: (rule) => rule.required().email(),
     }),
     defineField({
-      name: "socialLinks",
-      title: "Social links",
-      type: "array",
-      of: [
-        {
-          type: "object",
-          name: "socialLink",
-          fields: [
-            defineField({
-              name: "platform",
-              title: "Platform",
-              type: "string",
-              validation: (rule) => rule.required(),
-            }),
-            defineField({
-              name: "url",
-              title: "URL",
-              type: "url",
-              validation: (rule) => rule.required(),
-            }),
-          ],
-        },
-      ],
+      name: "githubUrl",
+      title: "GitHub URL",
+      type: "url",
+    }),
+    defineField({
+      name: "linkedinUrl",
+      title: "LinkedIn URL",
+      type: "url",
     }),
     defineField({
       name: "seo",

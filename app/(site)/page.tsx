@@ -1,61 +1,41 @@
-import { Availability } from "@/components/ui/availability";
 import {
-  ProjectList,
-  type ProjectListItem,
-} from "@/components/features/projects/project-list";
+  bioToText,
+  toProjectListItems,
+  toSiteLinks,
+} from "@/components/features/landing/sidebar-data";
+import { ProjectList } from "@/components/features/projects/project-list";
 import { SiteShell } from "@/components/layout/site-shell";
+import { Availability } from "@/components/ui/availability";
+import { getAbout, getProjects } from "@/lib/sanity";
 
-// TODO(#12): replace with Featured Projects and About from Sanity.
-const projects: ProjectListItem[] = [
-  {
-    slug: "the-home-hospital",
-    name: "The Home Hospital",
-    year: 2026,
-    discipline: ["Branding", "Development"],
-  },
-  {
-    slug: "matt-chan-work",
-    name: "Matt Chan Work",
-    year: 2026,
-    discipline: ["Design", "Development"],
-  },
-  {
-    slug: "pertemps",
-    name: "Pertemps",
-    year: 2024,
-    discipline: ["Development"],
-  },
-  {
-    slug: "ise-partners",
-    name: "ISE Partners",
-    year: 2023,
-    discipline: ["Development"],
-  },
-  {
-    slug: "mother-goods",
-    name: "Mother Goods",
-    year: 2022,
-    discipline: ["Development"],
-  },
-];
+export default async function HomePage() {
+  const [about, projects] = await Promise.all([getAbout(), getProjects()]);
 
-export default function HomePage() {
   return (
     <SiteShell
+      fixed
+      identity={{ name: about?.name ?? "", headline: about?.headline ?? "" }}
+      links={toSiteLinks({
+        email: about?.email ?? null,
+        githubUrl: about?.githubUrl ?? null,
+        linkedinUrl: about?.linkedinUrl ?? null,
+        resumeUrl: about?.resumeUrl ?? null,
+      })}
       middle={
         <div className="hidden lg:block">
-          <ProjectList projects={projects} />
+          <ProjectList projects={toProjectListItems(projects)} />
         </div>
       }
       bottom={
         <>
-          <p className="text-small text-foreground">
-            Frontend engineer based in the United Kingdom. Specialising in
-            building scalable, product-focused applications since 2020.
+          <p className="text-small text-foreground whitespace-pre-line">
+            {bioToText(about?.bio ?? null)}
           </p>
-          <Availability>
-            Available for collaborations or full time roles.
-          </Availability>
+          {about?.availability?.status ? (
+            <Availability isAvailable={about.availability.isAvailable ?? false}>
+              {about.availability.status}
+            </Availability>
+          ) : null}
         </>
       }
     >
