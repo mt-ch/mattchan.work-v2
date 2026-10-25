@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useActiveProject } from "./active-project";
 import type { StreamTile } from "./stream-data";
+import { TileVideo } from "./tile-video";
 import {
   BASE_SPEED,
   activeTileIndex,
@@ -91,10 +92,11 @@ export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
     };
     gsap.ticker.add(tick);
 
+    // Listens on the whole window so scrolling anywhere drives the stream.
     // wheelSpeed -1 makes wheel-down and finger-drag-up both negative, so
     // `-deltaY` is the direction the stream should flow.
     const observer = Observer.create({
-      target: viewport,
+      target: window,
       type: "wheel,touch",
       wheelSpeed: -1,
       tolerance: 1,
@@ -110,7 +112,15 @@ export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
       },
     });
 
+    // The stream is hidden below `lg`; leave native page scroll alone there.
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const syncObserver = () =>
+      desktop.matches ? observer.enable() : observer.disable();
+    syncObserver();
+    desktop.addEventListener("change", syncObserver);
+
     return () => {
+      desktop.removeEventListener("change", syncObserver);
       observer.kill();
       gsap.ticker.remove(tick);
       resize.disconnect();
@@ -135,7 +145,7 @@ export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
               draggable={false}
               aria-hidden={copy > 0 || undefined}
               tabIndex={copy > 0 ? -1 : undefined}
-              className="block shrink-0 overflow-hidden rounded-md"
+              className="relative block shrink-0 overflow-hidden rounded-md"
             >
               <Image
                 src={tile.src}
@@ -148,6 +158,7 @@ export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
                 draggable={false}
                 className="aspect-16/9 h-auto w-full object-cover"
               />
+              {tile.videoSrc ? <TileVideo src={tile.videoSrc} /> : null}
             </Link>
           )),
         )}

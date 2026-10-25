@@ -26,4 +26,18 @@ describe("toStreamTiles", () => {
       ]),
     ).toEqual([]);
   });
+
+  it("carries the cover video url when present", () => {
+    const [withVideo, without] = toStreamTiles([
+      {
+        title: "A",
+        slug: { current: "a" },
+        coverImage: cover,
+        coverVideoUrl: "https://cdn.sanity.io/files/p/d/abc.mp4",
+      },
+      { title: "B", slug: { current: "b" }, coverImage: cover },
+    ]);
+    expect(withVideo.videoSrc).toBe("https://cdn.sanity.io/files/p/d/abc.mp4");
+    expect(without.videoSrc).toBeUndefined();
+  });
 });

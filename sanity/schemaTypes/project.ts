@@ -42,6 +42,15 @@ export const project = defineType({
       description: "Mobile carousel slide, Next Up thumbnail and OG fallback.",
       type: "image",
       options: { hotspot: true },
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "coverVideo",
+      title: "Cover video",
+      description:
+        "Optional. Plays muted and looping in the Landing tile; the cover image stays as the poster and fallback.",
+      type: "file",
+      options: { accept: "video/*" },
     }),
     defineField({
       name: "story",
