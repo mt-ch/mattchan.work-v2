@@ -41,14 +41,11 @@ describe("toProjectListItems", () => {
 });
 
 describe("toSiteLinks", () => {
-  it("builds email, social and résumé links, skipping missing ones", () => {
+  it("builds email, GitHub, LinkedIn and résumé links in order", () => {
     const links = toSiteLinks({
       email: "a@b.co",
-      socialLinks: [
-        { platform: "LinkedIn", url: "https://linkedin.com/in/x" },
-        { platform: "GitHub", url: "https://github.com/x" },
-        { platform: "Nothing" },
-      ],
+      githubUrl: "https://github.com/x",
+      linkedinUrl: "https://linkedin.com/in/x",
       resumeUrl: "https://cdn/resume.pdf",
     });
 
@@ -60,9 +57,14 @@ describe("toSiteLinks", () => {
     ]);
   });
 
-  it("omits email and résumé when absent", () => {
+  it("omits links that are not set", () => {
     expect(
-      toSiteLinks({ email: null, socialLinks: null, resumeUrl: null }),
+      toSiteLinks({
+        email: null,
+        githubUrl: null,
+        linkedinUrl: null,
+        resumeUrl: null,
+      }),
     ).toEqual([]);
   });
 });

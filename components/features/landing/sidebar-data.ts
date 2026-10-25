@@ -1,5 +1,5 @@
 import type { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faAt, faFile, faLink } from "@fortawesome/free-solid-svg-icons";
+import { faAt, faFile } from "@fortawesome/free-solid-svg-icons";
 import { faGithub, faSquareLinkedin } from "@fortawesome/free-brands-svg-icons";
 
 import type { ProjectListItem } from "@/components/features/projects/project-list";
@@ -31,27 +31,25 @@ export function toProjectListItems(
   });
 }
 
-const platformIcons: Record<string, IconProp> = {
-  linkedin: faSquareLinkedin,
-  github: faGithub,
-};
-
 export function toSiteLinks(about: {
   email: string | null;
-  socialLinks: { platform?: string; url?: string }[] | null;
+  githubUrl: string | null;
+  linkedinUrl: string | null;
   resumeUrl: string | null;
 }): SiteLink[] {
   const links: SiteLink[] = [];
   if (about.email) {
     links.push({ label: "Email", href: `mailto:${about.email}`, icon: faAt });
   }
-  for (const { platform, url } of about.socialLinks ?? []) {
-    if (!platform || !url) continue;
+  if (about.linkedinUrl) {
     links.push({
-      label: platform,
-      href: url,
-      icon: platformIcons[platform.toLowerCase()] ?? faLink,
+      label: "LinkedIn",
+      href: about.linkedinUrl,
+      icon: faSquareLinkedin,
     });
+  }
+  if (about.githubUrl) {
+    links.push({ label: "GitHub", href: about.githubUrl, icon: faGithub });
   }
   if (about.resumeUrl) {
     links.push({ label: "Resume", href: about.resumeUrl, icon: faFile });

@@ -188,12 +188,8 @@ export type About = {
     _type: "file";
   };
   email?: string;
-  socialLinks?: Array<{
-    platform?: string;
-    url?: string;
-    _type: "socialLink";
-    _key: string;
-  }>;
+  githubUrl?: string;
+  linkedinUrl?: string;
   seo?: Seo;
   siteName?: string;
   titleTemplate?: string;
@@ -479,7 +475,7 @@ export type ProjectBySlugQueryResult = {
 
 // Source: lib/sanity/queries.ts
 // Variable: aboutQuery
-// Query: *[_type == "about"][0] {    _id,    name,    headline,    bio,    availability {      status,      isAvailable    },    "resumeUrl": resumeFile.asset->url,    email,    socialLinks,    seo {      metaTitle,      metaDescription,      ogImage,      ogImageAlt,      noIndex    },    siteName,    titleTemplate,    defaultMetaDescription,    defaultOgImage  }
+// Query: *[_type == "about"][0] {    _id,    name,    headline,    bio,    availability {      status,      isAvailable    },    "resumeUrl": resumeFile.asset->url,    email,    githubUrl,    linkedinUrl,    seo {      metaTitle,      metaDescription,      ogImage,      ogImageAlt,      noIndex    },    siteName,    titleTemplate,    defaultMetaDescription,    defaultOgImage  }
 export type AboutQueryResult = {
   _id: string;
   name: string | null;
@@ -508,12 +504,8 @@ export type AboutQueryResult = {
   } | null;
   resumeUrl: string | null;
   email: string | null;
-  socialLinks: Array<{
-    platform?: string;
-    url?: string;
-    _type: "socialLink";
-    _key: string;
-  }> | null;
+  githubUrl: string | null;
+  linkedinUrl: string | null;
   seo: {
     metaTitle: string | null;
     metaDescription: string | null;
@@ -545,7 +537,7 @@ declare global {
     '\n  *[_type == "project"] | order(order asc) {\n    _id,\n    title,\n    slug,\n    summary,\n    discipline,\n    dateCompleted,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    order\n  }\n': ProjectsQueryResult;
     '\n  *[_type == "project" && _id != $currentId] | order(order asc) [0...2] {\n    _id,\n    title,\n    slug,\n    discipline,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    order\n  }\n': OtherProjectsQueryResult;
     '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    summary,\n    discipline,\n    dateCompleted,\n    links,\n    order,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    story[] {\n      ...,\n      _type == "imageBlock" => {\n        ...,\n        image {\n          ...,\n          "metadata": asset->metadata { lqip, dimensions }\n        },\n        secondImage {\n          ...,\n          "metadata": asset->metadata { lqip, dimensions }\n        }\n      }\n    },\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage,\n      ogImageAlt,\n      noIndex\n    }\n  }\n': ProjectBySlugQueryResult;
-    '\n  *[_type == "about"][0] {\n    _id,\n    name,\n    headline,\n    bio,\n    availability {\n      status,\n      isAvailable\n    },\n    "resumeUrl": resumeFile.asset->url,\n    email,\n    socialLinks,\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage,\n      ogImageAlt,\n      noIndex\n    },\n    siteName,\n    titleTemplate,\n    defaultMetaDescription,\n    defaultOgImage\n  }\n': AboutQueryResult;
+    '\n  *[_type == "about"][0] {\n    _id,\n    name,\n    headline,\n    bio,\n    availability {\n      status,\n      isAvailable\n    },\n    "resumeUrl": resumeFile.asset->url,\n    email,\n    githubUrl,\n    linkedinUrl,\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage,\n      ogImageAlt,\n      noIndex\n    },\n    siteName,\n    titleTemplate,\n    defaultMetaDescription,\n    defaultOgImage\n  }\n': AboutQueryResult;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

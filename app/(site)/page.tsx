@@ -17,7 +17,8 @@ export default async function HomePage() {
       identity={{ name: about?.name ?? "", headline: about?.headline ?? "" }}
       links={toSiteLinks({
         email: about?.email ?? null,
-        socialLinks: about?.socialLinks ?? null,
+        githubUrl: about?.githubUrl ?? null,
+        linkedinUrl: about?.linkedinUrl ?? null,
         resumeUrl: about?.resumeUrl ?? null,
       })}
       middle={

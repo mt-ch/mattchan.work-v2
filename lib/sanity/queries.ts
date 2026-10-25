@@ -84,7 +84,8 @@ export const aboutQuery = defineQuery(`
     },
     "resumeUrl": resumeFile.asset->url,
     email,
-    socialLinks,
+    githubUrl,
+    linkedinUrl,
     seo {
       metaTitle,
       metaDescription,
