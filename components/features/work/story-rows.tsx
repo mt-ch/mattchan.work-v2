@@ -1,8 +1,7 @@
-import Image from "next/image";
 import { PortableText } from "next-sanity";
 
+import { MediaFrame } from "@/components/ui/media-frame";
 import { TileVideo } from "@/components/ui/tile-video";
-import { urlFor } from "@/lib/sanity/image";
 import type { ProjectBySlugQueryResult } from "@/sanity.types";
 
 type Story = NonNullable<ProjectBySlugQueryResult>["story"];
@@ -12,53 +11,21 @@ type ImageCell = Extract<Cell, { _type: "imageCell" }>;
 type TextCell = Extract<Cell, { _type: "textCell" }>;
 type VideoCell = Extract<Cell, { _type: "videoCell" }>;
 
-const MEDIA_WIDTH = 1600;
-const MEDIA_HEIGHT = 1067;
-
 function ImageCellView({ cell }: { cell: ImageCell }) {
   const image = cell.image;
   if (!image?.asset) return null;
-  return (
-    <div className="relative aspect-3/2 overflow-hidden rounded-md">
-      <Image
-        src={urlFor(image as Parameters<typeof urlFor>[0])
-          .width(MEDIA_WIDTH)
-          .height(MEDIA_HEIGHT)
-          .fit("crop")
-          .auto("format")
-          .url()}
-        alt={image.alt ?? ""}
-        fill
-        placeholder={image.metadata?.lqip ? "blur" : "empty"}
-        blurDataURL={image.metadata?.lqip ?? undefined}
-        sizes="(min-width: 1024px) 66vw, 100vw"
-        className="object-cover"
-      />
-    </div>
-  );
+  return <MediaFrame image={image} alt={image.alt ?? ""} />;
 }
 
 function VideoCellView({ cell }: { cell: VideoCell }) {
   const poster = cell.poster;
-  if (!poster?.asset || !cell.videoUrl) return null;
+  if (!poster?.asset) return null;
   return (
-    <div className="relative aspect-3/2 overflow-hidden rounded-md">
-      <Image
-        src={urlFor(poster as Parameters<typeof urlFor>[0])
-          .width(MEDIA_WIDTH)
-          .height(MEDIA_HEIGHT)
-          .fit("crop")
-          .auto("format")
-          .url()}
-        alt={cell.label ?? ""}
-        fill
-        placeholder={poster.metadata?.lqip ? "blur" : "empty"}
-        blurDataURL={poster.metadata?.lqip ?? undefined}
-        sizes="(min-width: 1024px) 66vw, 100vw"
-        className="object-cover"
-      />
-      <TileVideo src={cell.videoUrl} label={cell.label ?? undefined} />
-    </div>
+    <MediaFrame image={poster} alt={cell.label ?? ""}>
+      {cell.videoUrl ? (
+        <TileVideo src={cell.videoUrl} label={cell.label ?? undefined} />
+      ) : null}
+    </MediaFrame>
   );
 }
 
@@ -67,11 +34,22 @@ export function textCellId(key: string) {
   return `block-${key}`;
 }
 
+/** Heading cells of a story, in order, as section-nav entries. */
+export function getSections(story: Story) {
+  return (story ?? []).flatMap((row) =>
+    (row.items ?? []).flatMap((cell) =>
+      cell._type === "textCell" && cell.heading
+        ? [{ id: textCellId(cell._key), label: cell.heading }]
+        : [],
+    ),
+  );
+}
+
 function TextCellView({ cell }: { cell: TextCell }) {
   return (
     <div
       id={cell.heading ? textCellId(cell._key) : undefined}
-      className="gap-sm bg-surface p-sm text-foreground flex flex-col rounded-md"
+      className="gap-sm bg-surface p-sm text-foreground scroll-mt-sm flex flex-col rounded-md"
     >
       {cell.heading ? (
         <h2 className="text-subheading">{cell.heading}</h2>

@@ -4,8 +4,8 @@ import type { Image } from "sanity";
 import {
   bioToText,
   toProjectListItems,
-  toSiteLinks,
 } from "@/components/features/landing/sidebar-data";
+import { toSiteLinks } from "@/components/layout/site-links";
 import {
   ActiveProjectList,
   ActiveProjectProvider,

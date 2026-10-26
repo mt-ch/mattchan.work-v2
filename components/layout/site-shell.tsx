@@ -1,4 +1,4 @@
-import type { SiteLink } from "@/components/features/landing/sidebar-data";
+import type { SiteLink } from "@/components/layout/site-links";
 
 import { IconButtonRow } from "./icon-button-row";
 import { IdentityCard } from "./identity-card";

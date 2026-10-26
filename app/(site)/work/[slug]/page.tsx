@@ -3,16 +3,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Image } from "sanity";
 
-import { toSiteLinks } from "@/components/features/landing/sidebar-data";
 import { NextUpCard } from "@/components/features/work/next-up-card";
 import { ProjectMeta } from "@/components/features/work/project-meta";
 import { SectionNav } from "@/components/features/work/section-nav";
-import { StoryRows, textCellId } from "@/components/features/work/story-rows";
+import { getSections, StoryRows } from "@/components/features/work/story-rows";
+import { toSiteLinks } from "@/components/layout/site-links";
 import { SiteShell } from "@/components/layout/site-shell";
 import {
   getAbout,
-  getOtherProjects,
   getProject,
+  getProjects,
   getProjectSlugs,
 } from "@/lib/sanity";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
@@ -55,14 +55,11 @@ export default async function WorkPage({
   const { slug } = await params;
   const [about, project] = await Promise.all([getAbout(), getProject(slug)]);
   if (!project) notFound();
-  const [nextProject] = await getOtherProjects(project._id);
-  const sections = (project.story ?? []).flatMap((row) =>
-    (row.items ?? []).flatMap((cell) =>
-      cell._type === "textCell" && cell.heading
-        ? [{ id: textCellId(cell._key), label: cell.heading }]
-        : [],
-    ),
-  );
+  const projects = await getProjects();
+  const index = projects.findIndex((p) => p._id === project._id);
+  const nextProject =
+    projects.length > 1 ? projects[(index + 1) % projects.length] : undefined;
+  const sections = getSections(project.story);
 
   return (
     <SiteShell

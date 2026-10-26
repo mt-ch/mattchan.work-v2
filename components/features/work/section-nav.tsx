@@ -36,11 +36,16 @@ export function SectionNav({ sections }: { sections: NavSection[] }) {
   }, [sections]);
 
   function go(id: string) {
+    const behavior: ScrollBehavior = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches
+      ? "auto"
+      : "smooth";
     if (id === INTRO_ID) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior });
       return;
     }
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+    document.getElementById(id)?.scrollIntoView({ behavior });
   }
 
   const entries: NavSection[] = [

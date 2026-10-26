@@ -11,7 +11,7 @@ export function ProjectMeta({
 }) {
   return (
     <section className="gap-sm bg-surface p-sm flex flex-col rounded-md">
-      <h2 className="type-small text-foreground">{title}</h2>
+      <h2 className="text-small text-foreground">{title}</h2>
       <dl className="text-small gap-2xs grid grid-cols-[auto_1fr]">
         {year ? (
           <>
