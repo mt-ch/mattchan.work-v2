@@ -6,7 +6,8 @@ import type { Image } from "sanity";
 import { toSiteLinks } from "@/components/features/landing/sidebar-data";
 import { NextUpCard } from "@/components/features/work/next-up-card";
 import { ProjectMeta } from "@/components/features/work/project-meta";
-import { StoryRows } from "@/components/features/work/story-rows";
+import { SectionNav } from "@/components/features/work/section-nav";
+import { StoryRows, textCellId } from "@/components/features/work/story-rows";
 import { SiteShell } from "@/components/layout/site-shell";
 import {
   getAbout,
@@ -55,6 +56,13 @@ export default async function WorkPage({
   const [about, project] = await Promise.all([getAbout(), getProject(slug)]);
   if (!project) notFound();
   const [nextProject] = await getOtherProjects(project._id);
+  const sections = (project.story ?? []).flatMap((row) =>
+    (row.items ?? []).flatMap((cell) =>
+      cell._type === "textCell" && cell.heading
+        ? [{ id: textCellId(cell._key), label: cell.heading }]
+        : [],
+    ),
+  );
 
   return (
     <SiteShell
@@ -77,6 +85,7 @@ export default async function WorkPage({
             discipline={project.discipline ?? []}
             summary={project.summary ?? ""}
           />
+          <SectionNav sections={sections} />
         </>
       }
     >
