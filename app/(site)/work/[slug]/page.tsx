@@ -4,10 +4,16 @@ import { notFound } from "next/navigation";
 import type { Image } from "sanity";
 
 import { toSiteLinks } from "@/components/features/landing/sidebar-data";
+import { NextUpCard } from "@/components/features/work/next-up-card";
 import { ProjectMeta } from "@/components/features/work/project-meta";
 import { StoryRows } from "@/components/features/work/story-rows";
 import { SiteShell } from "@/components/layout/site-shell";
-import { getAbout, getProject, getProjectSlugs } from "@/lib/sanity";
+import {
+  getAbout,
+  getOtherProjects,
+  getProject,
+  getProjectSlugs,
+} from "@/lib/sanity";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { resolveSeo, type SeoObject } from "@/lib/seo/resolveSeo";
 
@@ -48,6 +54,7 @@ export default async function WorkPage({
   const { slug } = await params;
   const [about, project] = await Promise.all([getAbout(), getProject(slug)]);
   if (!project) notFound();
+  const [nextProject] = await getOtherProjects(project._id);
 
   return (
     <SiteShell
@@ -81,6 +88,7 @@ export default async function WorkPage({
           Return
         </Link>
         <StoryRows story={project.story} />
+        {nextProject ? <NextUpCard project={nextProject} /> : null}
       </div>
     </SiteShell>
   );
