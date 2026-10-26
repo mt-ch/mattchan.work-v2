@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { PortableText } from "next-sanity";
 
+import { TileVideo } from "@/components/ui/tile-video";
 import { urlFor } from "@/lib/sanity/image";
 import type { ProjectBySlugQueryResult } from "@/sanity.types";
 
@@ -9,6 +10,7 @@ type Row = NonNullable<Story>[number];
 type Cell = NonNullable<Row["items"]>[number];
 type ImageCell = Extract<Cell, { _type: "imageCell" }>;
 type TextCell = Extract<Cell, { _type: "textCell" }>;
+type VideoCell = Extract<Cell, { _type: "videoCell" }>;
 
 const MEDIA_WIDTH = 1600;
 const MEDIA_HEIGHT = 1067;
@@ -36,6 +38,30 @@ function ImageCellView({ cell }: { cell: ImageCell }) {
   );
 }
 
+function VideoCellView({ cell }: { cell: VideoCell }) {
+  const poster = cell.poster;
+  if (!poster?.asset || !cell.videoUrl) return null;
+  return (
+    <div className="relative aspect-3/2 overflow-hidden rounded-md">
+      <Image
+        src={urlFor(poster as Parameters<typeof urlFor>[0])
+          .width(MEDIA_WIDTH)
+          .height(MEDIA_HEIGHT)
+          .fit("crop")
+          .auto("format")
+          .url()}
+        alt={cell.label ?? ""}
+        fill
+        placeholder={poster.metadata?.lqip ? "blur" : "empty"}
+        blurDataURL={poster.metadata?.lqip ?? undefined}
+        sizes="(min-width: 1024px) 66vw, 100vw"
+        className="object-cover"
+      />
+      <TileVideo src={cell.videoUrl} label={cell.label ?? undefined} />
+    </div>
+  );
+}
+
 // Heading cells get a stable id from the block key for section nav anchors.
 export function textCellId(key: string) {
   return `block-${key}`;
@@ -57,9 +83,9 @@ function TextCellView({ cell }: { cell: TextCell }) {
   );
 }
 
-// Video cells are skipped until their renderer lands.
 function CellView({ cell }: { cell: Cell }) {
   if (cell._type === "imageCell") return <ImageCellView cell={cell} />;
+  if (cell._type === "videoCell") return <VideoCellView cell={cell} />;
   if (cell._type === "textCell") return <TextCellView cell={cell} />;
   return null;
 }
