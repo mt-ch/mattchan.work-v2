@@ -20,6 +20,14 @@ _Avoid_: Bio, profile
 A single item in an ordered, editable block array (for example a Project's story). Section navigation on a Work page is derived from block headings.
 _Avoid_: Section, module
 
+**Row**:
+A Content Block in a Project's story holding one or two cells side by side. Its number of cells always matches its column count.
+_Avoid_: Section, band
+
+**Cell**:
+One item inside a Row: an image, a video or text. Rows may mix cell types freely.
+_Avoid_: Tile, column
+
 **Landing**:
 The single-page overview at `/`, made of sections designed in Figma.
 

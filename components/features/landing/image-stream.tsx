@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useActiveProject } from "./active-project";
 import type { StreamTile } from "./stream-data";
-import { TileVideo } from "./tile-video";
+import { TileVideo } from "@/components/ui/tile-video";
 import {
   BASE_SPEED,
   activeTileIndex,

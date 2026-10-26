@@ -52,16 +52,22 @@ export const projectBySlugQuery = defineQuery(`
       "metadata": asset->metadata { lqip, dimensions }
     },
     story[] {
-      ...,
-      _type == "imageBlock" => {
+      _key,
+      columns,
+      items[] {
         ...,
-        image {
-          ...,
-          "metadata": asset->metadata { lqip, dimensions }
+        _type == "imageCell" => {
+          image {
+            ...,
+            "metadata": asset->metadata { lqip, dimensions }
+          }
         },
-        secondImage {
-          ...,
-          "metadata": asset->metadata { lqip, dimensions }
+        _type == "videoCell" => {
+          "videoUrl": video.asset->url,
+          poster {
+            ...,
+            "metadata": asset->metadata { lqip, dimensions }
+          }
         }
       }
     },
@@ -73,6 +79,10 @@ export const projectBySlugQuery = defineQuery(`
       noIndex
     }
   }
+`);
+
+export const projectSlugsQuery = defineQuery(`
+  *[_type == "project" && defined(slug.current)].slug.current
 `);
 
 export const aboutQuery = defineQuery(`

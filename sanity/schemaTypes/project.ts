@@ -58,7 +58,7 @@ export const project = defineType({
       description:
         "Reorderable case-study narrative, composed of Content Blocks.",
       type: "array",
-      of: [{ type: "textBlock" }, { type: "imageBlock" }],
+      of: [{ type: "row" }],
     }),
     defineField({
       name: "links",

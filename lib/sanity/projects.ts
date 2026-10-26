@@ -4,6 +4,7 @@ import { client } from "./client";
 import {
   otherProjectsQuery,
   projectBySlugQuery,
+  projectSlugsQuery,
   projectsQuery,
 } from "./queries";
 import { tags } from "./tags";
@@ -20,6 +21,13 @@ export async function getProject(slug: string) {
   cacheLife("max");
   cacheTag(tags.projects, tags.project(slug));
   return client.fetch(projectBySlugQuery, { slug });
+}
+
+export async function getProjectSlugs() {
+  "use cache";
+  cacheLife("max");
+  cacheTag(tags.projects);
+  return client.fetch(projectSlugsQuery);
 }
 
 export async function getOtherProjects(currentId: string) {

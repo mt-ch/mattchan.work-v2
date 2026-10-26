@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { StreamTile } from "./stream-data";
 import { BASE_SPEED, decayBoost, wrapOffset } from "./stream-math";
-import { TileVideo } from "./tile-video";
+import { TileVideo } from "@/components/ui/tile-video";
 
 gsap.registerPlugin(Observer);
 

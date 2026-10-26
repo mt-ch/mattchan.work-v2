@@ -25,7 +25,11 @@ export function SiteShell({
         fixed ? "h-dvh overflow-hidden lg:grid-rows-1" : "min-h-screen"
       }`}
     >
-      <aside className="gap-md py-sm relative col-span-12 flex h-full flex-col justify-between lg:sticky lg:order-2 lg:col-span-4 lg:shrink-0">
+      <aside
+        className={`gap-md py-sm relative col-span-12 flex h-full flex-col justify-between lg:sticky lg:order-2 lg:col-span-4 lg:shrink-0 ${
+          fixed ? "" : "lg:top-0 lg:h-dvh lg:self-start"
+        }`}
+      >
         <div className="gap-2xs flex flex-col">
           <IdentityCard {...identity} />
           <IconButtonRow links={links} />
