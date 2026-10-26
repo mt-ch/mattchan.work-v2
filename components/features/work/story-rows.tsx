@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { PortableText } from "next-sanity";
 
 import { urlFor } from "@/lib/sanity/image";
 import type { ProjectBySlugQueryResult } from "@/sanity.types";
@@ -7,6 +8,7 @@ type Story = NonNullable<ProjectBySlugQueryResult>["story"];
 type Row = NonNullable<Story>[number];
 type Cell = NonNullable<Row["items"]>[number];
 type ImageCell = Extract<Cell, { _type: "imageCell" }>;
+type TextCell = Extract<Cell, { _type: "textCell" }>;
 
 const MEDIA_WIDTH = 1600;
 const MEDIA_HEIGHT = 1067;
@@ -34,9 +36,31 @@ function ImageCellView({ cell }: { cell: ImageCell }) {
   );
 }
 
-// Video and text cells are skipped until their renderers land.
+// Heading cells get a stable id from the block key for section nav anchors.
+export function textCellId(key: string) {
+  return `block-${key}`;
+}
+
+function TextCellView({ cell }: { cell: TextCell }) {
+  return (
+    <div
+      id={cell.heading ? textCellId(cell._key) : undefined}
+      className="gap-sm bg-surface p-sm text-foreground flex flex-col rounded-md"
+    >
+      {cell.heading ? (
+        <h2 className="text-subheading">{cell.heading}</h2>
+      ) : null}
+      <div className="text-body gap-sm flex flex-col">
+        <PortableText value={cell.content ?? []} />
+      </div>
+    </div>
+  );
+}
+
+// Video cells are skipped until their renderer lands.
 function CellView({ cell }: { cell: Cell }) {
   if (cell._type === "imageCell") return <ImageCellView cell={cell} />;
+  if (cell._type === "textCell") return <TextCellView cell={cell} />;
   return null;
 }
 
