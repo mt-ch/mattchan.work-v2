@@ -1,0 +1,85 @@
+@theme {
+  /* Colors */
+  --color-white: var(--white);
+  --color-black: var(--black);
+  --color-grey-dark: var(--grey-dark);
+  --color-grey-mid: var(--grey-mid);
+  --color-grey-light: var(--grey-light);
+  --color-grey-lightest: var(--grey-lightest);
+  --color-ink: var(--ink);
+  --color-brand: var(--brand);
+  --color-accent: var(--accent);
+
+  /* Semantic */
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-inverse-background: var(--inverse-background);
+  --color-inverse-foreground: var(--inverse-foreground);
+
+  /* Typography */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --text-hero: var(--type-hero-size);
+  --text-hero--line-height: var(--leading-hero);
+  --text-hero--letter-spacing: var(--tracking-hero);
+
+  --text-display: var(--type-display-size);
+  --text-display--line-height: var(--leading-display);
+  --text-display--letter-spacing: var(--tracking-display);
+
+  --text-heading: var(--type-heading-size);
+  --text-heading--line-height: var(--leading-heading);
+  --text-heading--letter-spacing: var(--tracking-heading);
+
+  --text-subheading: var(--type-subheading-size);
+  --text-subheading--line-height: var(--leading-subheading);
+  --text-subheading--letter-spacing: var(--tracking-subheading);
+
+  --text-body: var(--type-body-size);
+  --text-body--line-height: var(--leading-body);
+  --text-body--letter-spacing: var(--tracking-body);
+
+  --text-small: var(--type-small-size);
+  --text-small--line-height: var(--leading-small);
+  --text-small--letter-spacing: var(--tracking-small);
+
+  --text-caption: var(--type-caption-size);
+  --text-caption--line-height: var(--leading-caption);
+  --text-caption--letter-spacing: var(--tracking-caption);
+
+  --text-mono-small: var(--type-mono-small-size);
+  --text-mono-small--line-height: var(--leading-small);
+  --text-mono-small--letter-spacing: var(--tracking-caption);
+
+  --text-mono-caption: var(--type-mono-caption-size);
+  --text-mono-caption--line-height: var(--leading-caption);
+  --text-mono-caption--letter-spacing: var(--tracking-caption);
+
+  --text-mono-code: var(--type-mono-code-size);
+  --text-mono-code--line-height: var(--leading-code);
+  --text-mono-code--letter-spacing: var(--tracking-code);
+
+  /* Spacing */
+  --spacing-2xs: var(--space-2xs);
+  --spacing-xs: var(--space-xs);
+  --spacing-sm: var(--space-sm);
+  --spacing-md: var(--space-md);
+  --spacing-lg: var(--space-lg);
+  --spacing-xl: var(--space-xl);
+  --spacing-2xl: var(--space-2xl);
+  --spacing-3xl: var(--space-3xl);
+  --spacing-4xl: var(--space-4xl);
+  --spacing-5xl: var(--space-5xl);
+  --spacing-6xl: var(--space-6xl);
+
+  --spacing-page-x: var(--layout-page-x);
+  --spacing-section-y: var(--layout-section-y);
+  --spacing-grid-gap: var(--layout-grid-gap);
+
+  --radius-card: var(--radius-card);
+}

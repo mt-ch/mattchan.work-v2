@@ -64,12 +64,12 @@ export default async function WorkPage({
 
   return (
     <div
-      className={`lg:gap-sm p-sm flex min-h-screen flex-col justify-between lg:grid lg:grid-cols-12 lg:py-0`}
+      className={`flex min-h-screen flex-col justify-between p-sm lg:grid lg:grid-cols-12 lg:gap-sm lg:py-0`}
     >
       <aside
-        className={`gap-4xl lg:py-sm relative col-span-12 flex flex-col lg:sticky lg:top-0 lg:order-2 lg:col-span-4 lg:h-dvh lg:shrink-0 lg:justify-between lg:self-start`}
+        className={`relative col-span-12 flex flex-col gap-4xl lg:sticky lg:top-0 lg:order-2 lg:col-span-4 lg:h-dvh lg:shrink-0 lg:justify-between lg:self-start lg:py-sm`}
       >
-        <div className="gap-2xs flex flex-col">
+        <div className="flex flex-col gap-2xs">
           <IdentityCard
             name={about?.name ?? ""}
             headline={about?.headline ?? ""}
@@ -95,7 +95,7 @@ export default async function WorkPage({
           summary={project.summary ?? ""}
         />
 
-        <div className="gap-sm flex flex-col">
+        <div className="flex flex-col gap-sm">
           {/* <SectionNav sections={sections} /> */}
           {nextProject ? (
             <div className="hidden lg:block">
@@ -104,7 +104,7 @@ export default async function WorkPage({
           ) : null}
         </div>
       </aside>
-      <main className="gap-sm lg:py-sm flex h-full flex-col lg:order-1 lg:col-span-8 lg:flex-1">
+      <main className="flex h-full flex-col gap-sm lg:order-1 lg:col-span-8 lg:flex-1 lg:py-sm">
         <StoryRows story={project.story} />
         {nextProject ? (
           <div className="block lg:hidden">

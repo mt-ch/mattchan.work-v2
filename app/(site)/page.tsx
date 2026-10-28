@@ -47,12 +47,12 @@ export default async function HomePage() {
   return (
     <ActiveProjectProvider initialSlug={tiles[0]?.slug ?? listItems[0]?.slug}>
       <div
-        className={`lg:gap-sm px-sm flex h-dvh flex-col justify-between overflow-hidden lg:grid lg:grid-cols-12 lg:grid-rows-1`}
+        className={`flex h-dvh flex-col justify-between overflow-hidden px-sm lg:grid lg:grid-cols-12 lg:grid-rows-1 lg:gap-sm`}
       >
         <aside
-          className={`gap-4xl pb-4xl pt-sm lg:py-sm relative col-span-12 flex flex-col lg:sticky lg:top-0 lg:order-2 lg:col-span-4 lg:h-full lg:shrink-0 lg:justify-between lg:self-start`}
+          className={`relative col-span-12 flex flex-col gap-4xl pt-sm pb-4xl lg:sticky lg:top-0 lg:order-2 lg:col-span-4 lg:h-full lg:shrink-0 lg:justify-between lg:self-start lg:py-sm`}
         >
-          <div className="gap-2xs flex flex-col">
+          <div className="flex flex-col gap-2xs">
             <IdentityCard
               name={about?.name ?? ""}
               headline={about?.headline ?? ""}
@@ -67,12 +67,12 @@ export default async function HomePage() {
             />
           </div>
 
-          <div className="hidden lg:block absolute w-full top-1/2 -translate-y-1/2">
+          <div className="absolute top-1/2 hidden w-full -translate-y-1/2 lg:block">
             <ActiveProjectList projects={listItems} />
           </div>
 
-          <div className="gap-sm flex flex-col">
-            <p className="text-small text-foreground whitespace-pre-line">
+          <div className="flex flex-col gap-sm">
+            <p className="text-small whitespace-pre-line text-foreground">
               {bioToText(about?.bio ?? null)}
             </p>
             {about?.availability?.status ? (
@@ -84,7 +84,7 @@ export default async function HomePage() {
             ) : null}
           </div>
         </aside>
-        <main className="lg:gap-sm pb-sm h-full lg:order-1 lg:col-span-8 lg:flex lg:flex-1 lg:flex-col lg:pb-0">
+        <main className="h-full pb-sm lg:order-1 lg:col-span-8 lg:flex lg:flex-1 lg:flex-col lg:gap-sm lg:pb-0">
           <ImageStream tiles={tiles} />
           <MobileCarousel tiles={tiles} />
         </main>
