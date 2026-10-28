@@ -16,10 +16,10 @@ export function IdentityCard({
   headline: string;
 }) {
   return (
-    <section className="gap-sm bg-surface p-sm flex items-center justify-between rounded-md">
-      <div className="text-mono-caption shrink-0 space-y-0.5 font-mono">
+    <section className="flex items-center justify-between gap-sm rounded-md bg-surface p-sm">
+      <div className="shrink-0 space-y-0.5 font-mono text-mono-caption">
         <h1 className="type-small">{name}</h1>
-        <p className="type-small text-muted whitespace-pre-line">{headline}</p>
+        <p className="type-small whitespace-pre-line text-muted">{headline}</p>
       </div>
       <Avatar />
     </section>

@@ -58,9 +58,10 @@ function usePlayWhenVisible(
  * reduced-motion users, who keep the poster.
  *
  * @param props.src - URL of the video file.
+ * @param props.label - Accessible name for the video; when omitted the video is hidden from assistive tech.
  * @returns The video, or nothing when motion is not allowed.
  */
-export function TileVideo({ src }: { src: string }) {
+export function TileVideo({ src, label }: { src: string; label?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const allowed = useMotionAllowed();
@@ -77,7 +78,8 @@ export function TileVideo({ src }: { src: string }) {
       loop
       playsInline
       preload="none"
-      aria-hidden
+      aria-hidden={label ? undefined : true}
+      aria-label={label || undefined}
       tabIndex={-1}
       draggable={false}
       onPlaying={() => setPlaying(true)}

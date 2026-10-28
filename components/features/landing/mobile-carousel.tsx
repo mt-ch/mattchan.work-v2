@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 // Local modules
 import { startCarousel } from "./carousel-motion";
 import type { StreamTile } from "./stream-data";
-import { TileVideo } from "./tile-video";
+import { TileVideo } from "@/components/ui/tile-video";
 
 /** Swipe distance (px) past which the gesture is a drag, not a tap. */
 const TAP_SLOP = 8;
@@ -41,8 +41,7 @@ function CarouselSlide({ tile, copy }: { tile: StreamTile; copy: number }) {
         className="object-cover"
       />
       {tile.videoSrc ? <TileVideo src={tile.videoSrc} /> : null}
-      <div className="absolute inset-0 bg-black/30" />
-      <div className="p-xs text-foreground m-xs bg-background/50 absolute top-0 inline-block rounded-md backdrop-blur-sm">
+      <div className="absolute top-0 m-xs inline-block rounded-md bg-background/50 p-xs text-foreground backdrop-blur-sm">
         <div className="text-small text-foreground">{tile.title}</div>
       </div>
     </Link>
@@ -108,11 +107,11 @@ export function MobileCarousel({ tiles }: { tiles: StreamTile[] }) {
   return (
     <div
       ref={viewportRef}
-      className="-mx-sm h-[45dvh] shrink-0 overflow-hidden lg:hidden"
+      className="-mx-sm h-full shrink-0 overflow-hidden lg:hidden"
       style={{ touchAction: "none" }}
       onClickCapture={swallowSwipeClick}
     >
-      <div ref={trackRef} className="gap-sm flex h-full will-change-transform">
+      <div ref={trackRef} className="flex h-full gap-sm will-change-transform">
         {Array.from({ length: copies }, (_, copy) =>
           tiles.map((tile) => (
             <CarouselSlide

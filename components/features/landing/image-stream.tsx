@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { useActiveProject } from "./active-project";
 import type { StreamTile } from "./stream-data";
 import { startStream } from "./stream-motion";
-import { TileVideo } from "./tile-video";
+import { TileVideo } from "@/components/ui/tile-video";
 
 /**
  * One Project tile in the stream. Repeated copies are hidden from assistive
@@ -37,7 +37,7 @@ function StreamTileLink({ tile, copy }: { tile: StreamTile; copy: number }) {
         blurDataURL={tile.blurDataURL}
         sizes="(min-width: 1024px) 66vw, 0px"
         draggable={false}
-        className="aspect-16/9 h-auto w-full object-cover"
+        className="aspect-3/2 h-auto w-full object-cover"
       />
       {tile.videoSrc ? <TileVideo src={tile.videoSrc} /> : null}
     </Link>
@@ -80,7 +80,7 @@ export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
     >
       <div
         ref={trackRef}
-        className="gap-sm flex flex-col will-change-transform"
+        className="flex flex-col gap-sm will-change-transform"
       >
         {Array.from({ length: copies }, (_, copy) =>
           tiles.map((tile) => (
