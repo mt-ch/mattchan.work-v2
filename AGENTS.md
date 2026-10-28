@@ -8,6 +8,10 @@ Issues live in GitHub Issues for mt-ch/mattchan.work-v2 (via `gh`). See `docs/ag
 
 Default vocabulary: needs-triage, needs-info, ready-for-agent, ready-for-human, wontfix. See `docs/agents/triage-labels.md`.
 
+### Coding conventions
+
+Before writing or editing any code, read `docs/agents/coding-conventions.md`.
+
 ### Domain docs
 
 Single-context: root `GLOSSARY.md` + `docs/adr/`. See `docs/agents/domain.md`.
