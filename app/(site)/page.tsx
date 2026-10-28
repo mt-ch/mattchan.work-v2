@@ -13,7 +13,10 @@ import {
 import { ImageStream } from "@/components/features/landing/image-stream";
 import { MobileCarousel } from "@/components/features/landing/mobile-carousel";
 import { toStreamTiles } from "@/components/features/landing/stream-data";
-import { SiteShell } from "@/components/layout/site-shell";
+
+import { IdentityCard } from "@/components/layout/identity-card";
+import { IconButtonRow } from "@/components/layout/icon-button-row";
+
 import { Availability } from "@/components/ui/availability";
 import { getAbout, getProjects } from "@/lib/sanity";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
@@ -43,22 +46,32 @@ export default async function HomePage() {
 
   return (
     <ActiveProjectProvider initialSlug={tiles[0]?.slug ?? listItems[0]?.slug}>
-      <SiteShell
-        fixed
-        identity={{ name: about?.name ?? "", headline: about?.headline ?? "" }}
-        links={toSiteLinks({
-          email: about?.email ?? null,
-          githubUrl: about?.githubUrl ?? null,
-          linkedinUrl: about?.linkedinUrl ?? null,
-          resumeUrl: about?.resumeUrl ?? null,
-        })}
-        middle={
-          <div className="hidden lg:block">
+      <div
+        className={`lg:gap-sm px-sm flex h-dvh flex-col justify-between overflow-hidden lg:grid lg:grid-cols-12 lg:grid-rows-1`}
+      >
+        <aside
+          className={`gap-4xl pb-4xl pt-sm lg:py-sm relative col-span-12 flex flex-col lg:sticky lg:top-0 lg:order-2 lg:col-span-4 lg:h-full lg:shrink-0 lg:justify-between lg:self-start`}
+        >
+          <div className="gap-2xs flex flex-col">
+            <IdentityCard
+              name={about?.name ?? ""}
+              headline={about?.headline ?? ""}
+            />
+            <IconButtonRow
+              links={toSiteLinks({
+                email: about?.email ?? null,
+                githubUrl: about?.githubUrl ?? null,
+                linkedinUrl: about?.linkedinUrl ?? null,
+                resumeUrl: about?.resumeUrl ?? null,
+              })}
+            />
+          </div>
+
+          <div className="hidden lg:block absolute w-full top-1/2 -translate-y-1/2">
             <ActiveProjectList projects={listItems} />
           </div>
-        }
-        bottom={
-          <>
+
+          <div className="gap-sm flex flex-col">
             <p className="text-small text-foreground whitespace-pre-line">
               {bioToText(about?.bio ?? null)}
             </p>
@@ -69,12 +82,13 @@ export default async function HomePage() {
                 {about.availability.status}
               </Availability>
             ) : null}
-          </>
-        }
-      >
-        <ImageStream tiles={tiles} />
-        <MobileCarousel tiles={tiles} />
-      </SiteShell>
+          </div>
+        </aside>
+        <main className="lg:gap-sm pb-sm h-full lg:order-1 lg:col-span-8 lg:flex lg:flex-1 lg:flex-col lg:pb-0">
+          <ImageStream tiles={tiles} />
+          <MobileCarousel tiles={tiles} />
+        </main>
+      </div>
     </ActiveProjectProvider>
   );
 }

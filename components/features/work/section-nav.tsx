@@ -68,8 +68,8 @@ export function SectionNav({ sections }: { sections: NavSection[] }) {
                   : "text-foreground/50 hover:text-foreground"
               }`}
             >
-              <span>{pad(i)}</span>
-              <span>{entry.label}</span>
+              <span className="text-muted">{pad(i)}</span>
+              <span className="text-foreground font-light">{entry.label}</span>
             </button>
           </li>
         ))}

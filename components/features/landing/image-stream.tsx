@@ -156,7 +156,7 @@ export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
                 blurDataURL={tile.blurDataURL}
                 sizes="(min-width: 1024px) 66vw, 0px"
                 draggable={false}
-                className="aspect-16/9 h-auto w-full object-cover"
+                className="aspect-3/2 h-auto w-full object-cover"
               />
               {tile.videoSrc ? <TileVideo src={tile.videoSrc} /> : null}
             </Link>

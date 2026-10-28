@@ -12,14 +12,20 @@ export function NextUpCard({ project }: { project: NextProject }) {
   return (
     <Link
       href={`/work/${slug}`}
-      className="gap-xs bg-surface p-sm hover:bg-inverse-background hover:text-inverse-foreground flex flex-col rounded-md"
+      className="group gap-xs bg-surface p-sm hover:bg-inverse-background hover:text-inverse-foreground flex flex-row items-center justify-between rounded-md"
     >
-      <span className="text-small">Next up</span>
-      {cover?.asset ? <MediaFrame image={cover} alt="" /> : null}
-      <span className="text-small">{project.title}</span>
-      <span className="text-small opacity-70">
-        {(project.discipline ?? []).join(" + ")}
-      </span>
+      <div className="gap-2xs flex flex-col">
+        <span className="text-small text-foreground group-hover:text-background">Next up (Scroll)</span>
+        <span className="text-small text-muted">{project.title}</span>
+        <span className="text-small text-muted">
+          {(project.discipline ?? []).join(" + ")}
+        </span>
+      </div>
+      {cover?.asset ? (
+        <div className="size-18">
+          <MediaFrame image={cover} alt={project.title ?? ""} ratio="square" />
+        </div>
+      ) : null}
     </Link>
   );
 }

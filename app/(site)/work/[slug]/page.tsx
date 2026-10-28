@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Image } from "sanity";
 
@@ -8,7 +7,9 @@ import { ProjectMeta } from "@/components/features/work/project-meta";
 import { SectionNav } from "@/components/features/work/section-nav";
 import { getSections, StoryRows } from "@/components/features/work/story-rows";
 import { toSiteLinks } from "@/components/layout/site-links";
-import { SiteShell } from "@/components/layout/site-shell";
+import { IdentityCard } from "@/components/layout/identity-card";
+import { IconButtonRow } from "@/components/layout/icon-button-row";
+
 import {
   getAbout,
   getProject,
@@ -62,40 +63,55 @@ export default async function WorkPage({
   const sections = getSections(project.story);
 
   return (
-    <SiteShell
-      identity={{ name: about?.name ?? "", headline: about?.headline ?? "" }}
-      links={toSiteLinks({
-        email: about?.email ?? null,
-        githubUrl: about?.githubUrl ?? null,
-        linkedinUrl: about?.linkedinUrl ?? null,
-        resumeUrl: about?.resumeUrl ?? null,
-      })}
-      bottom={
-        <>
-          <ProjectMeta
-            title={project.title ?? ""}
-            year={
-              project.dateCompleted
-                ? new Date(project.dateCompleted).getUTCFullYear()
-                : undefined
-            }
-            discipline={project.discipline ?? []}
-            summary={project.summary ?? ""}
-          />
-          <SectionNav sections={sections} />
-        </>
-      }
+    <div
+      className={`lg:gap-sm p-sm flex min-h-screen flex-col justify-between lg:grid lg:grid-cols-12 lg:py-0`}
     >
-      <div className="gap-sm py-sm flex flex-col">
-        <Link
-          href="/"
-          className="text-small text-foreground bg-surface p-sm hover:bg-inverse-background hover:text-inverse-foreground self-start rounded-md"
-        >
-          Return
-        </Link>
+      <aside
+        className={`gap-4xl lg:py-sm relative col-span-12 flex flex-col lg:sticky lg:top-0 lg:order-2 lg:col-span-4 lg:h-dvh lg:shrink-0 lg:justify-between lg:self-start`}
+      >
+        <div className="gap-2xs flex flex-col">
+          <IdentityCard
+            name={about?.name ?? ""}
+            headline={about?.headline ?? ""}
+          />
+          <IconButtonRow
+            links={toSiteLinks({
+              email: about?.email ?? null,
+              githubUrl: about?.githubUrl ?? null,
+              linkedinUrl: about?.linkedinUrl ?? null,
+              resumeUrl: about?.resumeUrl ?? null,
+            })}
+          />
+        </div>
+
+        <ProjectMeta
+          title={project.title ?? ""}
+          year={
+            project.dateCompleted
+              ? new Date(project.dateCompleted).getUTCFullYear()
+              : undefined
+          }
+          discipline={project.discipline ?? []}
+          summary={project.summary ?? ""}
+        />
+
+        <div className="gap-sm flex flex-col">
+          {/* <SectionNav sections={sections} /> */}
+          {nextProject ? (
+            <div className="hidden lg:block">
+              <NextUpCard project={nextProject} />
+            </div>
+          ) : null}
+        </div>
+      </aside>
+      <main className="gap-sm lg:py-sm flex h-full flex-col lg:order-1 lg:col-span-8 lg:flex-1">
         <StoryRows story={project.story} />
-        {nextProject ? <NextUpCard project={nextProject} /> : null}
-      </div>
-    </SiteShell>
+        {nextProject ? (
+          <div className="block lg:hidden">
+            <NextUpCard project={nextProject} />
+          </div>
+        ) : null}
+      </main>
+    </div>
   );
 }
