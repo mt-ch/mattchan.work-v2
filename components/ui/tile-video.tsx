@@ -7,7 +7,7 @@ import { useEffect, useRef, useState } from "react";
  * on screen, fades in once frames are playing, and is not rendered at all for
  * reduced-motion users, who keep the poster.
  */
-export function TileVideo({ src }: { src: string }) {
+export function TileVideo({ src, label }: { src: string; label?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [allowed, setAllowed] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -44,7 +44,8 @@ export function TileVideo({ src }: { src: string }) {
       loop
       playsInline
       preload="none"
-      aria-hidden
+      aria-hidden={label ? undefined : true}
+      aria-label={label || undefined}
       tabIndex={-1}
       draggable={false}
       onPlaying={() => setPlaying(true)}

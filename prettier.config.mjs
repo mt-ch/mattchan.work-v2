@@ -1,6 +1,5 @@
 /** @type {import('prettier').Config & import('prettier-plugin-tailwindcss').PluginOptions} */
 const config = {
-  // Tailwind class sorting — must stay last when adding more plugins
   plugins: ["prettier-plugin-tailwindcss"],
 
   semi: true,
@@ -13,8 +12,7 @@ const config = {
   arrowParens: "always",
   endOfLine: "lf",
 
-  // Tailwind CSS v4 (theme + @theme live in this entry file)
-  // tailwindStylesheet: "./src/app/globals.scss",
+  tailwindStylesheet: "./styles/prettier-entry.css",
   tailwindFunctions: ["cn", "clsx"],
 };
 

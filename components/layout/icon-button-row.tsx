@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-import type { SiteLink } from "@/components/features/landing/sidebar-data";
+import type { SiteLink } from "@/components/layout/site-links";
 
 export function IconButtonRow({ links }: { links: SiteLink[] }) {
   return (

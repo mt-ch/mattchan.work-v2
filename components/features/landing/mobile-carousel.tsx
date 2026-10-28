@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 
 import type { StreamTile } from "./stream-data";
 import { BASE_SPEED, decayBoost, wrapOffset } from "./stream-math";
-import { TileVideo } from "./tile-video";
+import { TileVideo } from "@/components/ui/tile-video";
 
 gsap.registerPlugin(Observer);
 
@@ -114,7 +114,7 @@ export function MobileCarousel({ tiles }: { tiles: StreamTile[] }) {
   return (
     <div
       ref={viewportRef}
-      className="-mx-sm h-[45dvh] shrink-0 overflow-hidden lg:hidden"
+      className="-mx-sm h-full shrink-0 overflow-hidden lg:hidden"
       style={{ touchAction: "none" }}
       onClickCapture={(event) => {
         // A swipe that ends on a slide must not navigate.
@@ -146,7 +146,6 @@ export function MobileCarousel({ tiles }: { tiles: StreamTile[] }) {
                 className="object-cover"
               />
               {tile.videoSrc ? <TileVideo src={tile.videoSrc} /> : null}
-              <div className="absolute inset-0 bg-black/30" />
               <div className="p-xs text-foreground m-xs bg-background/50 absolute top-0 inline-block rounded-md backdrop-blur-sm">
                 <div className="text-small text-foreground">{tile.title}</div>
               </div>

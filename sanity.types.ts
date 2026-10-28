@@ -15,39 +15,8 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: schema.json
-export type SanityImageAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
-};
-
-export type ImageBlock = {
-  _type: "imageBlock";
-  image?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-  secondImage?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-  caption?: string;
-  background?: "default" | "muted" | "accent";
-  mockup?: boolean;
-  layout?: "full" | "pair";
-};
-
-export type TextBlock = {
-  _type: "textBlock";
+export type TextCell = {
+  _type: "textCell";
   heading?: string;
   content?: Array<{
     children?: Array<{
@@ -67,9 +36,65 @@ export type TextBlock = {
     _type: "block";
     _key: string;
   }>;
-  background?: "default" | "muted" | "accent";
-  layout?:
-    "one-column" | "two-column-split" | "two-column-left" | "two-column-right";
+};
+
+export type SanityFileAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
+};
+
+export type SanityImageAssetReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+};
+
+export type VideoCell = {
+  _type: "videoCell";
+  video?: {
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
+  };
+  poster?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  label?: string;
+};
+
+export type ImageCell = {
+  _type: "imageCell";
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+};
+
+export type Row = {
+  _type: "row";
+  columns?: 1 | 2;
+  items?: Array<
+    | ({
+        _key: string;
+      } & ImageCell)
+    | ({
+        _key: string;
+      } & VideoCell)
+    | ({
+        _key: string;
+      } & TextCell)
+  >;
 };
 
 export type Seo = {
@@ -85,13 +110,6 @@ export type Seo = {
   };
   ogImageAlt?: string;
   noIndex?: boolean;
-};
-
-export type SanityFileAssetReference = {
-  _ref: string;
-  _type: "reference";
-  _weak?: boolean;
-  [internalGroqTypeReferenceTo]?: "sanity.fileAsset";
 };
 
 export type Project = {
@@ -117,12 +135,9 @@ export type Project = {
     _type: "file";
   };
   story?: Array<
-    | ({
-        _key: string;
-      } & TextBlock)
-    | ({
-        _key: string;
-      } & ImageBlock)
+    {
+      _key: string;
+    } & Row
   >;
   links?: Array<{
     label?: string;
@@ -306,11 +321,13 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | SanityImageAssetReference
-  | ImageBlock
-  | TextBlock
-  | Seo
+  | TextCell
   | SanityFileAssetReference
+  | SanityImageAssetReference
+  | VideoCell
+  | ImageCell
+  | Row
+  | Seo
   | Project
   | SanityImageCrop
   | SanityImageHotspot
@@ -378,7 +395,7 @@ export type OtherProjectsQueryResult = Array<{
 
 // Source: lib/sanity/queries.ts
 // Variable: projectBySlugQuery
-// Query: *[_type == "project" && slug.current == $slug][0] {    _id,    title,    slug,    summary,    discipline,    dateCompleted,    links,    order,    coverImage {      ...,      "metadata": asset->metadata { lqip, dimensions }    },    story[] {      ...,      _type == "imageBlock" => {        ...,        image {          ...,          "metadata": asset->metadata { lqip, dimensions }        },        secondImage {          ...,          "metadata": asset->metadata { lqip, dimensions }        }      }    },    seo {      metaTitle,      metaDescription,      ogImage,      ogImageAlt,      noIndex    }  }
+// Query: *[_type == "project" && slug.current == $slug][0] {    _id,    title,    slug,    summary,    discipline,    dateCompleted,    links,    order,    coverImage {      ...,      "metadata": asset->metadata { lqip, dimensions }    },    story[] {      _key,      columns,      items[] {        ...,        _type == "imageCell" => {          image {            ...,            "metadata": asset->metadata { lqip, dimensions }          }        },        _type == "videoCell" => {          "videoUrl": video.asset->url,          poster {            ...,            "metadata": asset->metadata { lqip, dimensions }          }        }      }    },    seo {      metaTitle,      metaDescription,      ogImage,      ogImageAlt,      noIndex    }  }
 export type ProjectBySlugQueryResult = {
   _id: string;
   title: string | null;
@@ -404,70 +421,74 @@ export type ProjectBySlugQueryResult = {
       dimensions: SanityImageDimensions | null;
     } | null;
   } | null;
-  story: Array<
-    | {
-        _key: string;
-        _type: "imageBlock";
-        image: {
-          asset?: SanityImageAssetReference;
-          media?: unknown;
-          hotspot?: SanityImageHotspot;
-          crop?: SanityImageCrop;
-          alt?: string;
-          _type: "image";
-          metadata: {
-            lqip: string | null;
-            dimensions: SanityImageDimensions | null;
-          } | null;
-        } | null;
-        secondImage: {
-          asset?: SanityImageAssetReference;
-          media?: unknown;
-          hotspot?: SanityImageHotspot;
-          crop?: SanityImageCrop;
-          alt?: string;
-          _type: "image";
-          metadata: {
-            lqip: string | null;
-            dimensions: SanityImageDimensions | null;
-          } | null;
-        } | null;
-        caption?: string;
-        background?: "accent" | "default" | "muted";
-        mockup?: boolean;
-        layout?: "full" | "pair";
-      }
-    | {
-        _key: string;
-        _type: "textBlock";
-        heading?: string;
-        content?: Array<{
-          children?: Array<{
-            marks?: Array<string>;
-            text?: string;
-            _type: "span";
-            _key: string;
-          }>;
-          style?:
-            "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
-          listItem?: "bullet" | "number";
-          markDefs?: Array<{
-            href?: string;
-            _type: "link";
-            _key: string;
-          }>;
-          level?: number;
-          _type: "block";
+  story: Array<{
+    _key: string;
+    columns: 1 | 2 | null;
+    items: Array<
+      | {
           _key: string;
-        }>;
-        background?: "accent" | "default" | "muted";
-        layout?:
-          | "one-column"
-          | "two-column-left"
-          | "two-column-right"
-          | "two-column-split";
-      }
-  > | null;
+          _type: "imageCell";
+          image: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            alt?: string;
+            _type: "image";
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+        }
+      | {
+          _key: string;
+          _type: "textCell";
+          heading?: string;
+          content?: Array<{
+            children?: Array<{
+              marks?: Array<string>;
+              text?: string;
+              _type: "span";
+              _key: string;
+            }>;
+            style?:
+              "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+            listItem?: "bullet" | "number";
+            markDefs?: Array<{
+              href?: string;
+              _type: "link";
+              _key: string;
+            }>;
+            level?: number;
+            _type: "block";
+            _key: string;
+          }>;
+        }
+      | {
+          _key: string;
+          _type: "videoCell";
+          video?: {
+            asset?: SanityFileAssetReference;
+            media?: unknown;
+            _type: "file";
+          };
+          poster: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            _type: "image";
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+          label?: string;
+          videoUrl: string | null;
+        }
+    > | null;
+  }> | null;
   seo: {
     metaTitle: string | null;
     metaDescription: string | null;
@@ -482,6 +503,11 @@ export type ProjectBySlugQueryResult = {
     noIndex: boolean | null;
   } | null;
 } | null;
+
+// Source: lib/sanity/queries.ts
+// Variable: projectSlugsQuery
+// Query: *[_type == "project" && defined(slug.current)].slug.current
+export type ProjectSlugsQueryResult = Array<string | null>;
 
 // Source: lib/sanity/queries.ts
 // Variable: aboutQuery
@@ -547,7 +573,8 @@ declare global {
   interface SanityQueries {
     '\n  *[_type == "project"] | order(order asc) {\n    _id,\n    _updatedAt,\n    title,\n    slug,\n    summary,\n    discipline,\n    dateCompleted,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    "coverVideoUrl": coverVideo.asset->url,\n    order,\n    seo { noIndex }\n  }\n': ProjectsQueryResult;
     '\n  *[_type == "project" && _id != $currentId] | order(order asc) [0...2] {\n    _id,\n    title,\n    slug,\n    discipline,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    order\n  }\n': OtherProjectsQueryResult;
-    '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    summary,\n    discipline,\n    dateCompleted,\n    links,\n    order,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    story[] {\n      ...,\n      _type == "imageBlock" => {\n        ...,\n        image {\n          ...,\n          "metadata": asset->metadata { lqip, dimensions }\n        },\n        secondImage {\n          ...,\n          "metadata": asset->metadata { lqip, dimensions }\n        }\n      }\n    },\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage,\n      ogImageAlt,\n      noIndex\n    }\n  }\n': ProjectBySlugQueryResult;
+    '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    summary,\n    discipline,\n    dateCompleted,\n    links,\n    order,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    story[] {\n      _key,\n      columns,\n      items[] {\n        ...,\n        _type == "imageCell" => {\n          image {\n            ...,\n            "metadata": asset->metadata { lqip, dimensions }\n          }\n        },\n        _type == "videoCell" => {\n          "videoUrl": video.asset->url,\n          poster {\n            ...,\n            "metadata": asset->metadata { lqip, dimensions }\n          }\n        }\n      }\n    },\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage,\n      ogImageAlt,\n      noIndex\n    }\n  }\n': ProjectBySlugQueryResult;
+    '\n  *[_type == "project" && defined(slug.current)].slug.current\n': ProjectSlugsQueryResult;
     '\n  *[_type == "about"][0] {\n    _id,\n    _updatedAt,\n    name,\n    headline,\n    bio,\n    availability {\n      status,\n      isAvailable\n    },\n    "resumeUrl": resumeFile.asset->url,\n    email,\n    githubUrl,\n    linkedinUrl,\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage,\n      ogImageAlt,\n      noIndex\n    },\n    siteName,\n    titleTemplate,\n    defaultMetaDescription,\n    defaultOgImage\n  }\n': AboutQueryResult;
   }
 }
