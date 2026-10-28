@@ -2,6 +2,9 @@
 import { gsap } from "gsap";
 import { Observer } from "gsap/Observer";
 
+// Shared modules
+import { getDesktop, getReducedMotion } from "@/lib/motion/environment";
+
 // Local modules
 import type { StreamTile } from "./stream-data";
 import {
@@ -174,7 +177,7 @@ function startInput(
     },
   });
 
-  const desktop = window.matchMedia("(min-width: 1024px)");
+  const desktop = getDesktop();
   const syncObserver = () =>
     desktop.matches ? observer.enable() : observer.disable();
   syncObserver();
@@ -194,7 +197,7 @@ function startInput(
  * @returns A function that stops the stream and removes every listener.
  */
 export function startStream(options: StreamOptions) {
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const reduced = getReducedMotion();
   const state: StreamState = {
     offset: 0,
     boost: 0,

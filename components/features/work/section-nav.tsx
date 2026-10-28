@@ -3,6 +3,9 @@
 // React and Next.js
 import { useEffect, useState } from "react";
 
+// Shared modules
+import { prefersReducedMotion } from "@/lib/motion/environment";
+
 export type NavSection = { id: string; label: string };
 
 const INTRO_ID = "introduction";
@@ -70,8 +73,7 @@ function useActiveSection(sections: NavSection[]) {
  * @param id - The ID of the section to scroll to.
  */
 function scrollToSection(id: string) {
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-  const behavior: ScrollBehavior = reduced.matches ? "auto" : "smooth";
+  const behavior: ScrollBehavior = prefersReducedMotion() ? "auto" : "smooth";
 
   if (id === INTRO_ID) {
     window.scrollTo({ top: 0, behavior });

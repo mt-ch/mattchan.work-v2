@@ -2,6 +2,9 @@
 import { gsap } from "gsap";
 import { Observer } from "gsap/Observer";
 
+// Shared modules
+import { getReducedMotion } from "@/lib/motion/environment";
+
 // Local modules
 import { BOOST_GAIN, advanceMotion, wrapOffset } from "./stream-math";
 
@@ -157,7 +160,7 @@ function startInput(
  * @returns A function that stops the carousel and removes every listener.
  */
 export function startCarousel(options: CarouselOptions) {
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const reduced = getReducedMotion();
   const state: CarouselState = {
     offset: 0,
     boost: 0,
