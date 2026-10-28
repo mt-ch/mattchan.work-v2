@@ -1,8 +1,22 @@
+// Shared modules
 import type { SiteLink } from "@/components/features/landing/sidebar-data";
 
+// Local modules
 import { IconButtonRow } from "./icon-button-row";
 import { IdentityCard } from "./identity-card";
 
+/**
+ * Site chrome: a sidebar with the owner's identity and links, beside the main
+ * content.
+ *
+ * @param props.children - The main content.
+ * @param props.middle - Content centred vertically in the sidebar.
+ * @param props.bottom - Content pinned to the sidebar's lower section.
+ * @param props.identity - The owner's name and headline.
+ * @param props.links - The icon links shown under the identity card.
+ * @param props.fixed - Landing variant: exactly one viewport tall, no page scroll.
+ * @returns The shell around `children`.
+ */
 export function SiteShell({
   children,
   middle,
@@ -16,7 +30,6 @@ export function SiteShell({
   bottom?: React.ReactNode;
   identity: { name: string; headline: string };
   links: SiteLink[];
-  /** Landing variant: exactly one viewport tall, no page scroll. */
   fixed?: boolean;
 }) {
   return (

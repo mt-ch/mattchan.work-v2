@@ -1,7 +1,15 @@
+// Third-party libraries
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
+// Shared modules
 import type { SiteLink } from "@/components/features/landing/sidebar-data";
 
+/**
+ * A row of icon-only link buttons, equal width across the row.
+ *
+ * @param props.links - The links to show, each with a label, URL and icon.
+ * @returns The button row; the label is exposed as `aria-label`.
+ */
 export function IconButtonRow({ links }: { links: SiteLink[] }) {
   return (
     <ul className="gap-2xs flex flex-row items-center justify-between">

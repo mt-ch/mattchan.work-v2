@@ -1,3 +1,4 @@
+// React and Next.js
 import Link from "next/link";
 
 export type ProjectListItem = {
@@ -7,6 +8,13 @@ export type ProjectListItem = {
   discipline: string[];
 };
 
+/**
+ * List of Projects, each linking to its Work page.
+ *
+ * @param props.projects - The Projects to list.
+ * @param props.activeSlug - Slug of the Project to highlight, if any.
+ * @returns The list; the active Project carries `aria-current="page"`.
+ */
 export function ProjectList({
   projects,
   activeSlug,
@@ -18,6 +26,7 @@ export function ProjectList({
     <ul className="text-small text-foreground gap-xs flex flex-col font-normal">
       {projects.map((project) => {
         const active = project.slug === activeSlug;
+
         return (
           <li key={project.slug}>
             <Link

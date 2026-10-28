@@ -1,5 +1,7 @@
+// Third-party libraries
 import { describe, expect, it } from "vitest";
 
+// Local modules
 import { bioToText, toProjectListItems, toSiteLinks } from "./sidebar-data";
 
 describe("toProjectListItems", () => {

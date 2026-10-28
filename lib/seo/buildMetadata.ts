@@ -1,5 +1,7 @@
+// React and Next.js
 import type { Metadata } from "next";
 
+// Local modules
 import type { ResolvedSeo } from "./resolveSeo";
 
 // Maps a ResolvedSeo to Next Metadata. `path` is the canonical path relative to

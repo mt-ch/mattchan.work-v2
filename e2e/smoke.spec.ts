@@ -1,3 +1,4 @@
+// Third-party libraries
 import { expect, test } from "@playwright/test";
 
 test("landing loads with the theme attribute set", async ({ page }) => {

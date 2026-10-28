@@ -1,5 +1,7 @@
+// Third-party libraries
 import type { Image } from "sanity";
 
+// Shared modules
 import { urlFor } from "@/lib/sanity/image";
 
 // Fixed Open Graph / Twitter card image size, requested with a hotspot-aware crop.

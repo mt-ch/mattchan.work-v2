@@ -1,7 +1,14 @@
+// Third-party libraries
 import { describe, expect, it, vi } from "vitest";
 import type { Image } from "sanity";
 
 vi.mock("@/lib/sanity/image", () => {
+  /**
+   * Fakes the image builder chain, ending in a URL derived from the asset ref.
+   *
+   * @param ref - The asset reference ID.
+   * @returns A chainable builder whose `url()` returns a test CDN URL.
+   */
   const chain = (ref: string) => {
     const api = {
       width: () => api,
@@ -16,8 +23,15 @@ vi.mock("@/lib/sanity/image", () => {
   };
 });
 
+// Local modules
 import { resolveSeo } from "./resolveSeo";
 
+/**
+ * Builds a minimal Sanity image pointing at the given asset.
+ *
+ * @param ref - The asset reference ID.
+ * @returns An image with that asset.
+ */
 const img = (ref: string) =>
   ({ _type: "image", asset: { _type: "reference", _ref: ref } }) as Image;
 

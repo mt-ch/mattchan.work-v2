@@ -1,28 +1,57 @@
 "use client";
 
-import { gsap } from "gsap";
-import { Observer } from "gsap/Observer";
+// React and Next.js
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+// Local modules
 import { useActiveProject } from "./active-project";
 import type { StreamTile } from "./stream-data";
+import { startStream } from "./stream-motion";
 import { TileVideo } from "./tile-video";
-import {
-  BASE_SPEED,
-  activeTileIndex,
-  decayBoost,
-  wrapOffset,
-} from "./stream-math";
 
-gsap.registerPlugin(Observer);
+/**
+ * One Project tile in the stream. Repeated copies are hidden from assistive
+ * tech and the tab order so each Project is announced once.
+ *
+ * @param props.tile - The Project tile to show.
+ * @param props.copy - Which repeat of the set this tile belongs to; 0 is the real one.
+ * @returns A link to the Project's Work page.
+ */
+function StreamTileLink({ tile, copy }: { tile: StreamTile; copy: number }) {
+  return (
+    <Link
+      href={`/work/${tile.slug}`}
+      draggable={false}
+      aria-hidden={copy > 0 || undefined}
+      tabIndex={copy > 0 ? -1 : undefined}
+      className="relative block shrink-0 overflow-hidden rounded-md"
+    >
+      <Image
+        src={tile.src}
+        alt={copy === 0 ? tile.title : ""}
+        width={tile.width}
+        height={tile.height}
+        placeholder={tile.blurDataURL ? "blur" : "empty"}
+        blurDataURL={tile.blurDataURL}
+        sizes="(min-width: 1024px) 66vw, 0px"
+        draggable={false}
+        className="aspect-16/9 h-auto w-full object-cover"
+      />
+      {tile.videoSrc ? <TileVideo src={tile.videoSrc} /> : null}
+    </Link>
+  );
+}
 
-/** Longest frame the ticker will integrate, so resuming a tab never jumps. */
-const MAX_DT = 0.1;
-/** Converts wheel/drag delta (px) into boost velocity (px/s). */
-const BOOST_GAIN = 12;
-
+/**
+ * Desktop Landing stream: Project tiles flowing vertically in an endless loop.
+ * Wheel and touch input anywhere on the window boosts the flow, and the Project
+ * at the viewport centre becomes the active one.
+ *
+ * @param props.tiles - The Project tiles to loop.
+ * @returns The stream, hidden below the `lg` breakpoint.
+ */
 export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
   const { setSlug } = useActiveProject();
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -34,97 +63,13 @@ export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
     const track = trackRef.current;
     if (!viewport || !track || tiles.length === 0) return;
 
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    let offset = 0;
-    let boost = 0;
-    let setHeight = 0;
-    let viewportHeight = 0;
-    let boxes: { top: number; height: number }[] = [];
-    let activeSlug = "";
-
-    const measure = () => {
-      viewportHeight = viewport.clientHeight;
-      const first = Array.from(track.children).slice(0, tiles.length);
-      const nextTop = track.children[tiles.length] as HTMLElement | undefined;
-      boxes = first.map((el) => ({
-        top: (el as HTMLElement).offsetTop,
-        height: (el as HTMLElement).offsetHeight,
-      }));
-      setHeight = nextTop ? nextTop.offsetTop : 0;
-      if (setHeight > 0) {
-        const needed = Math.ceil(viewportHeight / setHeight) + 2;
-        setCopies((c) => (needed > c ? needed : c));
-      }
-    };
-
-    const render = () => {
-      if (setHeight <= 0) return;
-      offset = wrapOffset(offset, setHeight);
-      gsap.set(track, { y: -offset });
-      const index = activeTileIndex(offset, viewportHeight, boxes, setHeight);
-      const slug = tiles[index].slug;
-      if (slug !== activeSlug) {
-        activeSlug = slug;
-        setSlug(slug);
-      }
-    };
-
-    measure();
-    // Start with the first Project at the centre of the viewport.
-    if (boxes[0]) {
-      offset = boxes[0].top + boxes[0].height / 2 - viewportHeight / 2;
-    }
-    render();
-
-    const resize = new ResizeObserver(() => {
-      measure();
-      render();
+    return startStream({
+      viewport,
+      track,
+      tiles,
+      onActiveSlug: setSlug,
+      onCopiesNeeded: (needed) => setCopies((c) => Math.max(c, needed)),
     });
-    resize.observe(viewport);
-    resize.observe(track);
-
-    const tick = (_time: number, deltaMs: number) => {
-      if (document.hidden || reduced.matches || setHeight <= 0) return;
-      const dt = Math.min(deltaMs / 1000, MAX_DT);
-      boost = decayBoost(boost, dt);
-      offset += (BASE_SPEED + boost) * dt;
-      render();
-    };
-    gsap.ticker.add(tick);
-
-    // Listens on the whole window so scrolling anywhere drives the stream.
-    // wheelSpeed -1 makes wheel-down and finger-drag-up both negative, so
-    // `-deltaY` is the direction the stream should flow.
-    const observer = Observer.create({
-      target: window,
-      type: "wheel,touch",
-      wheelSpeed: -1,
-      tolerance: 1,
-      preventDefault: true,
-      onChangeY: (self) => {
-        const delta = -self.deltaY;
-        if (reduced.matches) {
-          offset += delta;
-          render();
-        } else {
-          boost += delta * BOOST_GAIN;
-        }
-      },
-    });
-
-    // The stream is hidden below `lg`; leave native page scroll alone there.
-    const desktop = window.matchMedia("(min-width: 1024px)");
-    const syncObserver = () =>
-      desktop.matches ? observer.enable() : observer.disable();
-    syncObserver();
-    desktop.addEventListener("change", syncObserver);
-
-    return () => {
-      desktop.removeEventListener("change", syncObserver);
-      observer.kill();
-      gsap.ticker.remove(tick);
-      resize.disconnect();
-    };
   }, [tiles, setSlug]);
 
   return (
@@ -139,27 +84,11 @@ export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
       >
         {Array.from({ length: copies }, (_, copy) =>
           tiles.map((tile) => (
-            <Link
+            <StreamTileLink
               key={`${copy}-${tile.slug}`}
-              href={`/work/${tile.slug}`}
-              draggable={false}
-              aria-hidden={copy > 0 || undefined}
-              tabIndex={copy > 0 ? -1 : undefined}
-              className="relative block shrink-0 overflow-hidden rounded-md"
-            >
-              <Image
-                src={tile.src}
-                alt={copy === 0 ? tile.title : ""}
-                width={tile.width}
-                height={tile.height}
-                placeholder={tile.blurDataURL ? "blur" : "empty"}
-                blurDataURL={tile.blurDataURL}
-                sizes="(min-width: 1024px) 66vw, 0px"
-                draggable={false}
-                className="aspect-16/9 h-auto w-full object-cover"
-              />
-              {tile.videoSrc ? <TileVideo src={tile.videoSrc} /> : null}
-            </Link>
+              tile={tile}
+              copy={copy}
+            />
           )),
         )}
       </div>

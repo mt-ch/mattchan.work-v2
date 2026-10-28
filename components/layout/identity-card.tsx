@@ -1,5 +1,13 @@
+// Local modules
 import { Avatar } from "./avatar";
 
+/**
+ * Card naming the site owner, with their headline and avatar.
+ *
+ * @param props.name - The owner's name.
+ * @param props.headline - One or two lines describing what they do.
+ * @returns The identity card.
+ */
 export function IdentityCard({
   name,
   headline,

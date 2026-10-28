@@ -1,5 +1,14 @@
+// Third-party libraries
 import { defineField, defineType } from "sanity";
 
+/**
+ * Builds an image field with a required alt text and a hotspot.
+ *
+ * @param name - The field name.
+ * @param title - The field title shown in the Studio.
+ * @param required - Whether the image itself must be provided.
+ * @returns The image field definition.
+ */
 function imageField(name: string, title: string, required: boolean) {
   return defineField({
     name,

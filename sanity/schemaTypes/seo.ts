@@ -1,3 +1,4 @@
+// Third-party libraries
 import { defineField, defineType } from "sanity";
 
 // Reusable per-page SEO controls. Embedded in documents (currently `project`)

@@ -1,5 +1,12 @@
+// Third-party libraries
 import type { StructureResolver } from "sanity/structure";
 
+/**
+ * The Studio's content tree: About as a singleton, then the Projects list.
+ *
+ * @param S - The Studio's structure builder.
+ * @returns The "Content" list.
+ */
 export const structure: StructureResolver = (S) =>
   S.list()
     .title("Content")

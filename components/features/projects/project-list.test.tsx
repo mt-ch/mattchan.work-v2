@@ -1,6 +1,8 @@
+// Third-party libraries
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 
+// Local modules
 import { ProjectList } from "./project-list";
 
 const projects = [
