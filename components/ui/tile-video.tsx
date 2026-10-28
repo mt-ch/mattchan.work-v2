@@ -3,27 +3,8 @@
 // React and Next.js
 import { useEffect, useRef, useState } from "react";
 
-/**
- * Tracks whether motion is allowed, following the user's reduced-motion
- * preference as it changes.
- *
- * @returns False until mounted and whenever reduced motion is requested.
- */
-function useMotionAllowed() {
-  const [allowed, setAllowed] = useState(false);
-
-  useEffect(() => {
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setAllowed(!reduced.matches);
-
-    sync();
-    reduced.addEventListener("change", sync);
-
-    return () => reduced.removeEventListener("change", sync);
-  }, []);
-
-  return allowed;
-}
+// Shared modules
+import { useMotionAllowed } from "@/lib/motion/use-motion-allowed";
 
 /**
  * Plays the video while it is on screen and pauses it when it leaves.
