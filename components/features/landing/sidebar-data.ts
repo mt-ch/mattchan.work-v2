@@ -1,3 +1,4 @@
+// Shared modules
 import type { ProjectListItem } from "@/components/features/projects/project-list";
 
 type ProjectInput = {
@@ -7,11 +8,20 @@ type ProjectInput = {
   dateCompleted: string | null;
 };
 
+/**
+ * Maps Projects to sidebar list items. Projects without a title or slug are
+ * left out.
+ *
+ * @param projects - Projects as returned by the projects query.
+ * @returns One list item per listable Project, in order, with the year derived
+ * from `dateCompleted`.
+ */
 export function toProjectListItems(
   projects: ProjectInput[],
 ): ProjectListItem[] {
   return projects.flatMap((project) => {
     if (!project.title || !project.slug?.current) return [];
+
     return [
       {
         slug: project.slug.current,
@@ -25,6 +35,12 @@ export function toProjectListItems(
   });
 }
 
+/**
+ * Flattens portable-text bio blocks into plain text.
+ *
+ * @param bio - The About record's bio blocks, or null when unset.
+ * @returns The text of each block, separated by a blank line.
+ */
 export function bioToText(
   bio: { children?: { text?: string }[] }[] | null,
 ): string {

@@ -1,3 +1,4 @@
+// Third-party libraries
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const { fetch } = vi.hoisted(() => ({ fetch: vi.fn() }));
@@ -8,6 +9,7 @@ vi.mock("next/cache", () => ({
 }));
 vi.mock("./client", () => ({ client: { fetch } }));
 
+// Local modules
 import { getOtherProjects, getProject, getProjects } from "./projects";
 
 beforeEach(() => fetch.mockReset());

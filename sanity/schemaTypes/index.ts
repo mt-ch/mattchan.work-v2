@@ -1,5 +1,7 @@
+// Third-party libraries
 import type { SchemaTypeDefinition } from "sanity";
 
+// Local modules
 import { about } from "./about";
 import { imageCell } from "./blocks/imageCell";
 import { row } from "./blocks/row";

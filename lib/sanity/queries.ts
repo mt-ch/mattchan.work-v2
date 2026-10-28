@@ -1,3 +1,4 @@
+// Third-party libraries
 import { defineQuery } from "groq";
 
 // Image projections inline `asset->metadata { lqip, dimensions }` per query

@@ -1,3 +1,4 @@
+// Shared modules
 import { urlFor } from "@/lib/sanity/image";
 
 export type StreamTile = {
@@ -26,11 +27,18 @@ type ProjectInput = {
 export const TILE_WIDTH = 1600;
 export const TILE_HEIGHT = 900;
 
-/** Projects lacking a title, slug or cover image have no tile. */
+/**
+ * Maps Projects to stream tiles. Projects lacking a title, slug or cover image
+ * have no tile.
+ *
+ * @param projects - Projects as returned by the projects query.
+ * @returns One tile per Project that has everything a tile needs, in order.
+ */
 export function toStreamTiles(projects: ProjectInput[]): StreamTile[] {
   return projects.flatMap((project) => {
     const cover = project.coverImage;
     if (!project.title || !project.slug?.current || !cover?.asset) return [];
+
     return [
       {
         slug: project.slug.current,

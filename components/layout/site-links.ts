@@ -1,9 +1,17 @@
+// Third-party libraries
 import type { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faAt, faFile } from "@fortawesome/free-solid-svg-icons";
 import { faGithub, faSquareLinkedin } from "@fortawesome/free-brands-svg-icons";
+import { faAt, faFile } from "@fortawesome/free-solid-svg-icons";
 
 export type SiteLink = { label: string; href: string; icon: IconProp };
 
+/**
+ * Builds the sidebar's icon links from the About record. Links the owner
+ * hasn't filled in are left out.
+ *
+ * @param about - The contact fields from the About record.
+ * @returns Email, LinkedIn, GitHub and Resume links, in that order.
+ */
 export function toSiteLinks(about: {
   email: string | null;
   githubUrl: string | null;
@@ -11,6 +19,7 @@ export function toSiteLinks(about: {
   resumeUrl: string | null;
 }): SiteLink[] {
   const links: SiteLink[] = [];
+
   if (about.email) {
     links.push({ label: "Email", href: `mailto:${about.email}`, icon: faAt });
   }
@@ -27,5 +36,6 @@ export function toSiteLinks(about: {
   if (about.resumeUrl) {
     links.push({ label: "Resume", href: about.resumeUrl, icon: faFile });
   }
+
   return links;
 }

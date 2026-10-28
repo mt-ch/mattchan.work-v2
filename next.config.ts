@@ -1,3 +1,4 @@
+// React and Next.js
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {

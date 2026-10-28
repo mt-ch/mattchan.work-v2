@@ -1,6 +1,15 @@
+// Third-party libraries
 import { describe, expect, it } from "vitest";
 
-import { activeTileIndex, decayBoost, wrapOffset } from "./stream-math";
+// Local modules
+import {
+  BASE_SPEED,
+  MAX_DT,
+  activeTileIndex,
+  advanceMotion,
+  decayBoost,
+  wrapOffset,
+} from "./stream-math";
 
 const tiles = [
   { top: 0, height: 100 },
@@ -34,5 +43,20 @@ describe("decayBoost", () => {
     expect(decayBoost(100, 0.1)).toBeLessThan(100);
     expect(decayBoost(-100, 0.1)).toBeGreaterThan(-100);
     expect(decayBoost(1, 5)).toBe(0);
+  });
+});
+
+describe("advanceMotion", () => {
+  it("flows at the base speed when there is no boost", () => {
+    const next = advanceMotion({ offset: 10, boost: 0 }, 100);
+
+    expect(next.boost).toBe(0);
+    expect(next.offset).toBeCloseTo(10 + BASE_SPEED * 0.1);
+  });
+
+  it("caps a long frame so resuming a tab never jumps", () => {
+    const next = advanceMotion({ offset: 0, boost: 0 }, 60_000);
+
+    expect(next.offset).toBeCloseTo(BASE_SPEED * MAX_DT);
   });
 });

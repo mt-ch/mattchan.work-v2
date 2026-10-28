@@ -1,3 +1,4 @@
+// React and Next.js
 import Link from "next/link";
 
 export type ProjectListItem = {
@@ -7,6 +8,13 @@ export type ProjectListItem = {
   discipline: string[];
 };
 
+/**
+ * List of Projects, each linking to its Work page.
+ *
+ * @param props.projects - The Projects to list.
+ * @param props.activeSlug - Slug of the Project to highlight, if any.
+ * @returns The list; the active Project carries `aria-current="page"`.
+ */
 export function ProjectList({
   projects,
   activeSlug,
@@ -15,15 +23,16 @@ export function ProjectList({
   activeSlug?: string;
 }) {
   return (
-    <ul className="text-small text-foreground gap-xs flex flex-col font-normal">
+    <ul className="flex flex-col gap-xs text-small font-normal text-foreground">
       {projects.map((project) => {
         const active = project.slug === activeSlug;
+
         return (
           <li key={project.slug}>
             <Link
               href={`/work/${project.slug}`}
               aria-current={active ? "page" : undefined}
-              className="p-sm bg-surface hover:bg-inverse-background hover:text-inverse-foreground aria-[current=page]:bg-inverse-background aria-[current=page]:text-inverse-foreground flex items-center justify-between rounded-md"
+              className="flex items-center justify-between rounded-md bg-surface p-sm hover:bg-inverse-background hover:text-inverse-foreground aria-[current=page]:bg-inverse-background aria-[current=page]:text-inverse-foreground"
             >
               <span>{project.name}</span>
               <div className="text-muted">

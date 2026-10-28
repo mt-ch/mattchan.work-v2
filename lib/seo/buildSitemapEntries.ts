@@ -1,3 +1,4 @@
+// React and Next.js
 import type { MetadataRoute } from "next";
 
 export interface SitemapProject {

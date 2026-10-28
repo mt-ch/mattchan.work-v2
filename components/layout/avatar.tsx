@@ -1,12 +1,17 @@
 "use client";
 
+// Third-party libraries
 import { Blobatar } from "@blobatar/react";
 import { useGaze } from "@blobatar/react/gaze";
-
 import { wink } from "blobatar/expression";
 import "blobatar/motion.css";
 import "blobatar/gaze.css";
 
+/**
+ * The owner's animated blob avatar. Winks, and its gaze follows the pointer.
+ *
+ * @returns The avatar.
+ */
 export function Avatar() {
   const { ref } = useGaze({ travel: 3, lookAt: "pointer" });
 

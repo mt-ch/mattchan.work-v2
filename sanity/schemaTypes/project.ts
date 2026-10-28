@@ -1,3 +1,4 @@
+// Third-party libraries
 import { defineField, defineType } from "sanity";
 
 export const disciplines = ["Branding", "Design", "Development", "AI"];
