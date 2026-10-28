@@ -6,7 +6,7 @@ import { urlFor } from "@/lib/sanity/image";
 // Full-width media is 16:9; media sharing a 2-column row is 4:5.
 const RATIOS = {
   wide: {
-    width: 1200,  
+    width: 1200,
     height: 900,
     className: "aspect-3/2",
     sizes: "(min-width: 1024px) 66vw, 100vw",
@@ -32,21 +32,41 @@ type MediaImage = {
   metadata?: { lqip: string | null } | null;
 };
 
-/** Cropped Sanity image with lqip blur; children overlay the image. */
+const FILL_WIDTH = 1200;
+
+/**
+ * Cropped Sanity image with lqip blur; children overlay the image. With a
+ * `ratio` it sets its own aspect ratio. Without one it fills its parent, which
+ * owns the ratio; pass `aspect` (the parent's width / height) so the crop
+ * follows the hotspot.
+ */
 export function MediaFrame({
   image,
   alt,
-  ratio = "wide",
+  ratio,
+  aspect = 3 / 2,
+  sizes: sizesOverride,
+  className: extraClassName = "",
   children,
 }: {
   image: MediaImage;
   alt: string;
   ratio?: MediaRatio;
+  aspect?: number;
+  sizes?: string;
+  className?: string;
   children?: ReactNode;
 }) {
-  const { width, height, className, sizes } = RATIOS[ratio];
+  const preset = ratio ? RATIOS[ratio] : null;
+  const width = preset?.width ?? FILL_WIDTH;
+  const height = preset?.height ?? Math.round(FILL_WIDTH / aspect);
+  const className = preset?.className ?? "h-full";
+  const sizes =
+    sizesOverride ?? preset?.sizes ?? "(min-width: 1024px) 66vw, 100vw";
   return (
-    <div className={`relative ${className} overflow-hidden rounded-md`}>
+    <div
+      className={`relative ${className} ${extraClassName} overflow-hidden rounded-md`}
+    >
       <Image
         src={urlFor(image as Parameters<typeof urlFor>[0])
           .width(width)
