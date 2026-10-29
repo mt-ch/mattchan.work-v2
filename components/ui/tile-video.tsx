@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState } from "react";
 
 // Shared modules
+import { useEntrance } from "@/components/features/landing/entrance/entrance-context";
 import { useMotionAllowed } from "@/lib/motion/use-motion-allowed";
 
 /**
@@ -36,16 +37,21 @@ function usePlayWhenVisible(
 /**
  * Muted looping cover video laid over a tile's poster image. Plays only while
  * on screen, fades in once frames are playing, and is not rendered at all for
- * reduced-motion users, who keep the poster.
+ * reduced-motion users, who keep the poster, nor before the Landing Entrance
+ * has completed.
  *
  * @param props.src - URL of the video file.
  * @param props.label - Accessible name for the video; when omitted the video is hidden from assistive tech.
- * @returns The video, or nothing when motion is not allowed.
+ * @returns The video, or nothing when motion is not allowed or the Entrance is running.
  */
 export function TileVideo({ src, label }: { src: string; label?: string }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
-  const allowed = useMotionAllowed();
+  const motionAllowed = useMotionAllowed();
+  const { entranceDone } = useEntrance();
+
+  // Nothing loads or plays until the Landing Entrance has completed
+  const allowed = motionAllowed && entranceDone;
 
   usePlayWhenVisible(videoRef, allowed);
 

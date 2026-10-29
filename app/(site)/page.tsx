@@ -9,6 +9,7 @@ import {
   ActiveProjectList,
   ActiveProjectProvider,
 } from "@/components/features/landing/active-project";
+import { LandingEntrance } from "@/components/features/landing/entrance/landing-entrance";
 import { ImageStream } from "@/components/features/landing/image-stream";
 import { MobileCarousel } from "@/components/features/landing/mobile-carousel";
 import {
@@ -63,7 +64,10 @@ function LandingSidebar({
   projects: ProjectListItem[];
 }) {
   return (
-    <aside className="relative col-span-12 flex flex-col gap-4xl pt-sm pb-4xl lg:sticky lg:top-0 lg:order-2 lg:col-span-4 lg:h-full lg:shrink-0 lg:justify-between lg:self-start lg:py-sm">
+    <aside
+      data-entrance="sidebar"
+      className="relative col-span-12 flex flex-col gap-4xl pt-sm pb-4xl lg:sticky lg:top-0 lg:order-2 lg:col-span-4 lg:h-full lg:shrink-0 lg:justify-between lg:self-start lg:py-sm"
+    >
       <AboutIdentity about={about} />
 
       <div className="absolute top-1/2 hidden w-full -translate-y-1/2 lg:block">
@@ -98,13 +102,15 @@ export default async function HomePage() {
 
   return (
     <ActiveProjectProvider initialSlug={tiles[0]?.slug ?? listItems[0]?.slug}>
-      <div className="flex h-dvh flex-col justify-between overflow-hidden px-sm lg:grid lg:grid-cols-12 lg:grid-rows-1 lg:gap-sm">
-        <LandingSidebar about={about} projects={listItems} />
-        <main className="h-full pb-sm lg:order-1 lg:col-span-8 lg:flex lg:flex-1 lg:flex-col lg:gap-sm lg:pb-0">
-          <ImageStream tiles={tiles} />
-          <MobileCarousel tiles={tiles} />
-        </main>
-      </div>
+      <LandingEntrance>
+        <div className="flex h-dvh flex-col justify-between overflow-hidden px-sm lg:grid lg:grid-cols-12 lg:grid-rows-1 lg:gap-sm">
+          <LandingSidebar about={about} projects={listItems} />
+          <main className="h-full pb-sm lg:order-1 lg:col-span-8 lg:flex lg:flex-1 lg:flex-col lg:gap-sm lg:pb-0">
+            <ImageStream tiles={tiles} />
+            <MobileCarousel tiles={tiles} />
+          </main>
+        </div>
+      </LandingEntrance>
     </ActiveProjectProvider>
   );
 }

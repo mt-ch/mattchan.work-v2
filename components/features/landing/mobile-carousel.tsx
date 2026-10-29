@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 // Local modules
+import { useEntrance } from "./entrance/entrance-context";
 import { createCarousel } from "./carousel-motion";
 import type { StreamTile } from "./stream-data";
 import { TileVideo } from "@/components/ui/tile-video";
@@ -25,6 +26,7 @@ function CarouselSlide({ tile, copy }: { tile: StreamTile; copy: number }) {
   return (
     <Link
       href={`/work/${tile.slug}`}
+      data-entrance="tile"
       draggable={false}
       aria-hidden={copy > 0 || undefined}
       tabIndex={copy > 0 ? -1 : undefined}
@@ -60,6 +62,7 @@ function useCarousel(tiles: StreamTile[]) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const movedRef = useRef(0);
+  const { registerController } = useEntrance();
   const [copies, setCopies] = useState(3);
 
   useEffect(() => {
@@ -80,11 +83,14 @@ function useCarousel(tiles: StreamTile[]) {
       onCopiesNeeded: (needed) => setCopies((c) => Math.max(c, needed)),
     });
 
-    // The Landing has no Entrance yet, so it starts straight away
-    carousel.start();
+    // The Entrance starts the carousel when it completes
+    const unregister = registerController(carousel);
 
-    return carousel.destroy;
-  }, [tiles]);
+    return () => {
+      unregister();
+      carousel.destroy();
+    };
+  }, [tiles, registerController]);
 
   // A swipe that ends on a slide must not navigate.
   const swallowSwipeClick = (event: React.MouseEvent) => {
