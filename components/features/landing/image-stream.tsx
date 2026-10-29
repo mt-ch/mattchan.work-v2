@@ -6,7 +6,9 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 // Local modules
+import { ENTRANCE_CONFIG } from "./entrance/entrance-config";
 import { useEntrance } from "./entrance/entrance-context";
+import { STACK_INDEX_ATTRIBUTE } from "./entrance/entrance-play";
 import { useActiveProject } from "./active-project";
 import type { StreamTile } from "./stream-data";
 import { createStream } from "./stream-motion";
@@ -18,13 +20,26 @@ import { TileVideo } from "@/components/ui/tile-video";
  *
  * @param props.tile - The Project tile to show.
  * @param props.copy - Which repeat of the set this tile belongs to; 0 is the real one.
+ * @param props.index - The tile's place in the set.
  * @returns A link to the Project's Work page.
  */
-function StreamTileLink({ tile, copy }: { tile: StreamTile; copy: number }) {
+function StreamTileLink({
+  tile,
+  copy,
+  index,
+}: {
+  tile: StreamTile;
+  copy: number;
+  index: number;
+}) {
+  // The first copy of the first tiles is the Entrance stack: fetch it first
+  const inStack = copy === 0 && index < ENTRANCE_CONFIG.stackSize;
+
   return (
     <Link
       href={`/work/${tile.slug}`}
       data-entrance="tile"
+      {...(inStack && { [STACK_INDEX_ATTRIBUTE]: index })}
       draggable={false}
       aria-hidden={copy > 0 || undefined}
       tabIndex={copy > 0 ? -1 : undefined}
@@ -38,6 +53,8 @@ function StreamTileLink({ tile, copy }: { tile: StreamTile; copy: number }) {
         placeholder={tile.blurDataURL ? "blur" : "empty"}
         blurDataURL={tile.blurDataURL}
         sizes="(min-width: 1024px) 66vw, 0px"
+        preload={inStack}
+        fetchPriority={inStack ? "high" : undefined}
         draggable={false}
         className="aspect-3/2 h-auto w-full object-cover"
       />
@@ -98,6 +115,7 @@ export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
   return (
     <div
       ref={viewportRef}
+      data-entrance="stream"
       className="hidden h-full overflow-hidden lg:block"
       style={{ touchAction: "none" }}
     >
@@ -106,11 +124,12 @@ export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
         className="flex flex-col gap-sm will-change-transform"
       >
         {Array.from({ length: copies }, (_, copy) =>
-          tiles.map((tile) => (
+          tiles.map((tile, index) => (
             <StreamTileLink
               key={`${copy}-${tile.slug}`}
               tile={tile}
               copy={copy}
+              index={index}
             />
           )),
         )}

@@ -6,9 +6,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 // Local modules
 import type { MotionController } from "../motion-controller";
 import { EntranceContext } from "./entrance-context";
-import { mountEntranceDevTools } from "./entrance-devtools";
+import { EntranceCounter } from "./entrance-counter";
+import { playEntrance } from "./entrance-play";
 import { ENTRANCE_REDUCED, ENTRANCE_STATE_ATTRIBUTE } from "./entrance-script";
-import { buildEntranceTimeline } from "./entrance-timeline";
 
 /**
  * Owns the hand-off: the controllers waiting to start, and whether the
@@ -44,7 +44,9 @@ function useHandOff() {
 
 /**
  * Wraps the Landing and plays its Entrance: one GSAP master timeline whose
- * last step starts the stream and carousel. Plays only on a hard load, which
+ * last step starts the stream and carousel.
+ * On desktop it first gates on the stack images, then pops them into a stack
+ * while a counter runs to 100. Plays only on a hard load, which
  * the pre-hydration script marks on `<html>`; any other mount hands off at once.
  *
  * @param props.children - The Landing page.
@@ -67,17 +69,7 @@ export function LandingEntrance({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    const timeline = buildEntranceTimeline({
-      root,
-      reduced: state === ENTRANCE_REDUCED,
-      onComplete: handOff,
-    });
-    const removeDevTools = mountEntranceDevTools(timeline);
-
-    return () => {
-      removeDevTools();
-      timeline.kill();
-    };
+    return playEntrance(root, state === ENTRANCE_REDUCED, handOff);
   }, [handOff]);
 
   const value = useMemo(
@@ -89,6 +81,7 @@ export function LandingEntrance({ children }: { children: React.ReactNode }) {
     <EntranceContext value={value}>
       <div ref={rootRef} data-entrance="root">
         {children}
+        <EntranceCounter />
       </div>
     </EntranceContext>
   );

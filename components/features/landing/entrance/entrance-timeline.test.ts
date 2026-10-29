@@ -14,7 +14,7 @@ import { ENTRANCE_FADE_VAR, buildEntranceTimeline } from "./entrance-timeline";
 function setup(reduced: boolean) {
   const root = document.createElement("div");
   const onComplete = vi.fn();
-  const timeline = buildEntranceTimeline({ root, reduced, onComplete });
+  const { timeline } = buildEntranceTimeline({ root, reduced, onComplete });
   timeline.pause(0);
 
   return { root, onComplete, timeline };
