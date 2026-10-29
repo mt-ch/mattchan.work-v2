@@ -147,6 +147,11 @@ function addPops(tl: gsap.core.Timeline, ring: RingCard[], reader: SlotReader) {
         scale: from,
         opacity: 0,
         zIndex: i + 1,
+        // A clone has no layout of its own, so it is sized as a stack card
+        ...(card.clone && {
+          width: () => reader.slotOf(card).width,
+          height: () => reader.slotOf(card).height,
+        }),
         borderRadius: () => `${card.radius / from()}px`,
       },
       0,
