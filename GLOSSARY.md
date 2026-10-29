@@ -35,5 +35,8 @@ The single-page overview at `/`, made of sections designed in Figma.
 The one-time intro that plays on a hard load of the Landing: a single GSAP master timeline over the real stream nodes, ending by starting the stream and carousel. Client-side navigation back to `/` plays none.
 _Avoid_: Preloader, loader
 
+**Orbit**:
+A phase of the Entrance that replaces the stack pop-in: twelve Project images pop onto an oval ring that rotates slowly around the counter, then ease to a stop and collapse into the centred stack that the Deal starts from. The cards beyond the five real tiles are clones, removed when the Deal ends.
+
 **Work page**:
 A Project's detail page. Pertemps is the template.

@@ -3,17 +3,17 @@ import { gsap } from "gsap";
 
 // Local modules
 import { ENTRANCE_CONFIG } from "./entrance-config";
-import type { StackRect } from "./entrance-stack";
+import type { Point } from "./orbit-geometry";
 
 /** The Entrance counter's motion: blur in, climb with loading, run, blur out. */
 export type Counter = {
   /** Blurs the pill in. */
   show: () => gsap.core.Tween;
-  /** Moves the pill beside the stack's top-right corner. */
-  place: (stack: StackRect) => void;
+  /** Centres the pill on a point. */
+  place: (centre: Point) => void;
   /** Climbs towards the load phase's share of 100, never going backwards. */
   loadTo: (fraction: number) => void;
-  /** Stops the load-phase climb; the stack phase continues from the load share. */
+  /** Stops the load-phase climb; the orbit phase continues from the load share. */
   endLoad: () => void;
   /** Runs from the load share to 100 over the given seconds. */
   run: (duration: number) => gsap.core.Tween;
@@ -66,7 +66,7 @@ function blurOut(el: HTMLElement) {
  * @returns The counter's controls.
  */
 export function createCounter(el: HTMLElement): Counter {
-  const { counterLoadShare, counterSmoothing, counterGap } = ENTRANCE_CONFIG;
+  const { counterLoadShare, counterSmoothing } = ENTRANCE_CONFIG;
   const state = { n: 0 };
   const onUpdate = () => {
     el.textContent = String(Math.round(state.n));
@@ -74,13 +74,8 @@ export function createCounter(el: HTMLElement): Counter {
 
   return {
     show: () => blurIn(el),
-    place(stack) {
-      gsap.set(el, {
-        xPercent: -100,
-        yPercent: -100,
-        x: stack.left + stack.width,
-        y: stack.top - counterGap,
-      });
+    place(centre) {
+      gsap.set(el, { xPercent: -50, yPercent: -50, x: centre.x, y: centre.y });
     },
     loadTo(fraction) {
       // A new target starts from the current value, so the counter only climbs

@@ -1,0 +1,9 @@
+# Landing Entrance: an orbiting ring as an alternative to the stack pop-in
+
+The stack pop-in in ADR 0009 is static for a first impression: a counter on a blank page, then five cards piling up. The orbit is an exploratory alternative that replaces the Stack phase on desktop, keeping the load gate, the counter, the Deal, the Sidebar fade and the hand-off unchanged. It lives on its own branch and merges only if the owner chooses it over the stack.
+
+Twelve cards pop onto fixed slots on an ellipse around the centred counter while the ring turns clockwise at a constant speed. The first five are the real stream tiles, moved with the same measured transforms the stack used; the other seven are clones, in tile order repeating. The counter runs 0 to 40 on real image progress, then 40 to 100 across the pops. It blurs out, the rotation eases to a stop, and all twelve glide into the centred stack, from which the existing Deal runs.
+
+Clones are throwaway `aria-hidden`, non-interactive boxes appended to the Entrance root, showing the real tile's image URL so no extra download happens. They exist only while the Entrance is pending: they deal out beside the real cards, fade to nothing and are removed from the document when the Deal ends. Because a clone sits outside the stream, clones are layered above every real card; this looks the same because each shows the same image as its tile. The ring takes a card count and a list of sources, so photos uploaded later can replace the clones without code changes.
+
+A resize while the Load or orbit phase is showing re-measures the ellipse and slots and keeps the timeline's place. From the collapse onward, or on crossing the desktop breakpoint, the timeline snaps to its end as before. Reduced motion stays the plain fade, and mobile keeps the carousel until the desktop feel is approved.
