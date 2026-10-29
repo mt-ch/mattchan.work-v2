@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 // Local modules
-import { startCarousel } from "./carousel-motion";
+import { createCarousel } from "./carousel-motion";
 import type { StreamTile } from "./stream-data";
 import { TileVideo } from "@/components/ui/tile-video";
 
@@ -67,7 +67,7 @@ function useCarousel(tiles: StreamTile[]) {
     const track = trackRef.current;
     if (!viewport || !track || tiles.length === 0) return;
 
-    return startCarousel({
+    const carousel = createCarousel({
       viewport,
       track,
       tileCount: tiles.length,
@@ -79,6 +79,11 @@ function useCarousel(tiles: StreamTile[]) {
       },
       onCopiesNeeded: (needed) => setCopies((c) => Math.max(c, needed)),
     });
+
+    // The Landing has no Entrance yet, so it starts straight away
+    carousel.start();
+
+    return carousel.destroy;
   }, [tiles]);
 
   // A swipe that ends on a slide must not navigate.

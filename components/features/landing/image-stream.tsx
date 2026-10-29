@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 // Local modules
 import { useActiveProject } from "./active-project";
 import type { StreamTile } from "./stream-data";
-import { startStream } from "./stream-motion";
+import { createStream } from "./stream-motion";
 import { TileVideo } from "@/components/ui/tile-video";
 
 /**
@@ -45,14 +45,12 @@ function StreamTileLink({ tile, copy }: { tile: StreamTile; copy: number }) {
 }
 
 /**
- * Desktop Landing stream: Project tiles flowing vertically in an endless loop.
- * Wheel and touch input anywhere on the window boosts the flow, and the Project
- * at the viewport centre becomes the active one.
+ * Runs the stream's motion against its two elements.
  *
- * @param props.tiles - The Project tiles to loop.
- * @returns The stream, hidden below the `lg` breakpoint.
+ * @param tiles - The Project tiles to loop.
+ * @returns The element refs and how many copies of the set to render.
  */
-export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
+function useStream(tiles: StreamTile[]) {
   const { setSlug } = useActiveProject();
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
@@ -63,14 +61,33 @@ export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
     const track = trackRef.current;
     if (!viewport || !track || tiles.length === 0) return;
 
-    return startStream({
+    const stream = createStream({
       viewport,
       track,
       tiles,
       onActiveSlug: setSlug,
       onCopiesNeeded: (needed) => setCopies((c) => Math.max(c, needed)),
     });
+
+    // The Landing has no Entrance yet, so it starts straight away
+    stream.start();
+
+    return stream.destroy;
   }, [tiles, setSlug]);
+
+  return { viewportRef, trackRef, copies };
+}
+
+/**
+ * Desktop Landing stream: Project tiles flowing vertically in an endless loop.
+ * Wheel and touch input anywhere on the window boosts the flow, and the Project
+ * at the viewport centre becomes the active one.
+ *
+ * @param props.tiles - The Project tiles to loop.
+ * @returns The stream, hidden below the `lg` breakpoint.
+ */
+export function ImageStream({ tiles }: { tiles: StreamTile[] }) {
+  const { viewportRef, trackRef, copies } = useStream(tiles);
 
   return (
     <div
