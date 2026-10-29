@@ -4,12 +4,24 @@ export type EntranceConfig = {
   fadeDuration: number;
   /** Seconds the page takes to fade in when reduced motion is requested. */
   reducedFadeDuration: number;
-  /** How many Project tiles (from the first) make up the stack. */
+  /** How many Project tiles (from the first) the Entrance waits for and deals out. */
   stackSize: number;
   /** Stack card width as `clamp(min, vw, max)`: min and max in px, vw as a viewport fraction. */
   stackWidth: { min: number; vw: number; max: number };
   /** Stack card aspect ratio (width / height); matches the tiles' natural 3:2. */
   stackAspect: number;
+  /** How many cards sit on the orbit ring; real tiles first, then clones. */
+  ringCount: number;
+  /** Width and height of the orbit ellipse as fractions of the viewport. */
+  ringSize: { width: number; height: number };
+  /** Ring card width as a fraction of the stack card width. */
+  ringCardScale: number;
+  /** Seconds the ring takes to turn one full lap. */
+  ringPeriod: number;
+  /** Seconds the rotation takes to ease to a stop as the collapse begins. */
+  ringStopDuration: number;
+  /** GSAP ease of the rotation coming to a stop. */
+  ringStopEase: string;
   /** Seconds between one card starting to pop in and the next. */
   popStagger: number;
   /** Seconds each card's pop-in lasts. */
@@ -30,16 +42,20 @@ export type EntranceConfig = {
   counterOutDuration: number;
   /** GSAP ease of the counter blurring out. */
   counterOutEase: string;
-  /** Counter value the load phase climbs to; the stack phase runs from here to 100. */
+  /** Counter value the load phase climbs to; the orbit phase runs from here to 100. */
   counterLoadShare: number;
   /** Seconds the load-phase counter takes to catch up with each settled image. */
   counterSmoothing: number;
-  /** Gap in px between the stack's top-right corner and the counter. */
-  counterGap: number;
+  /** Seconds all cards take to glide from the ring into the centred stack. */
+  collapseDuration: number;
+  /** GSAP ease of the glide into the stack. */
+  collapseEase: string;
   /** Seconds each card takes to travel from the stack to its slot. */
   dealDuration: number;
   /** GSAP ease of each card's travel. */
   dealEase: string;
+  /** GSAP ease of the clones fading out as they deal. */
+  cloneFadeEase: string;
   /** Seconds between one card starting to deal and the next; tile 0 goes first. */
   dealStagger: number;
   /** Share of the deal (0 to 1), counted from its end, over which the other nodes fade in. */
@@ -56,14 +72,20 @@ export type EntranceConfig = {
   sidebarOverlap: number;
 };
 
-/** The Entrance's tunable values; later tickets add to this. */
+/** The Entrance's tunable values. */
 export const ENTRANCE_CONFIG: EntranceConfig = {
   fadeDuration: 0.8,
   reducedFadeDuration: 0.4,
   stackSize: 5,
   stackWidth: { min: 320, vw: 0.36, max: 560 },
   stackAspect: 3 / 2,
-  popStagger: 0.28,
+  ringCount: 12,
+  ringSize: { width: 0.7, height: 0.6 },
+  ringCardScale: 0.6,
+  ringPeriod: 12,
+  ringStopDuration: 0.6,
+  ringStopEase: "power2.out",
+  popStagger: 0.15,
   popDuration: 0.8,
   popEase: "expo.out",
   popFromScale: 0.6,
@@ -75,9 +97,11 @@ export const ENTRANCE_CONFIG: EntranceConfig = {
   counterOutEase: "power2.in",
   counterLoadShare: 40,
   counterSmoothing: 0.4,
-  counterGap: 12,
+  collapseDuration: 0.9,
+  collapseEase: "expo.inOut",
   dealDuration: 1.2,
   dealEase: "expo.inOut",
+  cloneFadeEase: "power1.in",
   dealStagger: 0.06,
   dealFadeShare: 0.5,
   dealFadeOffset: 40,

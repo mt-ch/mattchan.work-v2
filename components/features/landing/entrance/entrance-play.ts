@@ -6,7 +6,6 @@ import { createCounter, type Counter } from "./counter-motion";
 import { ENTRANCE_CONFIG } from "./entrance-config";
 import { mountEntranceDevTools } from "./entrance-devtools";
 import { waitForImages } from "./entrance-gate";
-import { getStackRect } from "./entrance-stack";
 import {
   buildEntranceTimeline,
   type EntranceTimeline,
@@ -125,10 +124,11 @@ function watchViewport(onResize: () => void, onBreakpoint: () => void) {
 }
 
 /**
- * Plays the Load and Stack phases: the counter blurs in and climbs with the
+ * Plays the Load and orbit phases: the counter blurs in and climbs with the
  * stack images' loading; once all of them have settled the cards that loaded
- * pop in, deal out into the stream and the sidebar fades in. A resize during
- * the deal, or crossing the desktop breakpoint, snaps to the finished state.
+ * pop onto a rotating ring, collapse into a stack, deal out into the stream
+ * and the sidebar fades in. A resize once the collapse has begun, or crossing
+ * the desktop breakpoint, snaps to the finished state.
  *
  * @param root - The Entrance root.
  * @param tiles - The stack tiles, top of the stack first.
@@ -147,7 +147,7 @@ function playStack(
   let [cancelled, crossed] = [false, false];
 
   const place = () => {
-    counter.place(getStackRect(window.innerWidth, window.innerHeight));
+    counter.place({ x: window.innerWidth / 2, y: window.innerHeight / 2 });
   };
   place();
   counter.show();
@@ -165,7 +165,7 @@ function playStack(
     },
   );
 
-  // A resize keeps the stack centred; crossing the breakpoint ends the Entrance
+  // A resize keeps the counter and ring centred; crossing the breakpoint ends the Entrance
   const stopWatching = watchViewport(
     () => {
       place();
@@ -181,13 +181,13 @@ function playStack(
     cancelled = true;
     stopWatching();
     run.stopDevTools();
-    run.master?.timeline.kill();
+    run.master?.dispose();
     counter.destroy();
   };
 }
 
 /**
- * Plays the Entrance that suits the visit: the full Load and Stack on desktop,
+ * Plays the Entrance that suits the visit: the full Load and orbit on desktop,
  * and the page fade for reduced motion, below the desktop breakpoint or when
  * there is no stack to show.
  *
