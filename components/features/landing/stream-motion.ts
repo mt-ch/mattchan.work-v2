@@ -7,6 +7,7 @@ import { getDesktop, getReducedMotion } from "@/lib/motion/environment";
 
 // Local modules
 import type { StreamTile } from "./stream-data";
+import type { MotionController } from "./motion-controller";
 import {
   BOOST_GAIN,
   activeTileIndex,
@@ -25,6 +26,8 @@ type StreamState = {
   viewportHeight: number;
   boxes: TileBox[];
   activeSlug: string;
+  /** False while paused: no active-Project reporting. */
+  started: boolean;
 };
 
 export type StreamOptions = {
@@ -74,6 +77,9 @@ function render(state: StreamState, options: StreamOptions) {
 
   state.offset = wrapOffset(state.offset, state.setHeight);
   gsap.set(options.track, { y: -state.offset });
+
+  // Stay silent until started so the owner controls the highlight
+  if (!state.started) return;
 
   // Report the Project at the viewport centre when it changes
   const index = activeTileIndex(
@@ -190,13 +196,14 @@ function startInput(
 }
 
 /**
- * Starts the infinite vertical stream: measures, centres the first Project,
- * then flows it with the ticker and wheel/touch input.
+ * Creates the infinite vertical stream paused: it measures, centres the first
+ * Project and keeps slots correct on resize, but does not flow, take input or
+ * report the active Project until `start()` is called.
  *
  * @param options - The stream's elements and callbacks.
- * @returns A function that stops the stream and removes every listener.
+ * @returns A controller to start the stream and to tear it down.
  */
-export function startStream(options: StreamOptions) {
+export function createStream(options: StreamOptions): MotionController {
   const reduced = getReducedMotion();
   const state: StreamState = {
     offset: 0,
@@ -205,19 +212,33 @@ export function startStream(options: StreamOptions) {
     viewportHeight: 0,
     boxes: [],
     activeSlug: "",
+    started: false,
   };
 
   measure(state, options);
   centreFirstTile(state);
   render(state, options);
 
-  const stopInput = startInput(state, options, reduced);
   const stopResize = watchResize(state, options);
-  const stopTicker = startTicker(state, options, reduced);
+  let stopRunning: (() => void) | undefined;
 
-  return () => {
-    stopInput();
-    stopTicker();
-    stopResize();
+  return {
+    start() {
+      if (state.started) return;
+      state.started = true;
+
+      // Report the centred Project now, then flow and listen
+      render(state, options);
+      const stopInput = startInput(state, options, reduced);
+      const stopTicker = startTicker(state, options, reduced);
+      stopRunning = () => {
+        stopInput();
+        stopTicker();
+      };
+    },
+    destroy() {
+      stopRunning?.();
+      stopResize();
+    },
   };
 }

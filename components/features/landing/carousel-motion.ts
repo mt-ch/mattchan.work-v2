@@ -6,6 +6,7 @@ import { Observer } from "gsap/Observer";
 import { getReducedMotion } from "@/lib/motion/environment";
 
 // Local modules
+import type { MotionController } from "./motion-controller";
 import { BOOST_GAIN, advanceMotion, wrapOffset } from "./stream-math";
 
 gsap.registerPlugin(Observer);
@@ -153,13 +154,15 @@ function startInput(
 }
 
 /**
- * Starts the infinite horizontal carousel: the stream's motion model on the
- * x axis. Constant base speed, swipes add velocity that eases back.
+ * Creates the infinite horizontal carousel paused: the stream's motion model
+ * on the x axis. It measures and keeps slots correct on resize, but does not
+ * flow or take swipes until `start()` is called. Constant base speed, swipes
+ * add velocity that eases back.
  *
  * @param options - The carousel's elements and callbacks.
- * @returns A function that stops the carousel and removes every listener.
+ * @returns A controller to start the carousel and to tear it down.
  */
-export function startCarousel(options: CarouselOptions) {
+export function createCarousel(options: CarouselOptions): MotionController {
   const reduced = getReducedMotion();
   const state: CarouselState = {
     offset: 0,
@@ -173,12 +176,24 @@ export function startCarousel(options: CarouselOptions) {
   render(state, options);
 
   const stopResize = watchResize(state, options);
-  const stopTicker = startTicker(state, options, reduced);
-  const stopInput = startInput(state, options, reduced);
+  let stopRunning: (() => void) | undefined;
+  let started = false;
 
-  return () => {
-    stopInput();
-    stopTicker();
-    stopResize();
+  return {
+    start() {
+      if (started) return;
+      started = true;
+
+      const stopTicker = startTicker(state, options, reduced);
+      const stopInput = startInput(state, options, reduced);
+      stopRunning = () => {
+        stopInput();
+        stopTicker();
+      };
+    },
+    destroy() {
+      stopRunning?.();
+      stopResize();
+    },
   };
 }
