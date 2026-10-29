@@ -2,6 +2,7 @@
 import { gsap } from "gsap";
 
 // Local modules
+import { counterScaleRadius, naturalRadius } from "./deal-motion";
 import type { Counter } from "./counter-motion";
 import { ENTRANCE_CONFIG } from "./entrance-config";
 import {
@@ -65,6 +66,36 @@ function createStackMeasurer() {
 }
 
 /**
+ * Adds one card's pop-in: it scales up and fades in, its corners counter-scaled
+ * so they match the deal's from the first frame.
+ *
+ * @param tl - The master timeline.
+ * @param el - The card.
+ * @param from - Where the card's scale starts.
+ * @param to - Where the card's scale ends.
+ * @param at - When the pop starts in seconds.
+ */
+function addPop(
+  tl: gsap.core.Timeline,
+  el: HTMLElement,
+  from: () => number,
+  to: () => number,
+  at: number,
+) {
+  const { popDuration, popEase, popFadeShare } = ENTRANCE_CONFIG;
+  const sync = () => counterScaleRadius(el, naturalRadius(el));
+
+  tl.fromTo(
+    el,
+    { scale: from },
+    { scale: to, duration: popDuration, ease: popEase, onUpdate: sync },
+    at,
+  );
+  const fade = { duration: popDuration * popFadeShare, ease: "none" };
+  tl.to(el, { opacity: 1, ...fade }, at);
+}
+
+/**
  * Adds the stack phase: every card pops in on top of the last, tile 4 first
  * and tile 0 last, while the counter runs to 100 and then blurs out.
  *
@@ -74,8 +105,7 @@ function createStackMeasurer() {
  */
 export function addStack(tl: gsap.core.Timeline, parts: StackParts) {
   const { cards, counter } = parts;
-  const { popStagger, popDuration, popEase, popFromScale, popFadeShare } =
-    ENTRANCE_CONFIG;
+  const { popStagger, popDuration, popFromScale } = ENTRANCE_CONFIG;
   const { transformOf, forget } = createStackMeasurer();
   const fromScale = (el: HTMLElement) => () =>
     transformOf(el).scale * popFromScale;
@@ -95,21 +125,13 @@ export function addStack(tl: gsap.core.Timeline, parts: StackParts) {
       scale: fromScale(el),
       opacity: 0,
       zIndex: cards.length - i,
+      borderRadius: () => `${naturalRadius(el) / fromScale(el)()}px`,
     });
   });
 
   // Pop them in from the last tile to the first
   [...cards].reverse().forEach((el, k) => {
-    const at = k * popStagger;
-    const to = { scale: () => transformOf(el).scale };
-    tl.fromTo(
-      el,
-      { scale: fromScale(el) },
-      { ...to, duration: popDuration, ease: popEase },
-      at,
-    );
-    const fade = { duration: popDuration * popFadeShare, ease: "none" };
-    tl.to(el, { opacity: 1, ...fade }, at);
+    addPop(tl, el, fromScale(el), () => transformOf(el).scale, k * popStagger);
   });
 
   // The counter reaches 100 as the top card settles, then blurs out

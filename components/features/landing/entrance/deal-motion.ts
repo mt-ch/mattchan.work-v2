@@ -7,6 +7,26 @@ import { ENTRANCE_CONFIG } from "./entrance-config";
 /** Label on the master timeline where the deal begins. */
 export const DEAL_LABEL = "deal";
 
+/** Each card's stylesheet radius, read once before the Entrance overrides it. */
+const naturalRadii = new WeakMap<HTMLElement, number>();
+
+/**
+ * Reads a card's natural corner radius. The first read is remembered, because
+ * the Entrance then overrides the radius inline.
+ *
+ * @param el - The card.
+ * @returns The radius in px.
+ */
+export function naturalRadius(el: HTMLElement) {
+  const known = naturalRadii.get(el);
+  if (known !== undefined) return known;
+
+  const radius = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+  naturalRadii.set(el, radius);
+
+  return radius;
+}
+
 /**
  * Keeps a card's corners the same size on screen while it is scaled, by
  * dividing its natural radius by its current scale.
@@ -14,7 +34,7 @@ export const DEAL_LABEL = "deal";
  * @param el - The card.
  * @param radius - The card's natural corner radius in px.
  */
-function counterScaleRadius(el: HTMLElement, radius: number) {
+export function counterScaleRadius(el: HTMLElement, radius: number) {
   const scale = Number(gsap.getProperty(el, "scale")) || 1;
   el.style.borderRadius = `${radius / scale}px`;
 }
@@ -40,7 +60,7 @@ function dealSpan(cardCount: number) {
  */
 function addCardDeal(tl: gsap.core.Timeline, el: HTMLElement, at: number) {
   const config = ENTRANCE_CONFIG;
-  const radius = parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0;
+  const radius = naturalRadius(el);
   const sync = () => counterScaleRadius(el, radius);
 
   tl.to(
