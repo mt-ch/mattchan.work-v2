@@ -36,6 +36,24 @@ export type EntranceConfig = {
   counterSmoothing: number;
   /** Gap in px between the stack's top-right corner and the counter. */
   counterGap: number;
+  /** Seconds each card takes to travel from the stack to its slot. */
+  dealDuration: number;
+  /** GSAP ease of each card's travel. */
+  dealEase: string;
+  /** Seconds between one card starting to deal and the next; tile 0 goes first. */
+  dealStagger: number;
+  /** Share of the deal (0 to 1), counted from its end, over which the other nodes fade in. */
+  dealFadeShare: number;
+  /** Distance in px the other nodes rise from as they fade in. */
+  dealFadeOffset: number;
+  /** GSAP ease of the other nodes fading in. */
+  dealFadeEase: string;
+  /** Seconds the sidebar takes to fade in. */
+  sidebarDuration: number;
+  /** GSAP ease of the sidebar fade. */
+  sidebarEase: string;
+  /** Seconds before the deal ends at which the sidebar starts to fade in. */
+  sidebarOverlap: number;
 };
 
 /** The Entrance's tunable values; later tickets add to this. */
@@ -58,4 +76,13 @@ export const ENTRANCE_CONFIG: EntranceConfig = {
   counterLoadShare: 40,
   counterSmoothing: 0.4,
   counterGap: 12,
+  dealDuration: 1.2,
+  dealEase: "expo.inOut",
+  dealStagger: 0.06,
+  dealFadeShare: 0.5,
+  dealFadeOffset: 40,
+  dealFadeEase: "power2.out",
+  sidebarDuration: 0.6,
+  sidebarEase: "power2.out",
+  sidebarOverlap: 0.5,
 };

@@ -22,7 +22,11 @@ vi.mock("./entrance-timeline", () => ({
   buildEntranceTimeline: ({ onComplete }: { onComplete: () => void }) => {
     timeline.finish = onComplete;
 
-    return { timeline: { kill: () => {} }, remeasure: () => {} };
+    return {
+      timeline: { kill: () => {} },
+      remeasure: () => {},
+      finish: () => {},
+    };
   },
 }));
 

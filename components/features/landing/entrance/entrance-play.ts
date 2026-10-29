@@ -2,7 +2,7 @@
 import { getDesktop } from "@/lib/motion/environment";
 
 // Local modules
-import { createCounter } from "./counter-motion";
+import { createCounter, type Counter } from "./counter-motion";
 import { ENTRANCE_CONFIG } from "./entrance-config";
 import { mountEntranceDevTools } from "./entrance-devtools";
 import { waitForImages } from "./entrance-gate";
@@ -69,10 +69,66 @@ function rafDebounce(fn: () => void) {
   return debounced;
 }
 
+/** The master timeline once the gate has opened, and how to unmount its dev tools. */
+type StackRun = { master?: EntranceTimeline; stopDevTools: () => void };
+
+/**
+ * Ends the counter's load phase, builds the master timeline for the cards that
+ * loaded and mounts the dev tools.
+ *
+ * @param run - The run to fill in.
+ * @param options - The root, stack tiles, which of them loaded, counter and hand-off callback.
+ */
+function startMaster(
+  run: StackRun,
+  options: {
+    root: HTMLElement;
+    tiles: HTMLElement[];
+    loaded: boolean[];
+    counter: Counter;
+    onComplete: () => void;
+  },
+) {
+  const { root, tiles, loaded, counter, onComplete } = options;
+  counter.endLoad();
+
+  const cards = tiles.filter((_, i) => loaded[i]);
+  const stack = { cards, counter };
+  run.master = buildEntranceTimeline({
+    root,
+    reduced: false,
+    stack,
+    onComplete,
+  });
+  run.stopDevTools = mountEntranceDevTools(run.master.timeline);
+}
+
+/**
+ * Watches the viewport for a resize (debounced to a frame) and for crossing
+ * the desktop breakpoint.
+ *
+ * @param onResize - Called after a burst of resize events.
+ * @param onBreakpoint - Called when the desktop breakpoint is crossed.
+ * @returns A function that stops watching.
+ */
+function watchViewport(onResize: () => void, onBreakpoint: () => void) {
+  const debounced = rafDebounce(onResize);
+  const desktop = getDesktop();
+  window.addEventListener("resize", debounced);
+  desktop.addEventListener("change", onBreakpoint);
+
+  return () => {
+    window.removeEventListener("resize", debounced);
+    desktop.removeEventListener("change", onBreakpoint);
+    debounced.cancel();
+  };
+}
+
 /**
  * Plays the Load and Stack phases: the counter blurs in and climbs with the
  * stack images' loading; once all of them have settled the cards that loaded
- * pop in, and the page fades in.
+ * pop in, deal out into the stream and the sidebar fades in. A resize during
+ * the deal, or crossing the desktop breakpoint, snaps to the finished state.
  *
  * @param root - The Entrance root.
  * @param tiles - The stack tiles, top of the stack first.
@@ -87,41 +143,45 @@ function playStack(
   onComplete: () => void,
 ) {
   const counter = createCounter(counterEl);
-  let master: EntranceTimeline | undefined;
-  let removeDevTools = () => {};
-  let cancelled = false;
+  const run: StackRun = { master: undefined, stopDevTools: () => {} };
+  let [cancelled, crossed] = [false, false];
 
-  const place = () =>
+  const place = () => {
     counter.place(getStackRect(window.innerWidth, window.innerHeight));
+  };
   place();
   counter.show();
 
   // Build the stack from the cards that loaded, once all have settled
   const images = tiles.map((tile) => tile.querySelector("img")!);
-  const onSettle = (settled: number) => counter.loadTo(settled / tiles.length);
-  waitForImages(images, onSettle).then((loaded) => {
-    if (cancelled) return;
+  waitForImages(images, (n) => counter.loadTo(n / tiles.length)).then(
+    (loaded) => {
+      if (cancelled) return;
 
-    counter.endLoad();
-    const cards = tiles.filter((_, i) => loaded[i]);
-    const stack = { cards, counter };
-    master = buildEntranceTimeline({ root, reduced: false, stack, onComplete });
-    removeDevTools = mountEntranceDevTools(master.timeline);
-  });
+      startMaster(run, { root, tiles, loaded, counter, onComplete });
 
-  // A resize keeps the stack centred and the timeline in place
-  const onResize = rafDebounce(() => {
-    place();
-    master?.remeasure();
-  });
-  window.addEventListener("resize", onResize);
+      // The breakpoint was crossed while the images loaded
+      if (crossed) run.master?.finish();
+    },
+  );
+
+  // A resize keeps the stack centred; crossing the breakpoint ends the Entrance
+  const stopWatching = watchViewport(
+    () => {
+      place();
+      run.master?.remeasure();
+    },
+    () => {
+      crossed = true;
+      run.master?.finish();
+    },
+  );
 
   return () => {
     cancelled = true;
-    window.removeEventListener("resize", onResize);
-    onResize.cancel();
-    removeDevTools();
-    master?.timeline.kill();
+    stopWatching();
+    run.stopDevTools();
+    run.master?.timeline.kill();
     counter.destroy();
   };
 }

@@ -2,6 +2,7 @@
 import { gsap } from "gsap";
 
 // Local modules
+import { addDeal, addSidebar, DEAL_LABEL } from "./deal-motion";
 import { ENTRANCE_CONFIG } from "./entrance-config";
 import { addStack, type StackParts } from "./stack-motion";
 
@@ -24,15 +25,43 @@ export type EntranceTimelineOptions = {
 /** The master timeline and how to keep it in place across a resize. */
 export type EntranceTimeline = {
   timeline: gsap.core.Timeline;
-  /** Re-measures the stack's slots and keeps the timeline's place. */
+  /** Re-measures the stack's slots and keeps the timeline's place; snaps to the end once dealing. */
   remeasure: () => void;
+  /** Snaps the timeline to its finished state. */
+  finish: () => void;
 };
 
 /**
- * Builds the Entrance's master timeline: the stack phase when there is one,
- * then a page fade from 0 to 1 and the hand-off call. Fading a CSS variable on
- * the root lets every element the pre-hydration CSS hid follow it, including
- * stream copies added after mount.
+ * Adds the deal and the sidebar fade after the stack, ending with the hand-off.
+ *
+ * @param tl - The master timeline.
+ * @param root - The Entrance root.
+ * @param stack - The stack that has just been added.
+ * @param stackEnd - When the stack phase ends in seconds.
+ * @returns When the deal and sidebar fade end in seconds.
+ */
+function addDealAndSidebar(
+  tl: gsap.core.Timeline,
+  root: HTMLElement,
+  stack: StackParts,
+  stackEnd: number,
+) {
+  const tiles = Array.from(
+    root.querySelectorAll<HTMLElement>('[data-entrance="tile"]'),
+  );
+  const others = tiles.filter((tile) => !stack.cards.includes(tile));
+  const sidebar = root.querySelector<HTMLElement>('[data-entrance="sidebar"]');
+
+  const dealEnd = addDeal(tl, stack.cards, others, stackEnd);
+
+  return addSidebar(tl, sidebar, dealEnd);
+}
+
+/**
+ * Builds the Entrance's master timeline. With a stack it runs the stack, the
+ * deal and the sidebar fade; without one it is a page fade. Either way it ends
+ * with the hand-off call. Fading a CSS variable on the root lets every element
+ * the pre-hydration CSS hid follow it, including stream copies added after mount.
  *
  * @param options - The root element, reduced-motion flag, stack and hand-off callback.
  * @returns The timeline, already playing, and its re-measure function.
@@ -43,34 +72,23 @@ export function buildEntranceTimeline({
   stack,
   onComplete,
 }: EntranceTimelineOptions): EntranceTimeline {
-  const duration = reduced
-    ? ENTRANCE_CONFIG.reducedFadeDuration
-    : ENTRANCE_CONFIG.fadeDuration;
   const tl = gsap.timeline();
   let forget = () => {};
 
   if (stack) {
     const added = addStack(tl, stack);
     forget = added.forget;
-
-    // Until the deal exists, the stack dissolves, then the page fades in
-    tl.to(
-      stack.cards,
-      {
-        opacity: 0,
-        duration: ENTRANCE_CONFIG.counterOutDuration,
-        ease: ENTRANCE_CONFIG.counterOutEase,
-      },
-      added.end,
+    addDealAndSidebar(tl, root, stack, added.end);
+  } else {
+    const duration = reduced
+      ? ENTRANCE_CONFIG.reducedFadeDuration
+      : ENTRANCE_CONFIG.fadeDuration;
+    tl.fromTo(
+      root,
+      { [ENTRANCE_FADE_VAR]: 0 },
+      { [ENTRANCE_FADE_VAR]: 1, duration, ease: "power1.out" },
     );
-    tl.set(stack.cards, { clearProps: "transform,opacity,zIndex" });
   }
-
-  tl.fromTo(
-    root,
-    { [ENTRANCE_FADE_VAR]: 0 },
-    { [ENTRANCE_FADE_VAR]: 1, duration, ease: "power1.out" },
-  );
 
   // Hand the page over once everything has faded in
   tl.call(onComplete);
@@ -78,8 +96,15 @@ export function buildEntranceTimeline({
   return {
     timeline: tl,
     remeasure() {
+      // Past the stack the layout takes over, so finish instead of re-aiming
+      if (tl.time() >= (tl.labels[DEAL_LABEL] ?? Infinity)) {
+        tl.progress(1);
+        return;
+      }
+
       forget();
       tl.invalidate();
     },
+    finish: () => tl.progress(1),
   };
 }

@@ -14,12 +14,15 @@ import type { StreamTile } from "./stream-data";
 import { createStream } from "./stream-motion";
 import { TileVideo } from "@/components/ui/tile-video";
 
+/** The copy of the set that rests at the viewport centre; the one announced and stacked. */
+const REAL_COPY = 1;
+
 /**
  * One Project tile in the stream. Repeated copies are hidden from assistive
  * tech and the tab order so each Project is announced once.
  *
  * @param props.tile - The Project tile to show.
- * @param props.copy - Which repeat of the set this tile belongs to; 0 is the real one.
+ * @param props.copy - Which repeat of the set this tile belongs to; 1 is the real one, the copy at the centre when the stream rests.
  * @param props.index - The tile's place in the set.
  * @returns A link to the Project's Work page.
  */
@@ -32,8 +35,9 @@ function StreamTileLink({
   copy: number;
   index: number;
 }) {
-  // The first copy of the first tiles is the Entrance stack: fetch it first
-  const inStack = copy === 0 && index < ENTRANCE_CONFIG.stackSize;
+  // Copy 1 sits at the viewport centre at rest, so its first tiles are the
+  // Entrance stack and the accessible copy: fetch them first
+  const inStack = copy === REAL_COPY && index < ENTRANCE_CONFIG.stackSize;
 
   return (
     <Link
@@ -41,13 +45,13 @@ function StreamTileLink({
       data-entrance="tile"
       {...(inStack && { [STACK_INDEX_ATTRIBUTE]: index })}
       draggable={false}
-      aria-hidden={copy > 0 || undefined}
-      tabIndex={copy > 0 ? -1 : undefined}
+      aria-hidden={copy !== REAL_COPY || undefined}
+      tabIndex={copy !== REAL_COPY ? -1 : undefined}
       className="relative block shrink-0 overflow-hidden rounded-md"
     >
       <Image
         src={tile.src}
-        alt={copy === 0 ? tile.title : ""}
+        alt={copy === REAL_COPY ? tile.title : ""}
         width={tile.width}
         height={tile.height}
         placeholder={tile.blurDataURL ? "blur" : "empty"}
