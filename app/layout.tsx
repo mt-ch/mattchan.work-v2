@@ -3,6 +3,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 // Shared modules
+import {
+  ENTRANCE_NOSCRIPT_CSS,
+  ENTRANCE_SCRIPT,
+} from "@/components/features/landing/entrance/entrance-script";
 import { getAbout } from "@/lib/sanity";
 import { SITE_URL } from "@/lib/seo/siteUrl";
 
@@ -40,7 +44,8 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * The root layout: the `<html>` and `<body>` shell with the site fonts.
+ * The root layout: the `<html>` and `<body>` shell with the site fonts and the
+ * pre-hydration Entrance script.
  *
  * @param props.children - The matched route.
  * @returns The document shell around `children`.
@@ -55,7 +60,15 @@ export default function RootLayout({
       lang="en"
       data-theme="dark"
       className={`${geistSans.variable} ${geistMono.variable}`}
+      // The Entrance script marks <html> before hydration
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: ENTRANCE_SCRIPT }} />
+        <noscript>
+          <style>{ENTRANCE_NOSCRIPT_CSS}</style>
+        </noscript>
+      </head>
       <body>{children}</body>
     </html>
   );

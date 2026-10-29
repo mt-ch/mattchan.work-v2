@@ -15,3 +15,19 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
 }
+
+// Landing Entrance: before hydration the script marks <html>, hiding the page
+// (and making it inert) until the Entrance fades --entrance-fade up to 1 and
+// removes the mark.
+html[data-entrance-state] [data-entrance="root"] {
+  pointer-events: none;
+}
+
+html[data-entrance-state="pending"]
+  :is([data-entrance="sidebar"], [data-entrance="tile"]) {
+  opacity: var(--entrance-fade, 0);
+}
+
+html[data-entrance-state="reduced"] [data-entrance="root"] {
+  opacity: var(--entrance-fade, 0);
+}

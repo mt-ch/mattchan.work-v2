@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 // Local modules
+import { useEntrance } from "./entrance/entrance-context";
 import { useActiveProject } from "./active-project";
 import type { StreamTile } from "./stream-data";
 import { createStream } from "./stream-motion";
@@ -23,6 +24,7 @@ function StreamTileLink({ tile, copy }: { tile: StreamTile; copy: number }) {
   return (
     <Link
       href={`/work/${tile.slug}`}
+      data-entrance="tile"
       draggable={false}
       aria-hidden={copy > 0 || undefined}
       tabIndex={copy > 0 ? -1 : undefined}
@@ -52,6 +54,7 @@ function StreamTileLink({ tile, copy }: { tile: StreamTile; copy: number }) {
  */
 function useStream(tiles: StreamTile[]) {
   const { setSlug } = useActiveProject();
+  const { registerController } = useEntrance();
   const viewportRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const [copies, setCopies] = useState(3);
@@ -69,11 +72,14 @@ function useStream(tiles: StreamTile[]) {
       onCopiesNeeded: (needed) => setCopies((c) => Math.max(c, needed)),
     });
 
-    // The Landing has no Entrance yet, so it starts straight away
-    stream.start();
+    // The Entrance starts the stream when it completes
+    const unregister = registerController(stream);
 
-    return stream.destroy;
-  }, [tiles, setSlug]);
+    return () => {
+      unregister();
+      stream.destroy();
+    };
+  }, [tiles, setSlug, registerController]);
 
   return { viewportRef, trackRef, copies };
 }

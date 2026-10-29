@@ -31,5 +31,9 @@ _Avoid_: Tile, column
 **Landing**:
 The single-page overview at `/`, made of sections designed in Figma.
 
+**Entrance**:
+The one-time intro that plays on a hard load of the Landing: a single GSAP master timeline over the real stream nodes, ending by starting the stream and carousel. Client-side navigation back to `/` plays none.
+_Avoid_: Preloader, loader
+
 **Work page**:
 A Project's detail page. Pertemps is the template.
