@@ -11,13 +11,18 @@ import { useEntrance } from "./entrance-context";
 import { ENTRANCE_STATE_ATTRIBUTE } from "./entrance-script";
 import { LandingEntrance } from "./landing-entrance";
 
+// Below the desktop breakpoint the Entrance is the plain page fade
+vi.mock("@/lib/motion/environment", () => ({
+  getDesktop: () => ({ matches: false }),
+}));
+
 const timeline = vi.hoisted(() => ({ finish: () => {} }));
 
 vi.mock("./entrance-timeline", () => ({
   buildEntranceTimeline: ({ onComplete }: { onComplete: () => void }) => {
     timeline.finish = onComplete;
 
-    return { kill: () => {} };
+    return { timeline: { kill: () => {} }, remeasure: () => {} };
   },
 }));
 

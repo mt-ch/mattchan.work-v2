@@ -28,6 +28,25 @@ html[data-entrance-state="pending"]
   opacity: var(--entrance-fade, 0);
 }
 
+// The stack sits at the viewport centre, which can lie outside the stream's
+// own box, so the stream does not clip it.
+html[data-entrance-state="pending"] [data-entrance="stream"] {
+  overflow: visible;
+}
+
+// The counter shows only for a desktop Entrance.
+[data-entrance="counter"] {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  html[data-entrance-state="pending"] [data-entrance="counter"] {
+    display: block;
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+
 html[data-entrance-state="reduced"] [data-entrance="root"] {
   opacity: var(--entrance-fade, 0);
 }
