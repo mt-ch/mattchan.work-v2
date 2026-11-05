@@ -12,6 +12,7 @@ import {
 } from "./config";
 
 type Range = { min?: number; max?: number; step?: number };
+type BindingApi = ReturnType<FolderApi["addBinding"]>;
 
 /**
  * Saves the current values so they survive a reload.
@@ -28,15 +29,23 @@ function persist(config: PlaygroundConfig) {
  * @param folder - Folder to add the bindings to.
  * @param group - The config object holding the values.
  * @param ranges - Slider ranges by key; the keys also set which values appear.
+ * @returns The created bindings by key.
  */
 function bindAll<T extends object>(
   folder: FolderApi,
   group: T,
   ranges: Partial<Record<keyof T, Range>>,
-) {
+): Record<string, BindingApi> {
+  const bindings: Record<string, BindingApi> = {};
   for (const [key, range] of Object.entries(ranges)) {
-    folder.addBinding(group, key as keyof T & string, range as Range);
+    bindings[key] = folder.addBinding(
+      group,
+      key as keyof T & string,
+      range as Range,
+    );
   }
+
+  return bindings;
 }
 
 /**
@@ -48,7 +57,11 @@ function bindAll<T extends object>(
 function addLayoutFolders(pane: Pane, config: PlaygroundConfig) {
   const folder = (title: string) => pane.addFolder({ title, expanded: false });
 
-  bindAll(folder("Layout"), config.layout, {
+  const layout = folder("Layout");
+  layout.addBinding(config.layout, "mode", {
+    options: { uniform: "uniform", mixed: "mixed" },
+  });
+  const widths = bindAll(layout, config.layout, {
     tileWidth: { min: 80, max: 600, step: 1 },
     tileHeight: { min: 80, max: 800, step: 1 },
     gap: { min: 0, max: 400, step: 1 },
@@ -59,6 +72,13 @@ function addLayoutFolders(pane: Pane, config: PlaygroundConfig) {
     dotSpacing: { min: 12, max: 120, step: 1 },
     dotOpacity: { min: 0, max: 1, step: 0.01 },
   });
+
+  // Tile width only applies to the uniform grid; mixed derives it from the height
+  const syncWidth = () => {
+    widths.tileWidth.hidden = config.layout.mode === "mixed";
+  };
+  syncWidth();
+  layout.on("change", syncWidth);
   bindAll(folder("Input & inertia"), config.input, {
     dragSpeed: { min: 0.2, max: 3, step: 0.05 },
     friction: { min: 0.5, max: 10, step: 0.1 },

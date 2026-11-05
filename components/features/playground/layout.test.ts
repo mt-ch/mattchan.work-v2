@@ -12,6 +12,7 @@ const viewport = { width: 1280, height: 800 };
 const pieces: Piece[] = Array.from({ length: 40 }, (_, i) => ({
   slug: `project-${i % 10}`,
   title: `Project ${i % 10}`,
+  orientation: i % 4 === 1 ? "landscape" : "portrait",
   src: `https://cdn.example/${i}.jpg`,
 }));
 

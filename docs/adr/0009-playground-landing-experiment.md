@@ -8,3 +8,7 @@ On the experiment branch, the Landing at `/` is the Playground, an infinite drag
 - **No schema change.** Tiles come from existing Project cover and story Cell fields, so new media added in Sanity appears automatically.
 
 ADR 0008 would be superseded for the Landing only if the experiment merges.
+
+## Mixed layout mode
+
+`layout.mode` switches the Playground between **uniform** (the default; one 4:5 tile shape on a staggered grid) and **mixed**, switchable in `?debug`. Mixed mode lays tiles in horizontal rows of one height, with 4:5 portrait and 3:2 landscape widths taken from each piece's own source dimensions (the poster, for videos). Each row loops at its own length, so Project clashes and back-to-back landscapes are avoided as the period is arranged, but because row lengths differ the neighbours of a tile can change from one repeat to the next. Production stays on uniform until the code default changes.

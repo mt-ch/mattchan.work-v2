@@ -1,10 +1,16 @@
+/** How the Playground arranges tiles. */
+export type LayoutMode = "uniform" | "mixed";
+
 /** Every tunable value of the Playground. The code defaults are the source of truth. */
 export type PlaygroundConfig = {
   layout: {
+    /** "uniform": every tile tileWidth × tileHeight. "mixed": 4:5 and 3:2 tiles of height tileHeight. */
+    mode: LayoutMode;
+    /** Tile width in uniform mode; mixed mode derives both widths from tileHeight. */
     tileWidth: number;
     tileHeight: number;
     gap: number;
-    /** Vertical offset of every other column, in px. */
+    /** Offset of every other column (uniform, vertical) or row (mixed, sideways), in px. */
     stagger: number;
     /** Share of world cells that hold a tile, 0 to 1. */
     fillRatio: number;
@@ -40,7 +46,7 @@ export type PlaygroundConfig = {
     /** Skew in degrees at full speed. */
     skewAmount: number;
     parallaxEnabled: boolean;
-    /** Per-column shift in px at full speed. */
+    /** Per-column (uniform) or per-row (mixed) shift in px at full speed. */
     parallaxAmount: number;
   };
   drift: {
@@ -85,6 +91,7 @@ export type PlaygroundConfig = {
 
 export const playgroundConfig: PlaygroundConfig = {
   layout: {
+    mode: "uniform",
     tileWidth: 240,
     tileHeight: 300,
     gap: 187,

@@ -76,7 +76,7 @@ function TileFace({ tile }: { tile: Tile }) {
           <PlaygroundVideo tileKey={tile.key} src={piece.videoSrc} />
         ) : null}
       </span>
-      <span className="type-mono-caption uppercase absolute top-0 right-full flex h-full items-start justify-between rounded-l-md bg-surface px-xs py-xs transition-colors duration-300 [writing-mode:sideways-lr] group-hover:text-foreground">
+      <span className="type-mono-caption absolute top-0 right-full flex h-full items-start justify-between rounded-l-md bg-surface px-xs py-xs uppercase transition-colors duration-300 [writing-mode:sideways-lr] group-hover:text-foreground">
         <span className="text-foreground">{piece.title}</span>
         <span aria-hidden className="text-muted">
           {tile.label}
@@ -94,9 +94,6 @@ function TileFace({ tile }: { tile: Tile }) {
  * @returns The positioned tile.
  */
 export function PlaygroundTile({ tile }: { tile: Tile }) {
-  // Neighbouring columns move at different rates for the parallax effect
-  const depth = (tile.column % 3) - 1;
-
   return (
     <div
       data-tile
@@ -108,7 +105,8 @@ export function PlaygroundTile({ tile }: { tile: Tile }) {
           width: tile.width,
           height: tile.height,
           transform: `translate3d(${tile.worldX}px, ${tile.worldY}px, 0)`,
-          "--depth": depth,
+          "--depth-x": tile.depth.x,
+          "--depth-y": tile.depth.y,
         } as React.CSSProperties
       }
     >
@@ -116,7 +114,7 @@ export function PlaygroundTile({ tile }: { tile: Tile }) {
         className="h-full w-full"
         style={{
           transform:
-            "translate3d(calc(var(--shift-x, 0px) * var(--depth)), calc(var(--shift-y, 0px) * var(--depth)), 0) skew(var(--skew-x, 0deg), var(--skew-y, 0deg))",
+            "translate3d(calc(var(--shift-x, 0px) * var(--depth-x)), calc(var(--shift-y, 0px) * var(--depth-y)), 0) skew(var(--skew-x, 0deg), var(--skew-y, 0deg))",
         }}
       >
         <div data-intro className="h-full w-full">

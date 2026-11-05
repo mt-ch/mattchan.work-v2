@@ -19,9 +19,11 @@ const tile = (key: string, x: number, y: number, video = true): Tile => ({
   height: 250,
   index: 1,
   label: "01",
+  depth: { x: 0, y: 0 },
   piece: {
     slug: key,
     title: key,
+    orientation: "portrait",
     src: "x",
     videoSrc: video ? "v.mp4" : undefined,
   },

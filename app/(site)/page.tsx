@@ -49,11 +49,10 @@ export default async function HomePage() {
     getPlaygroundProjects(),
   ]);
 
-  const { tileWidth, tileHeight } = playgroundConfig.layout;
-  const pieces = toPieces(projects, {
-    width: tileWidth * IMAGE_DENSITY,
-    height: tileHeight * IMAGE_DENSITY,
-  });
+  const pieces = toPieces(
+    projects,
+    playgroundConfig.layout.tileHeight * IMAGE_DENSITY,
+  );
   const name = about?.siteName ?? about?.name;
 
   return (
