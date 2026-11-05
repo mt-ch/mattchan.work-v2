@@ -30,3 +30,15 @@ export function getDesktop(): MediaQueryList {
 export function prefersReducedMotion(): boolean {
   return getReducedMotion().matches;
 }
+
+/** Media query that matches when the primary pointer is coarse, such as a finger. */
+const COARSE_POINTER_QUERY = "(pointer: coarse)";
+
+/**
+ * Reads whether the primary pointer is coarse as a live query.
+ *
+ * @returns A media query list that matches on touch-first devices.
+ */
+export function getCoarsePointer(): MediaQueryList {
+  return window.matchMedia(COARSE_POINTER_QUERY);
+}

@@ -568,6 +568,68 @@ export type AboutQueryResult = {
   } | null;
 } | null;
 
+// Source: lib/sanity/queries.ts
+// Variable: playgroundProjectsQuery
+// Query: *[_type == "project"] | order(order asc) {    _id,    title,    slug,    coverImage {      ...,      "metadata": asset->metadata { lqip, dimensions }    },    "coverVideoUrl": coverVideo.asset->url,    story[] {      _key,      items[] {        _key,        _type,        _type == "imageCell" => {          image {            ...,            "metadata": asset->metadata { lqip, dimensions }          }        },        _type == "videoCell" => {          "videoUrl": video.asset->url,          poster {            ...,            "metadata": asset->metadata { lqip, dimensions }          }        }      }    }  }
+export type PlaygroundProjectsQueryResult = Array<{
+  _id: string;
+  title: string | null;
+  slug: Slug | null;
+  coverImage: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+    metadata: {
+      lqip: string | null;
+      dimensions: SanityImageDimensions | null;
+    } | null;
+  } | null;
+  coverVideoUrl: string | null;
+  story: Array<{
+    _key: string;
+    items: Array<
+      | {
+          _key: string;
+          _type: "imageCell";
+          image: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            alt?: string;
+            _type: "image";
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+        }
+      | {
+          _key: string;
+          _type: "textCell";
+        }
+      | {
+          _key: string;
+          _type: "videoCell";
+          videoUrl: string | null;
+          poster: {
+            asset?: SanityImageAssetReference;
+            media?: unknown;
+            hotspot?: SanityImageHotspot;
+            crop?: SanityImageCrop;
+            _type: "image";
+            metadata: {
+              lqip: string | null;
+              dimensions: SanityImageDimensions | null;
+            } | null;
+          } | null;
+        }
+    > | null;
+  }> | null;
+}>;
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
@@ -576,6 +638,7 @@ declare global {
     '\n  *[_type == "project" && slug.current == $slug][0] {\n    _id,\n    title,\n    slug,\n    summary,\n    discipline,\n    dateCompleted,\n    links,\n    order,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    story[] {\n      _key,\n      columns,\n      items[] {\n        ...,\n        _type == "imageCell" => {\n          image {\n            ...,\n            "metadata": asset->metadata { lqip, dimensions }\n          }\n        },\n        _type == "videoCell" => {\n          "videoUrl": video.asset->url,\n          poster {\n            ...,\n            "metadata": asset->metadata { lqip, dimensions }\n          }\n        }\n      }\n    },\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage,\n      ogImageAlt,\n      noIndex\n    }\n  }\n': ProjectBySlugQueryResult;
     '\n  *[_type == "project" && defined(slug.current)].slug.current\n': ProjectSlugsQueryResult;
     '\n  *[_type == "about"][0] {\n    _id,\n    _updatedAt,\n    name,\n    headline,\n    bio,\n    availability {\n      status,\n      isAvailable\n    },\n    "resumeUrl": resumeFile.asset->url,\n    email,\n    githubUrl,\n    linkedinUrl,\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage,\n      ogImageAlt,\n      noIndex\n    },\n    siteName,\n    titleTemplate,\n    defaultMetaDescription,\n    defaultOgImage\n  }\n': AboutQueryResult;
+    '\n  *[_type == "project"] | order(order asc) {\n    _id,\n    title,\n    slug,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    "coverVideoUrl": coverVideo.asset->url,\n    story[] {\n      _key,\n      items[] {\n        _key,\n        _type,\n        _type == "imageCell" => {\n          image {\n            ...,\n            "metadata": asset->metadata { lqip, dimensions }\n          }\n        },\n        _type == "videoCell" => {\n          "videoUrl": video.asset->url,\n          poster {\n            ...,\n            "metadata": asset->metadata { lqip, dimensions }\n          }\n        }\n      }\n    }\n  }\n': PlaygroundProjectsQueryResult;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

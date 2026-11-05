@@ -5,6 +5,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { client } from "./client";
 import {
   otherProjectsQuery,
+  playgroundProjectsQuery,
   projectBySlugQuery,
   projectSlugsQuery,
   projectsQuery,
@@ -67,4 +68,19 @@ export async function getOtherProjects(currentId: string) {
   cacheTag(tags.projects);
 
   return client.fetch(otherProjectsQuery, { currentId });
+}
+
+/**
+ * Fetches every Project with the media the Playground shows: cover image and
+ * video, plus the image and video Cells of its story. Cached until the
+ * `projects` tag is revalidated.
+ *
+ * @returns All Projects with their Playground media.
+ */
+export async function getPlaygroundProjects() {
+  "use cache";
+  cacheLife("max");
+  cacheTag(tags.projects);
+
+  return client.fetch(playgroundProjectsQuery);
 }
