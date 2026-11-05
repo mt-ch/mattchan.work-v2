@@ -209,9 +209,7 @@ describe("layoutTiles in mixed mode", () => {
       expect(t.y + t.height).toBeGreaterThan(-mixed.margin);
       expect(t.y).toBeLessThan(viewport.height + mixed.margin);
     }
-    expect(layoutTiles({ ...base, pieces: [], camera: origin })).toEqual(
-      [],
-    );
+    expect(layoutTiles({ ...base, pieces: [], camera: origin })).toEqual([]);
   });
 
   it("zero-pads the index to two digits", () => {
