@@ -1,17 +1,21 @@
-/** How the Playground arranges tiles. */
-export type LayoutMode = "uniform" | "mixed";
-
 /** Every tunable value of the Playground. The code defaults are the source of truth. */
 export type PlaygroundConfig = {
   layout: {
-    /** "uniform": every tile tileWidth × tileHeight. "mixed": 4:5 and 3:2 tiles of height tileHeight. */
-    mode: LayoutMode;
-    /** Tile width in uniform mode; mixed mode derives both widths from tileHeight. */
-    tileWidth: number;
+    /** Height of every tile; 4:5 and 3:2 widths derive from it. */
     tileHeight: number;
     gap: number;
-    /** Offset of every other column (uniform, vertical) or row (mixed, sideways), in px. */
+    /** Sideways offset of every other row, in px. */
     stagger: number;
+    /** How far tiles rise and fall along a row, in px; 0 turns the wave off. */
+    waveAmplitude: number;
+    /** Distance along a row for one full rise and fall, in px. */
+    waveLength: number;
+    /** Phase shift per row, in degrees: 0 bends the grid together, larger weaves rows against each other. */
+    wavePhaseStep: number;
+    /** Largest random per-tile vertical shift, in px; 0 turns jitter off. */
+    jitterAmount: number;
+    /** Smallest vertical gap kept between offset tiles and the next row, in px. */
+    minGap: number;
     /** Share of world cells that hold a tile, 0 to 1. */
     fillRatio: number;
     /** Extra px around the viewport in which tiles are still rendered. */
@@ -46,7 +50,7 @@ export type PlaygroundConfig = {
     /** Skew in degrees at full speed. */
     skewAmount: number;
     parallaxEnabled: boolean;
-    /** Per-column (uniform) or per-row (mixed) shift in px at full speed. */
+    /** Per-row shift in px at full speed. */
     parallaxAmount: number;
   };
   drift: {
@@ -64,7 +68,6 @@ export type PlaygroundConfig = {
 
 // export const playgroundConfig: PlaygroundConfig = {
 //   layout: {
-//     tileWidth: 240,
 //     tileHeight: 300,
 //     gap: 120,
 //     stagger: 160,
@@ -91,11 +94,14 @@ export type PlaygroundConfig = {
 
 export const playgroundConfig: PlaygroundConfig = {
   layout: {
-    mode: "uniform",
-    tileWidth: 240,
     tileHeight: 300,
     gap: 187,
     stagger: 160,
+    waveAmplitude: 0,
+    waveLength: 1200,
+    wavePhaseStep: 0,
+    jitterAmount: 0,
+    minGap: 24,
     fillRatio: 0.9999999999999999,
     margin: 800,
     labelSize: 12,

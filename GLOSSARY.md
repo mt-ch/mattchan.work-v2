@@ -32,8 +32,12 @@ _Avoid_: Tile, column
 The single-page overview at `/`, made of sections designed in Figma.
 
 **Playground**:
-The infinite, draggable canvas of Project media on the Landing: a tile for every Project cover and every image and video Cell of its story. Experimental, built on a branch that is not yet merged.
+The infinite, draggable canvas on the Landing: a tile for every Playground piece. Experimental, built on a branch that is not yet merged.
 _Avoid_: Stream, canvas, gallery
+
+**Playground piece**:
+A single image or video chosen for the Playground, with its orientation (portrait 4:5 or landscape 3:2) and the Project it belongs to. Its own document in Sanity, and the only source of Playground content.
+_Avoid_: Tile (the tile is how a piece appears on the canvas)
 
 **Work page**:
 A Project's detail page. Pertemps is the template.

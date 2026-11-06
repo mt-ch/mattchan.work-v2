@@ -18,6 +18,12 @@ describe("tagsForDocument", () => {
     expect(tagsForDocument({ _type: "about" })).toEqual(["about"]);
   });
 
+  it("invalidates the playground for a playground piece", () => {
+    expect(tagsForDocument({ _type: "playgroundPiece" })).toEqual([
+      "playground",
+    ]);
+  });
+
   it("ignores other document types", () => {
     expect(tagsForDocument({ _type: "sanity.imageAsset" })).toEqual([]);
   });

@@ -58,14 +58,15 @@ function addLayoutFolders(pane: Pane, config: PlaygroundConfig) {
   const folder = (title: string) => pane.addFolder({ title, expanded: false });
 
   const layout = folder("Layout");
-  layout.addBinding(config.layout, "mode", {
-    options: { uniform: "uniform", mixed: "mixed" },
-  });
-  const widths = bindAll(layout, config.layout, {
-    tileWidth: { min: 80, max: 600, step: 1 },
+  bindAll(layout, config.layout, {
     tileHeight: { min: 80, max: 800, step: 1 },
     gap: { min: 0, max: 400, step: 1 },
     stagger: { min: 0, max: 400, step: 1 },
+    waveAmplitude: { min: 0, max: 300, step: 1 },
+    waveLength: { min: 200, max: 4000, step: 10 },
+    wavePhaseStep: { min: 0, max: 180, step: 1 },
+    jitterAmount: { min: 0, max: 300, step: 1 },
+    minGap: { min: 0, max: 400, step: 1 },
     fillRatio: { min: 0.1, max: 1, step: 0.01 },
     margin: { min: 0, max: 800, step: 10 },
     labelSize: { min: 8, max: 24, step: 1 },
@@ -73,12 +74,6 @@ function addLayoutFolders(pane: Pane, config: PlaygroundConfig) {
     dotOpacity: { min: 0, max: 1, step: 0.01 },
   });
 
-  // Tile width only applies to the uniform grid; mixed derives it from the height
-  const syncWidth = () => {
-    widths.tileWidth.hidden = config.layout.mode === "mixed";
-  };
-  syncWidth();
-  layout.on("change", syncWidth);
   bindAll(folder("Input & inertia"), config.input, {
     dragSpeed: { min: 0.2, max: 3, step: 0.05 },
     friction: { min: 0.5, max: 10, step: 0.1 },

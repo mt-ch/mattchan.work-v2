@@ -7,8 +7,8 @@ import type { Image } from "sanity";
 // Shared modules
 import { Playground } from "@/components/features/playground/playground";
 import { playgroundConfig } from "@/components/features/playground/config";
-import { toPieces } from "@/components/features/playground/playground-data";
-import { getAbout, getPlaygroundProjects } from "@/lib/sanity";
+import { toPlaygroundPieces } from "@/components/features/playground/playground-data";
+import { getAbout, getPlaygroundPieces } from "@/lib/sanity";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { resolveSeo, type SeoObject } from "@/lib/seo/resolveSeo";
 
@@ -39,18 +39,15 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * The Landing page at `/`: the experimental Playground, an infinite draggable
- * canvas of every Project's media.
+ * canvas of Playground pieces.
  *
  * @returns The Landing page.
  */
 export default async function HomePage() {
-  const [about, projects] = await Promise.all([
-    getAbout(),
-    getPlaygroundProjects(),
-  ]);
+  const [about, docs] = await Promise.all([getAbout(), getPlaygroundPieces()]);
 
-  const pieces = toPieces(
-    projects,
+  const pieces = toPlaygroundPieces(
+    docs,
     playgroundConfig.layout.tileHeight * IMAGE_DENSITY,
   );
   const name = about?.siteName ?? about?.name;

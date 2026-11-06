@@ -5,6 +5,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { client } from "./client";
 import {
   otherProjectsQuery,
+  playgroundPiecesQuery,
   playgroundProjectsQuery,
   projectBySlugQuery,
   projectSlugsQuery,
@@ -83,4 +84,19 @@ export async function getPlaygroundProjects() {
   cacheTag(tags.projects);
 
   return client.fetch(playgroundProjectsQuery);
+}
+
+/**
+ * Fetches every published Playground piece whose Project is live. Cached until
+ * the `playground` tag or the `projects` tag (a rename changes tile labels)
+ * is revalidated.
+ *
+ * @returns All Playground pieces with their Project's title and slug.
+ */
+export async function getPlaygroundPieces() {
+  "use cache";
+  cacheLife("max");
+  cacheTag(tags.playground, tags.projects);
+
+  return client.fetch(playgroundPiecesQuery);
 }
