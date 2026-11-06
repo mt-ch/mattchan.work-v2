@@ -10,6 +10,7 @@ import type { Tile } from "./layout";
 import { startPlayground, type PlaygroundController } from "./motion";
 import type { Piece } from "./playground-data";
 import { PlaygroundTile } from "./playground-tile";
+import { SeenCounter } from "./seen-counter";
 
 /**
  * Visually hidden heading and Project list, for screen readers and search
@@ -53,12 +54,33 @@ const DOT_GRID_STYLE: React.CSSProperties = {
 };
 
 /**
+ * Plays the intro once, as soon as the first tiles are in the DOM.
+ *
+ * @param controllerRef - Holds the running controller.
+ * @param tiles - The tiles currently rendered.
+ */
+function usePlayIntro(
+  controllerRef: React.RefObject<PlaygroundController | null>,
+  tiles: Tile[],
+) {
+  const played = useRef(false);
+
+  useLayoutEffect(() => {
+    if (played.current || tiles.length === 0) return;
+
+    played.current = true;
+    controllerRef.current?.intro();
+  }, [controllerRef, tiles]);
+}
+
+/**
  * Runs the canvas motion for the lifetime of the component. Opens the debug
  * panel alongside when `?debug` is set, and plays the intro once, as soon as
  * the first tiles are in the DOM.
  *
  * @param pieces - Everything the canvas can show.
- * @returns Refs for the canvas elements, and the tiles currently near the viewport.
+ * @returns Refs for the canvas elements, the tiles currently near the viewport,
+ * and how many pieces are seen (null until counting starts).
  */
 function useCanvas(pieces: Piece[]) {
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -66,8 +88,8 @@ function useCanvas(pieces: Piece[]) {
   const trackRef = useRef<HTMLDivElement>(null);
   const dotsRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<PlaygroundController | null>(null);
-  const introPlayed = useRef(false);
   const [tiles, setTiles] = useState<Tile[]>([]);
+  const [seen, setSeen] = useState<number | null>(null);
 
   useEffect(() => {
     const viewport = viewportRef.current;
@@ -85,9 +107,14 @@ function useCanvas(pieces: Piece[]) {
       pieces,
       config,
       onTiles: setTiles,
+      onSeen: (keys) => setSeen(keys.size),
     });
     controllerRef.current = controller;
-    const panel = openDebugPanel(config, controller.refresh);
+    const panel = openDebugPanel(
+      config,
+      controller.refresh,
+      controller.resetSeen,
+    );
 
     return () => {
       controller.stop();
@@ -95,14 +122,9 @@ function useCanvas(pieces: Piece[]) {
     };
   }, [pieces]);
 
-  useLayoutEffect(() => {
-    if (introPlayed.current || tiles.length === 0) return;
+  usePlayIntro(controllerRef, tiles);
 
-    introPlayed.current = true;
-    controllerRef.current?.intro();
-  }, [tiles]);
-
-  return { viewportRef, scalerRef, trackRef, dotsRef, tiles };
+  return { viewportRef, scalerRef, trackRef, dotsRef, tiles, seen };
 }
 
 /**
@@ -121,8 +143,9 @@ export function Playground({
   pieces: Piece[];
   heading: string;
 }) {
-  const { viewportRef, scalerRef, trackRef, dotsRef, tiles } =
+  const { viewportRef, scalerRef, trackRef, dotsRef, tiles, seen } =
     useCanvas(pieces);
+  const total = new Set(pieces.map((p) => p.key)).size;
 
   return (
     <div
@@ -147,6 +170,7 @@ export function Playground({
           ))}
         </div>
       </div>
+      {seen !== null && <SeenCounter seen={seen} total={total} />}
     </div>
   );
 }

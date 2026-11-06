@@ -10,6 +10,8 @@
 
   --brand: #ff3f0b;
   --accent: #ffc9e6;
+  --seen-fill: #2f9e5b;
+  --seen-count: #a98bff;
 
   /* Typography
    * Two-ratio system: 1.333 (Perfect Fourth) between caption/small/body/subheading,
@@ -105,6 +107,8 @@
   --color-ink: var(--ink);
   --color-brand: var(--brand);
   --color-accent: var(--accent);
+  --color-seen-fill: var(--seen-fill);
+  --color-seen-count: var(--seen-count);
 
   /* Semantic */
   --color-background: var(--background);

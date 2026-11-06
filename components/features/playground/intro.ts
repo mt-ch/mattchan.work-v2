@@ -1,9 +1,12 @@
 // Third-party libraries
 import { gsap } from "gsap";
 
+/** Seconds the intro takes from start to the last tile settling. */
+export const INTRO_DURATION = 1.2;
+
 /**
  * Fades the dot grid in, then staggers the tiles in from the viewport centre.
- * Takes about 1.2s.
+ * Takes `INTRO_DURATION` seconds.
  *
  * @param viewport - The canvas viewport, whose centre the stagger starts from.
  * @param dots - The dot grid element.

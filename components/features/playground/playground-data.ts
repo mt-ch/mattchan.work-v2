@@ -10,6 +10,8 @@ import { tileWidthFor, type Orientation } from "./orientation";
 
 /** One image or video the canvas can show, with the Project it belongs to. */
 export type Piece = {
+  /** Image asset reference (the poster's, for videos); stable across crops and pixel densities. */
+  key: string;
   slug: string;
   title: string;
   /** Shape of the tile, chosen on the Playground piece. */
@@ -24,7 +26,7 @@ export type Piece = {
 
 type Project = PlaygroundProjectsQueryResult[number];
 type ImageSource = {
-  asset?: unknown;
+  asset?: { _ref: string };
   metadata?: { lqip: string | null } | null;
 };
 
@@ -56,6 +58,7 @@ function toPiece(
   return [
     {
       ...project,
+      key: image.asset._ref,
       orientation,
       src: urlFor(image as Parameters<typeof urlFor>[0])
         .width(tileWidthFor(orientation, height))

@@ -12,7 +12,9 @@ import { applyConfigVars, render, type RenderTargets } from "./motion-render";
 import { createState, type MotionState } from "./motion-state";
 import { stepEffects, stepInertia, stepNudge } from "./motion-step";
 import type { Piece } from "./playground-data";
-import { playIntro } from "./intro";
+import { INTRO_DURATION, playIntro } from "./intro";
+import { createSeenState } from "./seen";
+import { clearSeen, loadSeen, saveSeen } from "./seen-storage";
 
 export type PlaygroundOptions = RenderTargets & {
   pieces: Piece[];
@@ -20,13 +22,17 @@ export type PlaygroundOptions = RenderTargets & {
   config: PlaygroundConfig;
   /** Called with the visible tiles whenever the set or arrangement changes. */
   onTiles: (tiles: Tile[]) => void;
+  /** Called with every seen piece key when counting starts and whenever a new piece is seen. */
+  onSeen: (seen: ReadonlySet<string>) => void;
 };
 
 export type PlaygroundController = {
   /** Re-reads the config on the next frame. */
   refresh: () => void;
-  /** Plays the load animation, unless motion is reduced. */
+  /** Plays the load animation, unless motion is reduced, then starts counting seen pieces. */
   intro: () => void;
+  /** Forgets every seen piece, in memory and in storage. */
+  resetSeen: () => void;
   stop: () => void;
 };
 
@@ -106,6 +112,13 @@ function startTicker(options: PlaygroundOptions, state: MotionState) {
   const reducedQuery = getReducedMotion();
   const coarseQuery = getCoarsePointer();
 
+  const hooks = {
+    onTiles: options.onTiles,
+    onSeen: (seen: ReadonlySet<string>) => {
+      saveSeen(seen);
+      options.onSeen(seen);
+    },
+  };
   const tick = (_time: number, deltaMs: number) => {
     if (document.hidden) return;
 
@@ -117,11 +130,43 @@ function startTicker(options: PlaygroundOptions, state: MotionState) {
     stepInertia(state, config, dt, reduced);
     stepNudge(state, config, size, dt, reduced || coarseQuery.matches);
     stepEffects(state, dt, reduced);
-    render(options, state, config, options.pieces, options.onTiles, reduced);
+    render(options, state, config, options.pieces, hooks, reduced);
   };
   gsap.ticker.add(tick);
 
   return () => gsap.ticker.remove(tick);
+}
+
+/**
+ * Builds the controller's seen-counting controls.
+ *
+ * @param options - The canvas options, for the `onSeen` callback.
+ * @param state - Motion state holding the seen pieces.
+ * @param reduced - Whether the visitor prefers reduced motion.
+ * @returns A function that starts counting once the intro has finished, and
+ * one that forgets every seen piece.
+ */
+function seenControls(
+  options: PlaygroundOptions,
+  state: MotionState,
+  reduced: boolean,
+) {
+  let pending: gsap.core.Tween | undefined;
+
+  return {
+    startCounting: () => {
+      pending = gsap.delayedCall(reduced ? 0 : INTRO_DURATION, () => {
+        state.counting = true;
+        options.onSeen(state.seen.seen);
+      });
+    },
+    reset: () => {
+      clearSeen();
+      state.seen = createSeenState();
+      options.onSeen(state.seen.seen);
+    },
+    cancel: () => pending?.kill(),
+  };
 }
 
 /**
@@ -136,10 +181,13 @@ export function startPlayground(
 ): PlaygroundController {
   const { viewport, dots, config } = options;
   const period = periodSize(config.layout);
-  const state = createState({
-    x: period.width / 2 - viewport.clientWidth / 2,
-    y: period.height / 2 - viewport.clientHeight / 2,
-  });
+  const state = createState(
+    {
+      x: period.width / 2 - viewport.clientWidth / 2,
+      y: period.height / 2 - viewport.clientHeight / 2,
+    },
+    loadSeen(options.pieces.map((p) => p.key)),
+  );
   applyConfigVars(viewport, config);
 
   const stops = [
@@ -151,16 +199,20 @@ export function startPlayground(
   const reduced = getReducedMotion().matches;
   if (reduced) gsap.set(dots, { opacity: 1 });
 
+  const seen = seenControls(options, state, reduced);
+
   return {
     refresh: () => {
       applyConfigVars(viewport, config);
       state.dirty = true;
     },
     intro: () => {
-      if (reduced) return;
-      playIntro(viewport, dots);
+      if (!reduced) playIntro(viewport, dots);
+      seen.startCounting();
     },
+    resetSeen: seen.reset,
     stop: () => {
+      seen.cancel();
       gsap.killTweensOf(state);
       stops.forEach((stop) => stop());
     },

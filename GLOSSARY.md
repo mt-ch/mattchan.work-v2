@@ -39,5 +39,12 @@ _Avoid_: Stream, canvas, gallery
 A single image or video chosen for the Playground, with its orientation (portrait 4:5 or landscape 3:2) and the Project it belongs to. Its own document in Sanity, and the only source of Playground content.
 _Avoid_: Tile (the tile is how a piece appears on the canvas)
 
+**Tile**:
+One placement of a Playground piece on the repeating canvas. A piece has many tiles; the canvas shows only those near the viewport.
+_Avoid_: Cell (a Cell belongs to a Project's story)
+
+**Seen**:
+A Playground piece that has had a tile at least the threshold visible for the dwell time, remembered across visits on the same device. Counted per piece, not per tile; two pieces sharing one image asset count as one.
+
 **Work page**:
 A Project's detail page. Pertemps is the template.

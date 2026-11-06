@@ -116,6 +116,26 @@ function addBehaviourFolders(pane: Pane, config: PlaygroundConfig) {
 }
 
 /**
+ * Builds the Seen folder: what counts as seen, and a button to start over.
+ *
+ * @param pane - The Tweakpane instance.
+ * @param config - The live config the bindings edit.
+ * @param onResetSeen - Called to forget every seen piece.
+ */
+function addSeenFolder(
+  pane: Pane,
+  config: PlaygroundConfig,
+  onResetSeen: () => void,
+) {
+  const folder = pane.addFolder({ title: "Seen", expanded: false });
+  bindAll(folder, config.seen, {
+    threshold: { min: 0.1, max: 1, step: 0.05 },
+    dwell: { min: 0, max: 2000, step: 50 },
+  });
+  folder.addButton({ title: "Reset seen" }).on("click", onResetSeen);
+}
+
+/**
  * Adds the seed controls, the FPS meter and the Copy / Reset buttons.
  *
  * @param pane - The Tweakpane instance.
@@ -166,11 +186,13 @@ function addTools(pane: Pane, config: PlaygroundConfig, onChange: () => void) {
  *
  * @param config - The live config the panel edits in place.
  * @param onChange - Called after a value changes, to re-read the config.
+ * @param onResetSeen - Called when "Reset seen" is pressed.
  * @returns A promise of a function that closes the panel, or undefined when not in debug mode.
  */
 export async function openDebugPanel(
   config: PlaygroundConfig,
   onChange: () => void,
+  onResetSeen: () => void,
 ): Promise<(() => void) | undefined> {
   if (!new URLSearchParams(window.location.search).has("debug")) return;
 
@@ -178,6 +200,7 @@ export async function openDebugPanel(
   const pane = new Pane({ title: "Playground" });
   addLayoutFolders(pane, config);
   addBehaviourFolders(pane, config);
+  addSeenFolder(pane, config, onResetSeen);
   const stopFps = addTools(pane, config, onChange);
 
   pane.on("change", () => {

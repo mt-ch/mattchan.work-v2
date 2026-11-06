@@ -63,6 +63,12 @@ export type PlaygroundConfig = {
   video: {
     maxConcurrent: number;
   };
+  seen: {
+    /** Share of a tile's area that must be on screen to count, 0 to 1. */
+    threshold: number;
+    /** How long a tile must stay past the threshold, in ms. */
+    dwell: number;
+  };
   seed: number;
 };
 
@@ -135,6 +141,10 @@ export const playgroundConfig: PlaygroundConfig = {
   },
   video: {
     maxConcurrent: 3,
+  },
+  seen: {
+    threshold: 0.5,
+    dwell: 300,
   },
   seed: 1739,
 };

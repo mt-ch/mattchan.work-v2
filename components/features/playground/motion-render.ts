@@ -6,6 +6,7 @@ import type { PlaygroundConfig } from "./config";
 import { layoutTiles, type Tile } from "./layout";
 import type { MotionState } from "./motion-state";
 import type { Piece } from "./playground-data";
+import { updateSeen } from "./seen";
 import { applyPlaying, pickPlaying } from "./video-budget";
 
 /** What the renderer writes to. */
@@ -14,6 +15,13 @@ export type RenderTargets = {
   scaler: HTMLElement;
   track: HTMLElement;
   dots: HTMLElement;
+};
+
+/** What the renderer reports back. */
+export type RenderHooks = {
+  onTiles: (tiles: Tile[]) => void;
+  /** Called with every seen piece key whenever a new piece is seen. */
+  onSeen: (seen: ReadonlySet<string>) => void;
 };
 
 /**
@@ -71,6 +79,34 @@ function applyTransforms(
 }
 
 /**
+ * Counts the pieces whose tiles have been on screen long enough, and reports
+ * when that set grows.
+ *
+ * @param state - Motion state holding the seen pieces.
+ * @param frame.tiles - Tiles near the viewport.
+ * @param frame.viewport - Viewport width and height in px.
+ * @param frame.config - Threshold and dwell.
+ * @param onSeen - Called with every seen piece key when a new piece is seen.
+ */
+function trackSeen(
+  state: MotionState,
+  frame: {
+    tiles: Tile[];
+    viewport: { width: number; height: number };
+    config: PlaygroundConfig["seen"];
+  },
+  onSeen: RenderHooks["onSeen"],
+) {
+  const before = state.seen.seen;
+  state.seen = updateSeen(state.seen, {
+    ...frame,
+    now: performance.now(),
+    enabled: state.counting,
+  });
+  if (state.seen.seen !== before) onSeen(state.seen.seen);
+}
+
+/**
  * Renders one frame: moves the canvas and, when the set of visible tiles
  * changed, hands the new list to React. Also keeps video playback within budget.
  *
@@ -78,14 +114,15 @@ function applyTransforms(
  * @param state - Motion state to read.
  * @param config - Current config.
  * @param pieces - Everything the canvas can show.
- * @param onTiles - Called with the visible tiles when the set changes.
+ * @param hooks - Callbacks for changed tiles and newly seen pieces.
+ * @param reduced - Whether the visitor prefers reduced motion.
  */
 export function render(
   targets: RenderTargets,
   state: MotionState,
   config: PlaygroundConfig,
   pieces: Piece[],
-  onTiles: (tiles: Tile[]) => void,
+  hooks: RenderHooks,
   reduced: boolean,
 ) {
   const camera = { x: state.x + state.nudge.x, y: state.y + state.nudge.y };
@@ -107,8 +144,10 @@ export function render(
   if (changed) {
     state.dirty = false;
     state.signature = signature;
-    onTiles(tiles);
+    hooks.onTiles(tiles);
   }
+
+  trackSeen(state, { tiles, viewport, config: config.seen }, hooks.onSeen);
 
   // Re-check which videos play now and then, and whenever the tiles change
   const now = performance.now();

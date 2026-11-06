@@ -11,6 +11,7 @@ const viewport = { width: 1280, height: 800 };
 const origin = { x: 0, y: 0 };
 
 const pieces: Piece[] = Array.from({ length: 40 }, (_, i) => ({
+  key: `asset-${i}`,
   slug: `project-${i % 10}`,
   title: `Project ${i % 10}`,
   orientation: i % 4 === 1 ? "landscape" : "portrait",

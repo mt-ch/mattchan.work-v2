@@ -179,6 +179,24 @@ describe("toPlaygroundPieces", () => {
     expect(toPlaygroundPieces([doc({ image: null })], size)).toEqual([]);
   });
 
+  it("keys the piece by its asset reference, the poster's for videos", () => {
+    const [still, video] = toPlaygroundPieces(
+      [doc(), doc({ videoUrl: "https://x/v.mp4", image: image("poster") })],
+      size,
+    );
+    expect(still.key).toBe("image-piece-2000x3000-jpg");
+    expect(video.key).toBe("image-poster-2000x3000-jpg");
+  });
+
+  it("gives the same key to one asset used twice, whatever the crop", () => {
+    const [a, b] = toPlaygroundPieces(
+      [doc(), doc({ orientation: "landscape" })],
+      size,
+    );
+    expect(a.key).toBe(b.key);
+    expect(a.src).not.toBe(b.src);
+  });
+
   it("carries the caption through", () => {
     const [piece] = toPlaygroundPieces([doc({ caption: "A caption" })], size);
     expect(piece.caption).toBe("A caption");

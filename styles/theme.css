@@ -9,6 +9,8 @@
   --color-ink: var(--ink);
   --color-brand: var(--brand);
   --color-accent: var(--accent);
+  --color-seen-fill: var(--seen-fill);
+  --color-seen-count: var(--seen-count);
 
   /* Semantic */
   --color-background: var(--background);

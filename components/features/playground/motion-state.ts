@@ -1,5 +1,6 @@
 // Local modules
 import type { Point } from "./edge-nudge";
+import { createSeenState, type SeenState } from "./seen";
 
 /** Mutable camera and effect state shared by the motion modules. */
 export type MotionState = {
@@ -25,6 +26,10 @@ export type MotionState = {
   /** Joined keys of the tiles last handed to React. */
   signature: string;
   videoClock: number;
+  /** Pieces seen so far and the tiles heading there. */
+  seen: SeenState;
+  /** Whether seen counting is on; off until the intro has played. */
+  counting: boolean;
   /** Set to force the next frame to recompute everything. */
   dirty: boolean;
 };
@@ -33,9 +38,13 @@ export type MotionState = {
  * Creates fresh motion state with the camera at a given world position.
  *
  * @param start - World position of the viewport's top-left corner.
+ * @param seen - Keys of the pieces already seen.
  * @returns State at rest.
  */
-export function createState(start: Point): MotionState {
+export function createState(
+  start: Point,
+  seen: Iterable<string> = [],
+): MotionState {
   return {
     x: start.x,
     y: start.y,
@@ -50,6 +59,8 @@ export function createState(start: Point): MotionState {
     last: { ...start },
     signature: "",
     videoClock: 0,
+    seen: createSeenState(seen),
+    counting: false,
     dirty: true,
   };
 }
