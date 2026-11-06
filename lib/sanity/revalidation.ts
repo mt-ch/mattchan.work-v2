@@ -23,6 +23,8 @@ export function tagsForDocument({ _type, slug }: RevalidationPayload) {
     case "project":
       // The list and "other projects" depend on every Project, the page only on its own slug
       return slug ? [tags.projects, tags.project(slug)] : [tags.projects];
+    case "playgroundPiece":
+      return [tags.playground];
     case "about":
       return [tags.about];
     default:
