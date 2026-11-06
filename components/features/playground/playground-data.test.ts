@@ -2,10 +2,13 @@
 import { describe, expect, it } from "vitest";
 
 // Shared modules
-import type { PlaygroundProjectsQueryResult } from "@/sanity.types";
+import type {
+  PlaygroundPiecesQueryResult,
+  PlaygroundProjectsQueryResult,
+} from "@/sanity.types";
 
 // Local modules
-import { toPieces } from "./playground-data";
+import { toPieces, toPlaygroundPieces } from "./playground-data";
 
 const size = 600;
 const image = (
@@ -31,62 +34,12 @@ const project = (
 });
 
 describe("toPieces", () => {
-  describe("orientation", () => {
-    const orientationOf = (dims: { width?: number; height?: number } | null) =>
-      toPieces([project({ coverImage: image("c", dims) })], size)[0]
-        .orientation;
-
-    it("is landscape above the 1.095 cut-off and portrait below it", () => {
-      expect(orientationOf({ width: 1100, height: 1000 })).toBe("landscape");
-      expect(orientationOf({ width: 1090, height: 1000 })).toBe("portrait");
-      expect(orientationOf({ width: 3000, height: 2000 })).toBe("landscape");
-      expect(orientationOf({ width: 2000, height: 3000 })).toBe("portrait");
-    });
-
-    it("treats square and missing dimensions as portrait", () => {
-      expect(orientationOf({ width: 1000, height: 1000 })).toBe("portrait");
-      expect(orientationOf(null)).toBe("portrait");
-      expect(orientationOf({ width: 1000 })).toBe("portrait");
-    });
-
-    it("takes a video piece's orientation from its poster", () => {
-      const pieces = toPieces(
-        [
-          project({
-            coverImage: null,
-            story: [
-              {
-                _key: "r1",
-                items: [
-                  {
-                    _key: "v",
-                    _type: "videoCell",
-                    videoUrl: "https://x/v.mp4",
-                    poster: image("v", { width: 1920, height: 1080 }),
-                  },
-                ],
-              },
-            ],
-          }),
-        ],
-        size,
-      );
-      expect(pieces[0].orientation).toBe("landscape");
-    });
-
-    it("crops each orientation to its own size", () => {
-      const [portrait] = toPieces(
-        [project({ coverImage: image("p", { width: 800, height: 1000 }) })],
-        size,
-      );
-      const [landscape] = toPieces(
-        [project({ coverImage: image("l", { width: 1500, height: 1000 }) })],
-        size,
-      );
-      expect(portrait.src).toContain("w=480");
-      expect(landscape.src).toContain("w=900");
-      expect(landscape.src).toContain("h=600");
-    });
+  it("falls back to portrait, since Project media has no chosen orientation", () => {
+    const [piece] = toPieces(
+      [project({ coverImage: image("c", { width: 3000, height: 1000 }) })],
+      size,
+    );
+    expect(piece.orientation).toBe("portrait");
   });
 
   it("makes a piece from a cover, cropped to the tile height", () => {
@@ -166,5 +119,68 @@ describe("toPieces", () => {
       size,
     );
     expect(pieces).toEqual([]);
+  });
+});
+
+const doc = (
+  over: Partial<PlaygroundPiecesQueryResult[number]> = {},
+): PlaygroundPiecesQueryResult[number] => ({
+  _id: "d1",
+  image: image("piece", { width: 2000, height: 3000 }),
+  videoUrl: null,
+  orientation: "portrait",
+  caption: null,
+  projectTitle: "Pertemps",
+  projectSlug: "pertemps",
+  ...over,
+});
+
+describe("toPlaygroundPieces", () => {
+  it("takes orientation from the field, whatever the image dimensions", () => {
+    const [piece] = toPlaygroundPieces(
+      [
+        doc({
+          orientation: "landscape",
+          image: image("tall", { width: 1000, height: 3000 }),
+        }),
+      ],
+      size,
+    );
+    expect(piece.orientation).toBe("landscape");
+  });
+
+  it("crops to the orientation's width at the requested height", () => {
+    const [portrait, landscape] = toPlaygroundPieces(
+      [doc(), doc({ orientation: "landscape" })],
+      size,
+    );
+    expect(portrait.src).toContain("w=480");
+    expect(portrait.src).toContain("h=600");
+    expect(landscape.src).toContain("w=900");
+    expect(landscape.src).toContain("h=600");
+  });
+
+  it("labels the piece with its Project and keeps the blur placeholder", () => {
+    const [piece] = toPlaygroundPieces([doc()], size);
+    expect(piece).toMatchObject({ slug: "pertemps", title: "Pertemps" });
+    expect(piece.blurDataURL).toBe("data:image/jpeg;base64,x");
+  });
+
+  it("gives a video piece its video, with the image as src", () => {
+    const [piece] = toPlaygroundPieces(
+      [doc({ videoUrl: "https://cdn.sanity.io/files/p/d/v.mp4" })],
+      size,
+    );
+    expect(piece.videoSrc).toBe("https://cdn.sanity.io/files/p/d/v.mp4");
+    expect(piece.src).toContain("piece-2000x3000");
+  });
+
+  it("skips a piece without an image asset", () => {
+    expect(toPlaygroundPieces([doc({ image: null })], size)).toEqual([]);
+  });
+
+  it("carries the caption through", () => {
+    const [piece] = toPlaygroundPieces([doc({ caption: "A caption" })], size);
+    expect(piece.caption).toBe("A caption");
   });
 });

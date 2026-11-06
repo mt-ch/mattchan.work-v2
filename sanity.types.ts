@@ -112,6 +112,52 @@ export type Seo = {
   noIndex?: boolean;
 };
 
+export type ProjectReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "project";
+};
+
+export type PlaygroundPiece = {
+  _id: string;
+  _type: "playgroundPiece";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  video?: {
+    asset?: SanityFileAssetReference;
+    media?: unknown;
+    _type: "file";
+  };
+  orientation?: "portrait" | "landscape";
+  project?: ProjectReference;
+  caption?: string;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
 export type Project = {
   _id: string;
   _type: "project";
@@ -148,22 +194,6 @@ export type Project = {
   order?: number;
   dateCompleted?: string;
   seo?: Seo;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type Slug = {
@@ -328,9 +358,11 @@ export type AllSanitySchemaTypes =
   | ImageCell
   | Row
   | Seo
-  | Project
+  | ProjectReference
+  | PlaygroundPiece
   | SanityImageCrop
   | SanityImageHotspot
+  | Project
   | Slug
   | About
   | SanityImagePaletteSwatch
@@ -630,6 +662,28 @@ export type PlaygroundProjectsQueryResult = Array<{
   }> | null;
 }>;
 
+// Source: lib/sanity/queries.ts
+// Variable: playgroundPiecesQuery
+// Query: *[    _type == "playgroundPiece" &&    defined(image.asset) &&    defined(project->title) &&    defined(project->slug.current)  ] | order(_createdAt asc) {    _id,    image {      ...,      "metadata": asset->metadata { lqip }    },    "videoUrl": video.asset->url,    orientation,    caption,    "projectTitle": project->title,    "projectSlug": project->slug.current  }
+export type PlaygroundPiecesQueryResult = Array<{
+  _id: string;
+  image: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+    metadata: {
+      lqip: string | null;
+    } | null;
+  } | null;
+  videoUrl: string | null;
+  orientation: "landscape" | "portrait" | null;
+  caption: string | null;
+  projectTitle: string | null;
+  projectSlug: string | null;
+}>;
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
@@ -639,6 +693,7 @@ declare global {
     '\n  *[_type == "project" && defined(slug.current)].slug.current\n': ProjectSlugsQueryResult;
     '\n  *[_type == "about"][0] {\n    _id,\n    _updatedAt,\n    name,\n    headline,\n    bio,\n    availability {\n      status,\n      isAvailable\n    },\n    "resumeUrl": resumeFile.asset->url,\n    email,\n    githubUrl,\n    linkedinUrl,\n    seo {\n      metaTitle,\n      metaDescription,\n      ogImage,\n      ogImageAlt,\n      noIndex\n    },\n    siteName,\n    titleTemplate,\n    defaultMetaDescription,\n    defaultOgImage\n  }\n': AboutQueryResult;
     '\n  *[_type == "project"] | order(order asc) {\n    _id,\n    title,\n    slug,\n    coverImage {\n      ...,\n      "metadata": asset->metadata { lqip, dimensions }\n    },\n    "coverVideoUrl": coverVideo.asset->url,\n    story[] {\n      _key,\n      items[] {\n        _key,\n        _type,\n        _type == "imageCell" => {\n          image {\n            ...,\n            "metadata": asset->metadata { lqip, dimensions }\n          }\n        },\n        _type == "videoCell" => {\n          "videoUrl": video.asset->url,\n          poster {\n            ...,\n            "metadata": asset->metadata { lqip, dimensions }\n          }\n        }\n      }\n    }\n  }\n': PlaygroundProjectsQueryResult;
+    '\n  *[\n    _type == "playgroundPiece" &&\n    defined(image.asset) &&\n    defined(project->title) &&\n    defined(project->slug.current)\n  ] | order(_createdAt asc) {\n    _id,\n    image {\n      ...,\n      "metadata": asset->metadata { lqip }\n    },\n    "videoUrl": video.asset->url,\n    orientation,\n    caption,\n    "projectTitle": project->title,\n    "projectSlug": project->slug.current\n  }\n': PlaygroundPiecesQueryResult;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too

@@ -4,4 +4,5 @@ export const tags = {
   projects: "projects",
   project: (slug: string) => `project:${slug}`,
   about: "about",
+  playground: "playground",
 } as const;

@@ -147,3 +147,23 @@ export const playgroundProjectsQuery = defineQuery(`
     }
   }
 `);
+
+export const playgroundPiecesQuery = defineQuery(`
+  *[
+    _type == "playgroundPiece" &&
+    defined(image.asset) &&
+    defined(project->title) &&
+    defined(project->slug.current)
+  ] | order(_createdAt asc) {
+    _id,
+    image {
+      ...,
+      "metadata": asset->metadata { lqip }
+    },
+    "videoUrl": video.asset->url,
+    orientation,
+    caption,
+    "projectTitle": project->title,
+    "projectSlug": project->slug.current
+  }
+`);

@@ -2,7 +2,8 @@
 import type { StructureResolver } from "sanity/structure";
 
 /**
- * The Studio's content tree: About as a singleton, then the Projects list.
+ * The Studio's content tree: About as a singleton, then the Projects and
+ * Playground piece lists.
  *
  * @param S - The Studio's structure builder.
  * @returns The "Content" list.
@@ -17,4 +18,5 @@ export const structure: StructureResolver = (S) =>
         .child(S.document().schemaType("about").documentId("about")),
       S.divider(),
       S.documentTypeListItem("project").title("Projects"),
+      S.documentTypeListItem("playgroundPiece").title("Playground"),
     ]);
