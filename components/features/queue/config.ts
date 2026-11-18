@@ -28,6 +28,12 @@ export type QueueConfig = {
   direction: number;
   /** When true a card keeps its piece's shape (4:5 or 3:2); when false every card is 4:5. */
   honourOrientation: boolean;
+  /** Auto-scroll speed in cards per second. */
+  driftSpeed: number;
+  /** Auto-scroll direction: 1 moves cards from far to near (right to left), -1 reverses it. */
+  driftDirection: number;
+  /** How fast momentum dies away, per second; higher stops sooner. */
+  friction: number;
 };
 
 export const queueConfig: QueueConfig = {
@@ -45,4 +51,7 @@ export const queueConfig: QueueConfig = {
   rotateFalloff: 0,
   direction: 1,
   honourOrientation: false,
+  driftSpeed: 0.25,
+  driftDirection: 1,
+  friction: 3,
 };

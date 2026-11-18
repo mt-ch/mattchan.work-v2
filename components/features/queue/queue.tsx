@@ -5,10 +5,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useLayoutEffect, useState } from "react";
 
+// Shared modules
+import { useMotionAllowed } from "@/lib/motion/use-motion-allowed";
+
 // Local modules
 import type { Piece } from "../playground/playground-data";
 import { layoutQueue, type QueueCard } from "./queue-layout";
 import { useQueueConfig } from "./use-queue-config";
+import { useQueuePosition } from "./use-queue-position";
 
 /** Viewport assumed until the real size is measured on the client. */
 const DEFAULT_VIEWPORT = { width: 1440, height: 900 };
@@ -74,7 +78,7 @@ function QueueItem({ card, piece }: { card: QueueCard; piece: Piece }) {
 
 /**
  * The Landing's Queue: a diagonal fan of cards in perspective, 4:5 unless the config honours orientation.
- * Every card links to its Project. Static for now; it does not move yet. `?debug` opens a tuning panel.
+ * Every card links to its Project. It drifts right to left by itself. `?debug` opens a tuning panel.
  *
  * @param props.pieces - Playground pieces, in Sanity order.
  * @param props.heading - Text of the visually hidden h1.
@@ -89,11 +93,13 @@ export function Queue({
 }) {
   const viewport = useViewport();
   const config = useQueueConfig();
+  const motionAllowed = useMotionAllowed();
+  const position = useQueuePosition(config, !motionAllowed);
   const cards = layoutQueue({
     count: pieces.length,
     orientations: pieces.map((piece) => piece.orientation),
     config,
-    position: 0,
+    position,
     viewport,
   });
 

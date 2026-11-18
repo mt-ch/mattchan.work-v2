@@ -19,6 +19,8 @@ const RANGES: Partial<Record<keyof QueueConfig, Range>> = {
   fadeFalloff: { min: 0, max: 0.3, step: 0.005 },
   cardHeight: { min: 0.2, max: 0.9, step: 0.01 },
   angle: { min: 0, max: 45, step: 0.5 },
+  driftSpeed: { min: 0, max: 2, step: 0.01 },
+  friction: { min: 0.1, max: 10, step: 0.1 },
 };
 
 /**
@@ -34,6 +36,9 @@ function addBindings(pane: Pane, config: QueueConfig) {
 
   pane.addBinding(config, "direction", {
     options: { "Far at top-right": 1, "Far at top-left": -1 },
+  });
+  pane.addBinding(config, "driftDirection", {
+    options: { "Right to left": 1, "Left to right": -1 },
   });
   pane.addBinding(config, "honourOrientation", {
     label: "honour orientation",
