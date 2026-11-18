@@ -9,7 +9,10 @@ const base = { paused: false, reduced: false, dt: 0.05, config: queueConfig };
 
 describe("stepQueue", () => {
   it("drifts at a constant speed with no input", () => {
-    const first = stepQueue({ ...base, motion: { position: 0, velocity: 0 } });
+    const first = stepQueue({
+      ...base,
+      motion: { position: 0, velocity: 0, drift: 1 },
+    });
     const second = stepQueue({ ...base, motion: first });
 
     expect(first.position).toBeCloseTo(queueConfig.driftSpeed * 0.05);
@@ -22,14 +25,14 @@ describe("stepQueue", () => {
     const next = stepQueue({
       ...base,
       config,
-      motion: { position: 5, velocity: 0 },
+      motion: { position: 5, velocity: 0, drift: 1 },
     });
 
     expect(next.position).toBeCloseTo(5 - queueConfig.driftSpeed * 0.05);
   });
 
   it("does not drift while paused or under reduced motion", () => {
-    const motion = { position: 2, velocity: 0 };
+    const motion = { position: 2, velocity: 0, drift: 1 };
 
     expect(stepQueue({ ...base, paused: true, motion }).position).toBe(2);
     expect(stepQueue({ ...base, reduced: true, motion }).position).toBe(2);
@@ -39,7 +42,7 @@ describe("stepQueue", () => {
     const next = stepQueue({
       ...base,
       paused: true,
-      motion: { position: 0, velocity: 2 },
+      motion: { position: 0, velocity: 2, drift: 1 },
     });
 
     expect(next.position).toBeGreaterThan(0);
@@ -51,7 +54,7 @@ describe("stepQueue", () => {
     const next = stepQueue({
       ...base,
       dt: 30,
-      motion: { position: 0, velocity: 0 },
+      motion: { position: 0, velocity: 0, drift: 1 },
     });
 
     expect(next.position).toBeCloseTo(queueConfig.driftSpeed * 0.1);

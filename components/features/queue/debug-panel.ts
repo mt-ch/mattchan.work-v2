@@ -21,6 +21,8 @@ const RANGES: Partial<Record<keyof QueueConfig, Range>> = {
   angle: { min: 0, max: 45, step: 0.5 },
   driftSpeed: { min: 0, max: 2, step: 0.01 },
   friction: { min: 0.1, max: 10, step: 0.1 },
+  resumeDelay: { min: 0, max: 5, step: 0.1 },
+  resumeRate: { min: 0.2, max: 10, step: 0.1 },
 };
 
 /**

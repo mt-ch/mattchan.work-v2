@@ -3,16 +3,18 @@
 // React and Next.js
 import Image from "next/image";
 import Link from "next/link";
-import { useLayoutEffect, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 // Shared modules
 import { useMotionAllowed } from "@/lib/motion/use-motion-allowed";
 
 // Local modules
 import type { Piece } from "../playground/playground-data";
+import type { QueueConfig } from "./config";
 import { layoutQueue, type QueueCard } from "./queue-layout";
 import { useQueueConfig } from "./use-queue-config";
-import { useQueuePosition } from "./use-queue-position";
+import { useQueueInput } from "./use-queue-input";
+import { useQueuePosition, type QueueControls } from "./use-queue-position";
 
 /** Viewport assumed until the real size is measured on the client. */
 const DEFAULT_VIEWPORT = { width: 1440, height: 900 };
@@ -36,6 +38,49 @@ function useViewport() {
   }, []);
 
   return viewport;
+}
+
+/**
+ * A ref for the Queue's root element, with input wired to it.
+ *
+ * @param controls - What input does to the Queue's motion.
+ * @param config - Queue config.
+ * @param height - Viewport height in px.
+ * @returns The ref to put on the root element.
+ */
+function useQueueRoot(
+  controls: QueueControls,
+  config: QueueConfig,
+  height: number,
+) {
+  const root = useRef<HTMLDivElement>(null);
+  useQueueInput(root, controls, config, height);
+
+  return root;
+}
+
+/**
+ * Lays out the cards for the pieces at a position.
+ *
+ * @param pieces - Playground pieces.
+ * @param config - Queue config.
+ * @param position - Scroll position as a fractional card index.
+ * @param viewport - Viewport size in px.
+ * @returns The visible cards.
+ */
+function layoutPieces(
+  pieces: Piece[],
+  config: QueueConfig,
+  position: number,
+  viewport: { width: number; height: number },
+) {
+  return layoutQueue({
+    count: pieces.length,
+    orientations: pieces.map((piece) => piece.orientation),
+    config,
+    position,
+    viewport,
+  });
 }
 
 /**
@@ -78,7 +123,7 @@ function QueueItem({ card, piece }: { card: QueueCard; piece: Piece }) {
 
 /**
  * The Landing's Queue: a diagonal fan of cards in perspective, 4:5 unless the config honours orientation.
- * Every card links to its Project. It drifts right to left by itself. `?debug` opens a tuning panel.
+ * Every card links to its Project. It drifts right to left by itself, and follows wheel, drag, touch and arrow keys. `?debug` opens a tuning panel.
  *
  * @param props.pieces - Playground pieces, in Sanity order.
  * @param props.heading - Text of the visually hidden h1.
@@ -94,17 +139,15 @@ export function Queue({
   const viewport = useViewport();
   const config = useQueueConfig();
   const motionAllowed = useMotionAllowed();
-  const position = useQueuePosition(config, !motionAllowed);
-  const cards = layoutQueue({
-    count: pieces.length,
-    orientations: pieces.map((piece) => piece.orientation),
-    config,
-    position,
-    viewport,
-  });
+  const { position, controls } = useQueuePosition(config, !motionAllowed);
+  const root = useQueueRoot(controls, config, viewport.height);
+  const cards = layoutPieces(pieces, config, position, viewport);
 
   return (
-    <div className="fixed inset-0 overflow-clip">
+    <div
+      ref={root}
+      className="fixed inset-0 touch-none overflow-clip select-none"
+    >
       <h1 className="sr-only">{heading}</h1>
       <div
         className="absolute inset-0"
