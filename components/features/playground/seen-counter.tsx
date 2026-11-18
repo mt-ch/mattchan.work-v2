@@ -86,14 +86,14 @@ export function SeenCounter({ seen, total }: { seen: number; total: number }) {
   const complete = total > 0 && seen >= total;
 
   // Fade in when the counter first appears
-  useLayoutEffect(() => {
-    if (prefersReducedMotion()) return;
-    const fade = gsap.from(rootRef.current, { opacity: 0, duration: 0.5 });
+  // useLayoutEffect(() => {
+  //   if (prefersReducedMotion()) return;
+  //   const fade = gsap.from(rootRef.current, { opacity: 0, duration: 0.5 });
 
-    return () => {
-      fade.kill();
-    };
-  }, []);
+  //   return () => {
+  //     fade.kill();
+  //   };
+  // }, []);
 
   return (
     <div

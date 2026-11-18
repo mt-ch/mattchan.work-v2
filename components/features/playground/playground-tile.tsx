@@ -70,7 +70,7 @@ function TileFace({ tile }: { tile: Tile }) {
           blurDataURL={piece.blurDataURL}
           sizes={`${tile.width}px`}
           draggable={false}
-          className="object-cover"
+          className="object-cover select-none"
         />
         {piece.videoSrc ? (
           <PlaygroundVideo tileKey={tile.key} src={piece.videoSrc} />
