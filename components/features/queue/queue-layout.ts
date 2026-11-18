@@ -2,6 +2,7 @@
 import type { Orientation } from "../playground/orientation";
 import { tileWidthFor } from "../playground/orientation";
 import type { QueueConfig } from "./config";
+import { curveDepth } from "./depth-curve";
 
 /** Aspect ratio (width ÷ height) of every Queue card: 4:5 portrait. */
 export const CARD_RATIO = 4 / 5;
@@ -62,6 +63,20 @@ function cardWidth(
 }
 
 /**
+ * Z position of a card: how far back it sits, shaped by the config's depth curve.
+ *
+ * @param config - Queue config.
+ * @param offset - Signed distance ahead of the focus point, in cards.
+ * @param height - Card height in px.
+ * @returns Z in px; negative is further from the camera.
+ */
+function depthZ(config: QueueConfig, offset: number, height: number): number {
+  const depth = curveDepth(config.depthCurve, offset, config.renderAfter);
+
+  return -depth * height * config.depthStep;
+}
+
+/**
  * Lays out the cards of the Queue: a diagonal fan from far (top-right) to near
  * (bottom-left), cards shrinking and fading with distance from the focus card.
  *
@@ -104,7 +119,7 @@ export function layoutQueue(input: {
       height,
       x: direction * offset * step * Math.cos(angle),
       y: -offset * step * Math.sin(angle),
-      z: -offset * height * config.depthStep,
+      z: depthZ(config, offset, height),
       rotateY: direction * (config.rotateY + distance * config.rotateFalloff),
       scale: Math.max(config.minScale, 1 - distance * config.scaleFalloff),
       opacity: Math.max(0, 1 - distance * config.fadeFalloff),

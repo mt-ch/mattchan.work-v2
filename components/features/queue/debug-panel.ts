@@ -3,6 +3,7 @@ import type { Pane } from "tweakpane";
 
 // Local modules
 import { queueConfig, type QueueConfig } from "./config";
+import { DEPTH_CURVES } from "./depth-curve";
 import { OVERRIDES_KEY, mergeQueueConfig } from "./config-overrides";
 
 type Range = { min: number; max: number; step: number };
@@ -36,6 +37,10 @@ function addBindings(pane: Pane, config: QueueConfig) {
     pane.addBinding(config, key as keyof QueueConfig, range);
   }
 
+  pane.addBinding(config, "depthCurve", {
+    label: "depth curve",
+    options: Object.fromEntries(DEPTH_CURVES.map((curve) => [curve, curve])),
+  });
   pane.addBinding(config, "direction", {
     options: { "Far at top-right": 1, "Far at top-left": -1 },
   });

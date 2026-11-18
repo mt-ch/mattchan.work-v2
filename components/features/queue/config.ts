@@ -1,3 +1,6 @@
+// Local modules
+import type { DepthCurve } from "./depth-curve";
+
 /** Every tunable value of the Queue. The code defaults are the source of truth. */
 export type QueueConfig = {
   /** Cards rendered nearer than the focus card. */
@@ -16,6 +19,8 @@ export type QueueConfig = {
   rotateY: number;
   /** Depth per card step, in card heights; farther cards sit further back. */
   depthStep: number;
+  /** How depth grows with distance from the focus card: linear, ease (flattens far away) or arc (a bowl). */
+  depthCurve: DepthCurve;
   /** Scale lost per card step away from the focus card. */
   scaleFalloff: number;
   /** Smallest scale a card shrinks to. */
@@ -49,6 +54,7 @@ export const queueConfig: QueueConfig = {
   perspective: 3,
   rotateY: -28,
   depthStep: 0.35,
+  depthCurve: "linear",
   scaleFalloff: 0.06,
   minScale: 0.35,
   fadeFalloff: 0.07,

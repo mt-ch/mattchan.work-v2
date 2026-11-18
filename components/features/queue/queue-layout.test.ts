@@ -150,4 +150,56 @@ describe("layoutQueue", () => {
     expect(uniform[0].width / uniform[0].height).toBeCloseTo(CARD_RATIO);
     expect(honoured[0].width / honoured[0].height).toBeCloseTo(1.5, 1);
   });
+
+  describe("depth curves", () => {
+    const zs = (depthCurve: "linear" | "ease" | "arc" | "bogus") =>
+      layoutQueue({
+        ...base,
+        config: { ...queueConfig, depthCurve: depthCurve as "linear" },
+      })
+        .sort((a, b) => Number(a.key) - Number(b.key))
+        .map((c) => c.z);
+    const focusAt = queueConfig.renderBefore;
+
+    it("keeps the focus card at z 0 on every curve", () => {
+      for (const curve of ["linear", "ease", "arc"] as const) {
+        expect(zs(curve)[focusAt]).toBeCloseTo(0);
+      }
+    });
+
+    it("linear steps back by an equal amount per card", () => {
+      const z = zs("linear");
+
+      expect(z[focusAt + 1] - z[focusAt + 2]).toBeCloseTo(
+        z[focusAt + 2] - z[focusAt + 3],
+      );
+    });
+
+    it("ease steps back less per card the further away", () => {
+      const z = zs("ease");
+      const near = z[focusAt + 1] - z[focusAt + 2];
+      const far = z[focusAt + 8] - z[focusAt + 9];
+
+      expect(far).toBeGreaterThan(0);
+      expect(far).toBeLessThan(near);
+    });
+
+    it("arc steps back more per card the further away, and bows near cards back", () => {
+      const z = zs("arc");
+      const near = z[focusAt + 1] - z[focusAt + 2];
+      const far = z[focusAt + 8] - z[focusAt + 9];
+
+      expect(far).toBeGreaterThan(near);
+      expect(z[focusAt - 1]).toBeLessThan(0);
+    });
+
+    it("meets the linear curve at the far end", () => {
+      expect(zs("ease").at(-1)).toBeCloseTo(zs("linear").at(-1)!);
+      expect(zs("arc").at(-1)).toBeCloseTo(zs("linear").at(-1)!);
+    });
+
+    it("falls back to linear for an unknown curve", () => {
+      expect(zs("bogus")).toEqual(zs("linear"));
+    });
+  });
 });
