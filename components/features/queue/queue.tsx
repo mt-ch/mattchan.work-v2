@@ -6,12 +6,14 @@ import Link from "next/link";
 import { useLayoutEffect, useRef, useState } from "react";
 
 // Shared modules
+import { TileVideo } from "@/components/ui/tile-video";
 import { useMotionAllowed } from "@/lib/motion/use-motion-allowed";
 
 // Local modules
 import type { Piece } from "../playground/playground-data";
 import type { QueueConfig } from "./config";
 import { layoutQueue, type QueueCard } from "./queue-layout";
+import { pickQueuePlaying } from "./queue-video";
 import { useQueueConfig } from "./use-queue-config";
 import { useQueueInput } from "./use-queue-input";
 import { useQueuePosition, type QueueControls } from "./use-queue-position";
@@ -88,9 +90,18 @@ function layoutPieces(
  *
  * @param props.card - Where and how to draw the card.
  * @param props.piece - The piece the card shows.
+ * @param props.playing - Whether the card's video should play; otherwise only the poster shows.
  * @returns The positioned card.
  */
-function QueueItem({ card, piece }: { card: QueueCard; piece: Piece }) {
+function QueueItem({
+  card,
+  piece,
+  playing,
+}: {
+  card: QueueCard;
+  piece: Piece;
+  playing: boolean;
+}) {
   return (
     <Link
       href={`/work/${piece.slug}`}
@@ -117,6 +128,7 @@ function QueueItem({ card, piece }: { card: QueueCard; piece: Piece }) {
         draggable={false}
         className="object-cover select-none"
       />
+      {playing && piece.videoSrc ? <TileVideo src={piece.videoSrc} /> : null}
     </Link>
   );
 }
@@ -142,6 +154,7 @@ export function Queue({
   const { position, controls } = useQueuePosition(config, !motionAllowed);
   const root = useQueueRoot(controls, config, viewport.height);
   const cards = layoutPieces(pieces, config, position, viewport);
+  const playing = pickQueuePlaying(cards, (i) => Boolean(pieces[i].videoSrc));
 
   return (
     <div
@@ -161,6 +174,7 @@ export function Queue({
             key={card.key}
             card={card}
             piece={pieces[card.pieceIndex]}
+            playing={playing.has(card.key)}
           />
         ))}
       </div>
