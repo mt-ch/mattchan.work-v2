@@ -34,6 +34,10 @@ export type QueueConfig = {
   driftDirection: number;
   /** How fast momentum dies away, per second; higher stops sooner. */
   friction: number;
+  /** Seconds the drift stays paused after the last input or hover before it resumes. */
+  resumeDelay: number;
+  /** How fast the drift eases back in once resumed, per second; higher is quicker. */
+  resumeRate: number;
 };
 
 export const queueConfig: QueueConfig = {
@@ -54,4 +58,6 @@ export const queueConfig: QueueConfig = {
   driftSpeed: 0.25,
   driftDirection: 1,
   friction: 3,
+  resumeDelay: 1.2,
+  resumeRate: 2,
 };
