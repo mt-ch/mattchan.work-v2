@@ -31,8 +31,16 @@ _Avoid_: Tile, column
 **Landing**:
 The single-page overview at `/`, made of sections designed in Figma.
 
+**Queue**:
+The diagonal fan of uniform 4:5 cards on the Landing, one card per Playground piece in Sanity order, wrapping by modulo. Cards further from the focus card are smaller, fainter and angled. Replaces the Playground at `/` on the experiment branch.
+_Avoid_: Tile (a Queue item is a card), carousel, stream
+
+**Card**:
+One item of the Queue: a Playground piece shown at 4:5 and linking to its Project. The card at the focus point is the focus card.
+_Avoid_: Tile, Cell
+
 **Playground**:
-The infinite, draggable canvas on the Landing: a tile for every Playground piece. Experimental, built on a branch that is not yet merged.
+The infinite, draggable canvas, no longer mounted on the Landing (see Queue): a tile for every Playground piece. Experimental, built on a branch that is not yet merged.
 _Avoid_: Stream, canvas, gallery
 
 **Playground piece**:

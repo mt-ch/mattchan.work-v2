@@ -5,15 +5,14 @@ import type { Metadata } from "next";
 import type { Image } from "sanity";
 
 // Shared modules
-import { Playground } from "@/components/features/playground/playground";
-import { playgroundConfig } from "@/components/features/playground/config";
 import { toPlaygroundPieces } from "@/components/features/playground/playground-data";
+import { Queue } from "@/components/features/queue/queue";
 import { getAbout, getPlaygroundPieces } from "@/lib/sanity";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { resolveSeo, type SeoObject } from "@/lib/seo/resolveSeo";
 
-/** Pixel density the tile images are cropped for; next/image trims it per device. */
-const IMAGE_DENSITY = 2;
+/** Height in px the card images are cropped to; next/image trims it per device. */
+const CARD_IMAGE_HEIGHT = 1200;
 
 /**
  * Builds the Landing page metadata from the About singleton.
@@ -38,23 +37,25 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * The Landing page at `/`: the experimental Playground, an infinite draggable
- * canvas of Playground pieces.
+ * The Landing page at `/`: the Queue, a diagonal fan of cards from Playground
+ * pieces.
  *
  * @returns The Landing page.
  */
 export default async function HomePage() {
   const [about, docs] = await Promise.all([getAbout(), getPlaygroundPieces()]);
 
-  const pieces = toPlaygroundPieces(
-    docs,
-    playgroundConfig.layout.tileHeight * IMAGE_DENSITY,
-  );
+  // Every Queue card is 4:5, so crop each piece as portrait around its hotspot
+  const portraitDocs = docs.map((doc) => ({
+    ...doc,
+    orientation: "portrait" as const,
+  }));
+  const pieces = toPlaygroundPieces(portraitDocs, CARD_IMAGE_HEIGHT);
   const name = about?.siteName ?? about?.name;
 
   return (
     <main>
-      <Playground
+      <Queue
         pieces={pieces}
         heading={name ? `${name}: selected work` : "Selected work"}
       />
