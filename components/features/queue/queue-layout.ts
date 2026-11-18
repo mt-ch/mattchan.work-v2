@@ -21,6 +21,8 @@ export type QueueCard = {
   y: number;
   z: number;
   rotateY: number;
+  /** Skew along the track in degrees, from scroll velocity. */
+  skew: number;
   scale: number;
   opacity: number;
   /** Cards ahead of this one, nearest first: 0 for the front-most card. */
@@ -28,6 +30,21 @@ export type QueueCard = {
   /** True for the single card at the focus point. */
   focus: boolean;
 };
+
+/** Speed in cards per second at which velocity coupling reaches its full effect. */
+export const FULL_COUPLING_SPEED = 4;
+
+/**
+ * Scroll speed as a share of the full coupling effect.
+ *
+ * @param velocity - Signed scroll speed in cards per second.
+ * @returns A value from -1 to 1.
+ */
+function couplingShare(velocity: number): number {
+  const share = velocity / FULL_COUPLING_SPEED;
+
+  return Math.min(Math.max(share, -1), 1);
+}
 
 /**
  * Wraps an index into [0, count) so the Queue loops without an end.
@@ -77,6 +94,58 @@ function depthZ(config: QueueConfig, offset: number, height: number): number {
 }
 
 /**
+ * Rotation and skew of a card, in degrees, from its distance and the scroll speed.
+ *
+ * @param config - Queue config.
+ * @param distance - Absolute distance from the focus point, in cards.
+ * @param share - Scroll speed as a share of full coupling, -1 to 1.
+ * @returns The signed rotateY and skew, mirrored by the config's direction.
+ */
+function tiltFor(config: QueueConfig, distance: number, share: number) {
+  const direction = config.direction < 0 ? -1 : 1;
+  const rotate =
+    config.rotateY +
+    distance * config.rotateFalloff +
+    share * config.velocityRotate;
+
+  return {
+    rotateY: direction * rotate,
+    skew: direction * share * config.velocitySkew,
+  };
+}
+
+/**
+ * Distance between neighbouring cards, widened by scroll speed.
+ *
+ * @param config - Queue config.
+ * @param height - Card height in px.
+ * @param share - Scroll speed as a share of full coupling, -1 to 1.
+ * @returns The step along the track in px.
+ */
+function stepFor(config: QueueConfig, height: number, share: number): number {
+  return (
+    height * config.spacing * (1 + config.velocitySpread * Math.abs(share))
+  );
+}
+
+/**
+ * Where a point along the track sits, given the track angle and direction.
+ *
+ * @param config - Queue config.
+ * @param along - Distance along the track from the focus point, in px.
+ * @returns The x and y offset in px.
+ */
+function trackPoint(config: QueueConfig, along: number) {
+  const angle = (config.angle * Math.PI) / 180;
+  const direction = config.direction < 0 ? -1 : 1;
+
+  return {
+    x: direction * along * Math.cos(angle),
+    y: -along * Math.sin(angle),
+  };
+}
+
+/**
  * Lays out the cards of the Queue: a diagonal fan from far (top-right) to near
  * (bottom-left), cards shrinking and fading with distance from the focus card.
  *
@@ -85,6 +154,7 @@ function depthZ(config: QueueConfig, offset: number, height: number): number {
  * @param input.config - Queue config.
  * @param input.position - Scroll position as a fractional card index; the focus card is the nearest integer.
  * @param input.viewport - Viewport size in px.
+ * @param input.velocity - Signed scroll speed in cards per second; faster movement skews, rotates and spreads the cards. Defaults to 0.
  * @returns The visible cards, nearest first. Empty when there are no pieces.
  */
 export function layoutQueue(input: {
@@ -93,14 +163,14 @@ export function layoutQueue(input: {
   config: QueueConfig;
   position: number;
   viewport: { width: number; height: number };
+  velocity?: number;
 }): QueueCard[] {
   const { count, orientations, config, position, viewport } = input;
   if (count <= 0) return [];
 
   const height = viewport.height * config.cardHeight;
-  const step = height * config.spacing;
-  const angle = (config.angle * Math.PI) / 180;
-  const direction = config.direction < 0 ? -1 : 1;
+  const share = couplingShare(input.velocity ?? 0);
+  const step = stepFor(config, height, share);
   const focusIndex = Math.round(position);
 
   const cards: QueueCard[] = [];
@@ -117,10 +187,9 @@ export function layoutQueue(input: {
       pieceIndex,
       width: cardWidth(config, orientation, height),
       height,
-      x: direction * offset * step * Math.cos(angle),
-      y: -offset * step * Math.sin(angle),
+      ...trackPoint(config, offset * step),
       z: depthZ(config, offset, height),
-      rotateY: direction * (config.rotateY + distance * config.rotateFalloff),
+      ...tiltFor(config, distance, share),
       scale: Math.max(config.minScale, 1 - distance * config.scaleFalloff),
       opacity: Math.max(0, 1 - distance * config.fadeFalloff),
       depthRank: 0,

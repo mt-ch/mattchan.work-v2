@@ -19,6 +19,30 @@ function easeToward(share: number, rate: number, dt: number): number {
   return 1 - (1 - share) * Math.exp(-rate * dt);
 }
 
+/** Seconds over which the measured speed settles, so single-frame jumps do not flicker the coupling. */
+const SPEED_SETTLE = 0.12;
+
+/**
+ * Measures how fast the Queue moved over a frame, smoothed against the previous reading.
+ *
+ * @param input.previous - Smoothed speed from the last frame, in cards per second.
+ * @param input.moved - Cards moved this frame, including direct moves such as drags.
+ * @param input.dt - Seconds since the previous frame.
+ * @returns The smoothed signed speed in cards per second.
+ */
+export function measureSpeed(input: {
+  previous: number;
+  moved: number;
+  dt: number;
+}): number {
+  const dt = Math.min(Math.max(input.dt, 0), MAX_DT);
+  if (dt === 0) return input.previous;
+
+  const share = 1 - Math.exp(-dt / SPEED_SETTLE);
+
+  return input.previous + (input.moved / dt - input.previous) * share;
+}
+
 /** Where the Queue is and how fast input is carrying it. */
 export type QueueMotion = {
   /** Scroll position as a fractional card index. */
