@@ -124,4 +124,30 @@ describe("layoutQueue", () => {
     expect(cards.at(-1)!.depthRank).toBe(cards.length - 1);
     expect(cards[0].z).toBeGreaterThanOrEqual(cards.at(-1)!.z);
   });
+
+  it("mirrors x and rotateY when the direction is -1", () => {
+    const flipped = layoutQueue({
+      ...base,
+      config: { ...queueConfig, direction: -1 },
+    });
+    const normal = layoutQueue(base);
+
+    flipped.forEach((card, i) => {
+      expect(card.x).toBeCloseTo(-normal[i].x);
+      expect(card.rotateY).toBeCloseTo(-normal[i].rotateY);
+    });
+  });
+
+  it("keeps every card 4:5 unless orientation is honoured", () => {
+    const orientations = Array<"landscape">(20).fill("landscape");
+    const uniform = layoutQueue({ ...base, orientations });
+    const honoured = layoutQueue({
+      ...base,
+      orientations,
+      config: { ...queueConfig, honourOrientation: true },
+    });
+
+    expect(uniform[0].width / uniform[0].height).toBeCloseTo(CARD_RATIO);
+    expect(honoured[0].width / honoured[0].height).toBeCloseTo(1.5, 1);
+  });
 });

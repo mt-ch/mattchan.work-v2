@@ -1,4 +1,6 @@
 // Local modules
+import type { Orientation } from "../playground/orientation";
+import { tileWidthFor } from "../playground/orientation";
 import type { QueueConfig } from "./config";
 
 /** Aspect ratio (width ÷ height) of every Queue card: 4:5 portrait. */
@@ -40,10 +42,31 @@ export function wrapIndex(index: number, count: number): number {
 }
 
 /**
+ * Width of a card: its piece's shape when the config honours orientation, else 4:5.
+ *
+ * @param config - Queue config.
+ * @param orientation - The piece's orientation, when known.
+ * @param height - Card height in px.
+ * @returns The card width in px.
+ */
+function cardWidth(
+  config: QueueConfig,
+  orientation: Orientation | undefined,
+  height: number,
+): number {
+  if (config.honourOrientation && orientation) {
+    return tileWidthFor(orientation, height);
+  }
+
+  return height * CARD_RATIO;
+}
+
+/**
  * Lays out the cards of the Queue: a diagonal fan from far (top-right) to near
  * (bottom-left), cards shrinking and fading with distance from the focus card.
  *
  * @param input.count - Number of pieces; indices wrap by modulo.
+ * @param input.orientations - Shape of each piece, used only when the config honours orientation.
  * @param input.config - Queue config.
  * @param input.position - Scroll position as a fractional card index; the focus card is the nearest integer.
  * @param input.viewport - Viewport size in px.
@@ -51,16 +74,18 @@ export function wrapIndex(index: number, count: number): number {
  */
 export function layoutQueue(input: {
   count: number;
+  orientations?: Orientation[];
   config: QueueConfig;
   position: number;
   viewport: { width: number; height: number };
 }): QueueCard[] {
-  const { count, config, position, viewport } = input;
+  const { count, orientations, config, position, viewport } = input;
   if (count <= 0) return [];
 
   const height = viewport.height * config.cardHeight;
   const step = height * config.spacing;
   const angle = (config.angle * Math.PI) / 180;
+  const direction = config.direction < 0 ? -1 : 1;
   const focusIndex = Math.round(position);
 
   const cards: QueueCard[] = [];
@@ -69,16 +94,18 @@ export function layoutQueue(input: {
     const offset = focusIndex + slot - position;
     const absolute = focusIndex + slot;
     const distance = Math.abs(offset);
+    const pieceIndex = wrapIndex(absolute, count);
+    const orientation = orientations?.[pieceIndex];
 
     cards.push({
       key: `${absolute}`,
-      pieceIndex: wrapIndex(absolute, count),
-      width: height * CARD_RATIO,
+      pieceIndex,
+      width: cardWidth(config, orientation, height),
       height,
-      x: offset * step * Math.cos(angle),
+      x: direction * offset * step * Math.cos(angle),
       y: -offset * step * Math.sin(angle),
       z: -offset * height * config.depthStep,
-      rotateY: config.rotateY + distance * config.rotateFalloff,
+      rotateY: direction * (config.rotateY + distance * config.rotateFalloff),
       scale: Math.max(config.minScale, 1 - distance * config.scaleFalloff),
       opacity: Math.max(0, 1 - distance * config.fadeFalloff),
       depthRank: 0,

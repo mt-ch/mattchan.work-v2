@@ -24,6 +24,10 @@ export type QueueConfig = {
   fadeFalloff: number;
   /** Extra rotateY per card step away from the focus card, in degrees. */
   rotateFalloff: number;
+  /** Which way the fan runs: 1 is far at the top-right, -1 mirrors it to the top-left. */
+  direction: number;
+  /** When true a card keeps its piece's shape (4:5 or 3:2); when false every card is 4:5. */
+  honourOrientation: boolean;
 };
 
 export const queueConfig: QueueConfig = {
@@ -39,4 +43,6 @@ export const queueConfig: QueueConfig = {
   minScale: 0.35,
   fadeFalloff: 0.07,
   rotateFalloff: 0,
+  direction: 1,
+  honourOrientation: false,
 };

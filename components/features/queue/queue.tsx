@@ -6,9 +6,9 @@ import Link from "next/link";
 import { useLayoutEffect, useState } from "react";
 
 // Local modules
-import { queueConfig } from "./config";
 import type { Piece } from "../playground/playground-data";
 import { layoutQueue, type QueueCard } from "./queue-layout";
+import { useQueueConfig } from "./use-queue-config";
 
 /** Viewport assumed until the real size is measured on the client. */
 const DEFAULT_VIEWPORT = { width: 1440, height: 900 };
@@ -73,8 +73,8 @@ function QueueItem({ card, piece }: { card: QueueCard; piece: Piece }) {
 }
 
 /**
- * The Landing's Queue: a diagonal fan of uniform 4:5 cards in perspective.
- * Every card links to its Project. Static for now; it does not move yet.
+ * The Landing's Queue: a diagonal fan of cards in perspective, 4:5 unless the config honours orientation.
+ * Every card links to its Project. Static for now; it does not move yet. `?debug` opens a tuning panel.
  *
  * @param props.pieces - Playground pieces, in Sanity order.
  * @param props.heading - Text of the visually hidden h1.
@@ -88,9 +88,11 @@ export function Queue({
   heading: string;
 }) {
   const viewport = useViewport();
+  const config = useQueueConfig();
   const cards = layoutQueue({
     count: pieces.length,
-    config: queueConfig,
+    orientations: pieces.map((piece) => piece.orientation),
+    config,
     position: 0,
     viewport,
   });
@@ -101,7 +103,7 @@ export function Queue({
       <div
         className="absolute inset-0"
         style={{
-          perspective: `${queueConfig.perspective * viewport.height * queueConfig.cardHeight}px`,
+          perspective: `${config.perspective * viewport.height * config.cardHeight}px`,
           transformStyle: "preserve-3d",
         }}
       >
