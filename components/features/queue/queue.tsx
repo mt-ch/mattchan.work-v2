@@ -7,6 +7,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 
 // Shared modules
 import { TileVideo } from "@/components/ui/tile-video";
+import { useDesktop } from "@/lib/motion/use-desktop";
 import { useMotionAllowed } from "@/lib/motion/use-motion-allowed";
 
 // Local modules
@@ -14,6 +15,7 @@ import type { Piece } from "../playground/playground-data";
 import type { QueueConfig } from "./config";
 import { layoutQueue, type QueueCard } from "./queue-layout";
 import { pickQueuePlaying } from "./queue-video";
+import { resolveConfig } from "./resolve-config";
 import { useQueueConfig } from "./use-queue-config";
 import { useQueueInput } from "./use-queue-input";
 import { useQueuePosition, type QueueControls } from "./use-queue-position";
@@ -137,6 +139,7 @@ function QueueItem({
 }
 
 /**
+/**
  * The perspective layer that holds every card.
  *
  * @param props.cards - The laid-out cards.
@@ -180,6 +183,19 @@ function QueueFan({
 }
 
 /**
+ * The tuned config, adjusted for narrow screens and reduced motion.
+ *
+ * @returns The config to render with, and whether motion is reduced.
+ */
+function useResolvedConfig() {
+  const tuned = useQueueConfig();
+  const reduced = !useMotionAllowed();
+  const mobile = !useDesktop();
+
+  return { config: resolveConfig(tuned, { mobile, reduced }), reduced };
+}
+
+/**
  * The Landing's Queue: a diagonal fan of cards in perspective, 4:5 unless the config honours orientation.
  * Every card links to its Project. It drifts right to left by itself, and follows wheel, drag, touch and arrow keys. `?debug` opens a tuning panel.
  *
@@ -195,18 +211,14 @@ export function Queue({
   heading: string;
 }) {
   const viewport = useViewport();
-  const config = useQueueConfig();
-  const motionAllowed = useMotionAllowed();
-  const { position, speed, controls } = useQueuePosition(
-    config,
-    !motionAllowed,
-  );
+  const { config, reduced } = useResolvedConfig();
+  const { position, speed, controls } = useQueuePosition(config, reduced);
   const root = useQueueRoot(controls, config, viewport.height);
   const cards = layoutPieces(
     pieces,
     config,
     position,
-    motionAllowed ? speed : 0,
+    reduced ? 0 : speed,
     viewport,
   );
   const playing = pickQueuePlaying(cards, (i) => Boolean(pieces[i].videoSrc));
