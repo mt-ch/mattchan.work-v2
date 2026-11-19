@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 // Local modules
 import { queueConfig } from "./config";
-import { stepQueue } from "./queue-step";
+import { measureSpeed, stepQueue } from "./queue-step";
 
 const base = { paused: false, reduced: false, dt: 0.05, config: queueConfig };
 
@@ -58,5 +58,20 @@ describe("stepQueue", () => {
     });
 
     expect(next.position).toBeCloseTo(queueConfig.driftSpeed * 0.1);
+  });
+});
+
+describe("measureSpeed", () => {
+  it("settles toward the real speed over a few frames", () => {
+    let speed = 0;
+    for (let i = 0; i < 30; i++) {
+      speed = measureSpeed({ previous: speed, moved: 0.05, dt: 0.016 });
+    }
+
+    expect(speed).toBeCloseTo(0.05 / 0.016, 0);
+  });
+
+  it("holds the previous speed when no time passed", () => {
+    expect(measureSpeed({ previous: 2, moved: 5, dt: 0 })).toBe(2);
   });
 });
