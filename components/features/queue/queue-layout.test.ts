@@ -3,7 +3,12 @@ import { describe, expect, it } from "vitest";
 
 // Local modules
 import { queueConfig } from "./config";
-import { CARD_RATIO, layoutQueue, wrapIndex } from "./queue-layout";
+import {
+  CARD_RATIO,
+  FULL_COUPLING_SPEED,
+  layoutQueue,
+  wrapIndex,
+} from "./queue-layout";
 
 const viewport = { width: 1280, height: 800 };
 const base = { count: 20, config: queueConfig, position: 0, viewport };

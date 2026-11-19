@@ -7,7 +7,7 @@ import { gsap } from "gsap";
 // Local modules
 import type { QueueConfig } from "./config";
 import { impulseFor, isPaused } from "./queue-input";
-import { stepQueue, type QueueMotion } from "./queue-step";
+import { measureSpeed, stepQueue, type QueueMotion } from "./queue-step";
 
 /** What input can do to the Queue's motion. */
 export type QueueControls = {
@@ -83,10 +83,13 @@ function createCore(config: QueueConfig) {
  *
  * @param config - Queue config; read fresh each frame, so panel edits apply live.
  * @param reduced - When true the drift is off.
- * @returns The scroll position as a fractional card index, and the controls input drives it with.
+ * @returns The scroll position as a fractional card index, its speed in cards per second, and the controls input drives it with.
  */
 export function useQueuePosition(config: QueueConfig, reduced: boolean) {
-  const [position, setPosition] = useState(0);
+  const [{ position, speed }, setReading] = useState({
+    position: 0,
+    speed: 0,
+  });
   const [{ core, controls, apply }] = useState(() => createCore(config));
 
   useEffect(() => {
@@ -96,6 +99,7 @@ export function useQueuePosition(config: QueueConfig, reduced: boolean) {
   useEffect(() => {
     // Step the motion by the frame time and publish the new position
     const tick = (time: number, deltaTime: number) => {
+      const before = core.motion.position;
       core.motion = stepQueue({
         motion: core.motion,
         paused: isPaused({
@@ -107,7 +111,16 @@ export function useQueuePosition(config: QueueConfig, reduced: boolean) {
         dt: deltaTime / 1000,
         config: core.config,
       });
-      setPosition(core.motion.position);
+
+      // Measure the speed, drift and drags included, for velocity coupling
+      setReading((last) => ({
+        position: core.motion.position,
+        speed: measureSpeed({
+          previous: last.speed,
+          moved: core.motion.position - before,
+          dt: deltaTime / 1000,
+        }),
+      }));
     };
 
     gsap.ticker.add(tick);
@@ -115,5 +128,5 @@ export function useQueuePosition(config: QueueConfig, reduced: boolean) {
     return () => gsap.ticker.remove(tick);
   }, [core]);
 
-  return { position, controls };
+  return { position, speed, controls };
 }

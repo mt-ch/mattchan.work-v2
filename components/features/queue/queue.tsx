@@ -67,6 +67,7 @@ function useQueueRoot(
  * @param pieces - Playground pieces.
  * @param config - Queue config.
  * @param position - Scroll position as a fractional card index.
+ * @param velocity - Signed scroll speed in cards per second.
  * @param viewport - Viewport size in px.
  * @returns The visible cards.
  */
@@ -74,6 +75,7 @@ function layoutPieces(
   pieces: Piece[],
   config: QueueConfig,
   position: number,
+  velocity: number,
   viewport: { width: number; height: number },
 ) {
   return layoutQueue({
@@ -81,6 +83,7 @@ function layoutPieces(
     orientations: pieces.map((piece) => piece.orientation),
     config,
     position,
+    velocity,
     viewport,
   });
 }
@@ -115,7 +118,7 @@ function QueueItem({
         marginTop: -card.height / 2,
         opacity: card.opacity,
         zIndex: 1000 - card.depthRank,
-        transform: `translate3d(${card.x}px, ${card.y}px, ${card.z}px) rotateY(${card.rotateY}deg) scale(${card.scale})`,
+        transform: `translate3d(${card.x}px, ${card.y}px, ${card.z}px) rotateY(${card.rotateY}deg) skewX(${card.skew}deg) scale(${card.scale})`,
       }}
     >
       <Image
@@ -130,6 +133,49 @@ function QueueItem({
       />
       {playing && piece.videoSrc ? <TileVideo src={piece.videoSrc} /> : null}
     </Link>
+  );
+}
+
+/**
+ * The perspective layer that holds every card.
+ *
+ * @param props.cards - The laid-out cards.
+ * @param props.pieces - Playground pieces the cards show.
+ * @param props.config - Queue config.
+ * @param props.height - Viewport height in px.
+ * @param props.playing - Keys of the cards whose video should play.
+ * @returns The 3D stage with its cards.
+ */
+function QueueFan({
+  cards,
+  pieces,
+  config,
+  height,
+  playing,
+}: {
+  cards: QueueCard[];
+  pieces: Piece[];
+  config: QueueConfig;
+  height: number;
+  playing: Set<string>;
+}) {
+  return (
+    <div
+      className="absolute inset-0"
+      style={{
+        perspective: `${config.perspective * height * config.cardHeight}px`,
+        transformStyle: "preserve-3d",
+      }}
+    >
+      {cards.map((card) => (
+        <QueueItem
+          key={card.key}
+          card={card}
+          piece={pieces[card.pieceIndex]}
+          playing={playing.has(card.key)}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -151,9 +197,18 @@ export function Queue({
   const viewport = useViewport();
   const config = useQueueConfig();
   const motionAllowed = useMotionAllowed();
-  const { position, controls } = useQueuePosition(config, !motionAllowed);
+  const { position, speed, controls } = useQueuePosition(
+    config,
+    !motionAllowed,
+  );
   const root = useQueueRoot(controls, config, viewport.height);
-  const cards = layoutPieces(pieces, config, position, viewport);
+  const cards = layoutPieces(
+    pieces,
+    config,
+    position,
+    motionAllowed ? speed : 0,
+    viewport,
+  );
   const playing = pickQueuePlaying(cards, (i) => Boolean(pieces[i].videoSrc));
 
   return (
@@ -162,22 +217,13 @@ export function Queue({
       className="fixed inset-0 touch-none overflow-clip select-none"
     >
       <h1 className="sr-only">{heading}</h1>
-      <div
-        className="absolute inset-0"
-        style={{
-          perspective: `${config.perspective * viewport.height * config.cardHeight}px`,
-          transformStyle: "preserve-3d",
-        }}
-      >
-        {cards.map((card) => (
-          <QueueItem
-            key={card.key}
-            card={card}
-            piece={pieces[card.pieceIndex]}
-            playing={playing.has(card.key)}
-          />
-        ))}
-      </div>
+      <QueueFan
+        cards={cards}
+        pieces={pieces}
+        config={config}
+        height={viewport.height}
+        playing={playing}
+      />
     </div>
   );
 }
