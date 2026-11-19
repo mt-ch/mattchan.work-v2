@@ -6,12 +6,14 @@ import Link from "next/link";
 import { useLayoutEffect, useRef, useState } from "react";
 
 // Shared modules
+import { TileVideo } from "@/components/ui/tile-video";
 import { useMotionAllowed } from "@/lib/motion/use-motion-allowed";
 
 // Local modules
 import type { Piece } from "../playground/playground-data";
 import type { QueueConfig } from "./config";
 import { layoutQueue, type QueueCard } from "./queue-layout";
+import { pickQueuePlaying } from "./queue-video";
 import { useQueueConfig } from "./use-queue-config";
 import { useQueueInput } from "./use-queue-input";
 import { useQueuePosition, type QueueControls } from "./use-queue-position";
@@ -91,9 +93,18 @@ function layoutPieces(
  *
  * @param props.card - Where and how to draw the card.
  * @param props.piece - The piece the card shows.
+ * @param props.playing - Whether the card's video should play; otherwise only the poster shows.
  * @returns The positioned card.
  */
-function QueueItem({ card, piece }: { card: QueueCard; piece: Piece }) {
+function QueueItem({
+  card,
+  piece,
+  playing,
+}: {
+  card: QueueCard;
+  piece: Piece;
+  playing: boolean;
+}) {
   return (
     <Link
       href={`/work/${piece.slug}`}
@@ -120,6 +131,7 @@ function QueueItem({ card, piece }: { card: QueueCard; piece: Piece }) {
         draggable={false}
         className="object-cover select-none"
       />
+      {playing && piece.videoSrc ? <TileVideo src={piece.videoSrc} /> : null}
     </Link>
   );
 }
@@ -131,6 +143,7 @@ function QueueItem({ card, piece }: { card: QueueCard; piece: Piece }) {
  * @param props.pieces - Playground pieces the cards show.
  * @param props.config - Queue config.
  * @param props.height - Viewport height in px.
+ * @param props.playing - Keys of the cards whose video should play.
  * @returns The 3D stage with its cards.
  */
 function QueueFan({
@@ -138,11 +151,13 @@ function QueueFan({
   pieces,
   config,
   height,
+  playing,
 }: {
   cards: QueueCard[];
   pieces: Piece[];
   config: QueueConfig;
   height: number;
+  playing: Set<string>;
 }) {
   return (
     <div
@@ -153,7 +168,12 @@ function QueueFan({
       }}
     >
       {cards.map((card) => (
-        <QueueItem key={card.key} card={card} piece={pieces[card.pieceIndex]} />
+        <QueueItem
+          key={card.key}
+          card={card}
+          piece={pieces[card.pieceIndex]}
+          playing={playing.has(card.key)}
+        />
       ))}
     </div>
   );
@@ -189,6 +209,7 @@ export function Queue({
     motionAllowed ? speed : 0,
     viewport,
   );
+  const playing = pickQueuePlaying(cards, (i) => Boolean(pieces[i].videoSrc));
 
   return (
     <div
@@ -201,6 +222,7 @@ export function Queue({
         pieces={pieces}
         config={config}
         height={viewport.height}
+        playing={playing}
       />
     </div>
   );
