@@ -16,12 +16,21 @@ export function IdentityCard({
   headline: string;
 }) {
   return (
-    <section className="flex items-center justify-between gap-sm rounded-md bg-surface p-sm">
-      <div className="shrink-0 space-y-0.5 font-mono text-mono-caption">
-        <h1 className="type-small">{name}</h1>
-        <p className="type-small whitespace-pre-line text-muted">{headline}</p>
+    <section className="flex flex-col overflow-hidden rounded-sm bg-foreground">
+      <div className="flex flex-col p-xs">
+        <h1 className="type-mono-caption text-surface">{name}</h1>
+        <p className="type-mono-caption whitespace-pre-line text-muted">
+          {headline}
+        </p>
       </div>
-      <Avatar />
+      <div className="flex flex-col border-t border-muted/30 p-xs">
+        <p className="type-mono-caption whitespace-pre-line text-surface">
+          Collaborations
+        </p>
+        <p className="type-mono-caption whitespace-pre-line text-surface underline">
+          hello@mattchan.work
+        </p>
+      </div>
     </section>
   );
 }
