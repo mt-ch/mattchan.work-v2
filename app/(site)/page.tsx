@@ -46,12 +46,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const [about, docs] = await Promise.all([getAbout(), getPlaygroundPieces()]);
 
-  // Every Queue card is 4:5, so crop each piece as portrait around its hotspot
-  const portraitDocs = docs.map((doc) => ({
-    ...doc,
-    orientation: "portrait" as const,
-  }));
-  const pieces = toPlaygroundPieces(portraitDocs, CARD_IMAGE_HEIGHT);
+  // Each piece is cropped to its own orientation, which the Queue honours
+  const pieces = toPlaygroundPieces(docs, CARD_IMAGE_HEIGHT);
   const name = about?.siteName ?? about?.name;
 
   return (
