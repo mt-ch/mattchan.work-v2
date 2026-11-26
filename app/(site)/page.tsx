@@ -60,7 +60,7 @@ export default async function HomePage() {
         14:55:35 GMT London
       </p>
 
-      <p className="type-mono-caption relative z-10 col-span-6 row-start-2 self-end col-start-7 text-right whitespace-pre-line text-foreground mix-blend-difference">
+      <p className="type-mono-caption relative z-10 col-span-6 col-start-7 row-start-2 self-end text-right whitespace-pre-line text-foreground mix-blend-difference">
         Available for collaborations or full time roles
       </p>
       <Queue
