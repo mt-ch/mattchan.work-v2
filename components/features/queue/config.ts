@@ -78,7 +78,7 @@ export const queueConfig: QueueConfig = {
   fadeFalloff: 0.01,
   rotateFalloff: 0,
   direction: 1,
-  honourOrientation: false,
+  honourOrientation: true,
   mobilePerspective: 4,
   mobileCardHeight: 0.26,
   reducedTilt: -6,

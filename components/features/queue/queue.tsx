@@ -197,7 +197,7 @@ function useResolvedConfig() {
 }
 
 /**
- * The Landing's Queue: a diagonal fan of cards in perspective, 4:5 unless the config honours orientation.
+ * The Landing's Queue: a diagonal fan of cards in perspective, each piece keeping its own shape (4:5 or 3:2) unless the config turns honourOrientation off.
  * Every card links to its Project. It drifts right to left by itself, and follows wheel, drag, touch and arrow keys. `?debug` opens a tuning panel.
  *
  * @param props.pieces - Playground pieces, in Sanity order.

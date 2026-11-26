@@ -143,17 +143,32 @@ describe("layoutQueue", () => {
     });
   });
 
-  it("keeps every card 4:5 unless orientation is honoured", () => {
+  it("honours each piece's shape by default, and is 4:5 when switched off", () => {
     const orientations = Array<"landscape">(20).fill("landscape");
-    const uniform = layoutQueue({ ...base, orientations });
-    const honoured = layoutQueue({
+    const honoured = layoutQueue({ ...base, orientations });
+    const uniform = layoutQueue({
       ...base,
       orientations,
-      config: { ...queueConfig, honourOrientation: true },
+      config: { ...queueConfig, honourOrientation: false },
     });
 
-    expect(uniform[0].width / uniform[0].height).toBeCloseTo(CARD_RATIO);
+    expect(queueConfig.honourOrientation).toBe(true);
     expect(honoured[0].width / honoured[0].height).toBeCloseTo(1.5, 1);
+    expect(uniform[0].width / uniform[0].height).toBeCloseTo(CARD_RATIO);
+  });
+
+  it("mixes 4:5 and 3:2 cards in one queue", () => {
+    const orientations = Array.from(
+      { length: 20 },
+      (_, i): "portrait" | "landscape" => (i % 2 ? "landscape" : "portrait"),
+    );
+    const ratios = layoutQueue({ ...base, orientations }).map(
+      (card) => card.width / card.height,
+    );
+
+    expect(new Set(ratios.map((r) => r.toFixed(1)))).toEqual(
+      new Set(["0.8", "1.5"]),
+    );
   });
 
   describe("depth curves", () => {
