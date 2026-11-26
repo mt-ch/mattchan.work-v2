@@ -24,7 +24,7 @@
 
   /* Typography */
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-mono: var(--font-jetbrains-mono);
 
   --text-hero: var(--type-hero-size);
   --text-hero--line-height: var(--leading-hero);

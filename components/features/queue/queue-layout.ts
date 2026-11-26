@@ -23,6 +23,8 @@ export type QueueCard = {
   rotateY: number;
   /** Skew along the track in degrees, from scroll velocity. */
   skew: number;
+  /** Static slope of the card's top and bottom edges in degrees. */
+  skewY: number;
   scale: number;
   opacity: number;
   /** Cards ahead of this one, nearest first: 0 for the front-most card. */
@@ -99,7 +101,7 @@ function depthZ(config: QueueConfig, offset: number, height: number): number {
  * @param config - Queue config.
  * @param distance - Absolute distance from the focus point, in cards.
  * @param share - Scroll speed as a share of full coupling, -1 to 1.
- * @returns The signed rotateY and skew, mirrored by the config's direction.
+ * @returns The signed rotateY, velocity skew and static skewY, mirrored by the config's direction.
  */
 function tiltFor(config: QueueConfig, distance: number, share: number) {
   const direction = config.direction < 0 ? -1 : 1;
@@ -111,6 +113,7 @@ function tiltFor(config: QueueConfig, distance: number, share: number) {
   return {
     rotateY: direction * rotate,
     skew: direction * share * config.velocitySkew,
+    skewY: direction * config.skewY,
   };
 }
 

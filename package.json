@@ -27,6 +27,7 @@
     "@fortawesome/react-fontawesome": "^3.5.0",
     "@sanity/client": "^8.11.0",
     "@sanity/image-url": "^2.1.1",
+    "@sanity/orderable-document-list": "^2.0.30",
     "@sanity/vision": "^6.20.0",
     "@tailwindcss/postcss": "^4.3.3",
     "blobatar": "^2.7.0",

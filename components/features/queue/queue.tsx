@@ -7,6 +7,7 @@ import { useLayoutEffect, useRef, useState } from "react";
 
 // Shared modules
 import { TileVideo } from "@/components/ui/tile-video";
+import { useDesktop } from "@/lib/motion/use-desktop";
 import { useMotionAllowed } from "@/lib/motion/use-motion-allowed";
 
 // Local modules
@@ -14,6 +15,7 @@ import type { Piece } from "../playground/playground-data";
 import type { QueueConfig } from "./config";
 import { layoutQueue, type QueueCard } from "./queue-layout";
 import { pickQueuePlaying } from "./queue-video";
+import { resolveConfig } from "./resolve-config";
 import { useQueueConfig } from "./use-queue-config";
 import { useQueueInput } from "./use-queue-input";
 import { useQueuePosition, type QueueControls } from "./use-queue-position";
@@ -118,7 +120,7 @@ function QueueItem({
         marginTop: -card.height / 2,
         opacity: card.opacity,
         zIndex: 1000 - card.depthRank,
-        transform: `translate3d(${card.x}px, ${card.y}px, ${card.z}px) rotateY(${card.rotateY}deg) skewX(${card.skew}deg) scale(${card.scale})`,
+        transform: `translate3d(${card.x}px, ${card.y}px, ${card.z}px) skewY(${card.skewY}deg) rotateY(${card.rotateY}deg) skewX(${card.skew}deg) scale(${card.scale})`,
       }}
     >
       <Image
@@ -136,6 +138,7 @@ function QueueItem({
   );
 }
 
+/**
 /**
  * The perspective layer that holds every card.
  *
@@ -164,6 +167,7 @@ function QueueFan({
       className="absolute inset-0"
       style={{
         perspective: `${config.perspective * height * config.cardHeight}px`,
+        perspectiveOrigin: `${config.cameraX * 100}% ${config.cameraY * 100}%`,
         transformStyle: "preserve-3d",
       }}
     >
@@ -180,7 +184,20 @@ function QueueFan({
 }
 
 /**
- * The Landing's Queue: a diagonal fan of cards in perspective, 4:5 unless the config honours orientation.
+ * The tuned config, adjusted for narrow screens and reduced motion.
+ *
+ * @returns The config to render with, and whether motion is reduced.
+ */
+function useResolvedConfig() {
+  const tuned = useQueueConfig();
+  const reduced = !useMotionAllowed();
+  const mobile = !useDesktop();
+
+  return { config: resolveConfig(tuned, { mobile, reduced }), reduced };
+}
+
+/**
+ * The Landing's Queue: a diagonal fan of cards in perspective, each piece keeping its own shape (4:5 or 3:2) unless the config turns honourOrientation off.
  * Every card links to its Project. It drifts right to left by itself, and follows wheel, drag, touch and arrow keys. `?debug` opens a tuning panel.
  *
  * @param props.pieces - Playground pieces, in Sanity order.
@@ -195,18 +212,14 @@ export function Queue({
   heading: string;
 }) {
   const viewport = useViewport();
-  const config = useQueueConfig();
-  const motionAllowed = useMotionAllowed();
-  const { position, speed, controls } = useQueuePosition(
-    config,
-    !motionAllowed,
-  );
+  const { config, reduced } = useResolvedConfig();
+  const { position, speed, controls } = useQueuePosition(config, reduced);
   const root = useQueueRoot(controls, config, viewport.height);
   const cards = layoutPieces(
     pieces,
     config,
     position,
-    motionAllowed ? speed : 0,
+    reduced ? 0 : speed,
     viewport,
   );
   const playing = pickQueuePlaying(cards, (i) => Boolean(pieces[i].videoSrc));

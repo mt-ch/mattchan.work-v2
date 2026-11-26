@@ -1,6 +1,6 @@
 // React and Next.js
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, JetBrains_Mono } from "next/font/google";
 
 // Shared modules
 import { getAbout } from "@/lib/sanity";
@@ -9,9 +9,9 @@ import { SITE_URL } from "@/lib/seo/siteUrl";
 import "./globals.scss";
 
 const geistSans = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
-const geistMono = Geist_Mono({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-geist-mono",
+  variable: "--font-jetbrains-mono",
 });
 
 const FALLBACK_SITE_NAME = "Matt Chan";
@@ -54,7 +54,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-theme="dark"
-      className={`${geistSans.variable} ${geistMono.variable}`}
+      className={`${geistSans.variable} ${jetbrainsMono.variable}`}
     >
       <body>{children}</body>
     </html>

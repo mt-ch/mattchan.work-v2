@@ -154,7 +154,7 @@ export const playgroundPiecesQuery = defineQuery(`
     defined(image.asset) &&
     defined(project->title) &&
     defined(project->slug.current)
-  ] | order(_createdAt asc) {
+  ] | order(orderRank asc, _createdAt asc) {
     _id,
     image {
       ...,

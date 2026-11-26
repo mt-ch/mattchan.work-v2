@@ -14,16 +14,6 @@ import { toSiteLinks } from "./site-links";
  */
 export function AboutIdentity({ about }: { about: AboutQueryResult }) {
   return (
-    <div className="flex flex-col gap-2xs">
-      <IdentityCard name={about?.name ?? ""} headline={about?.headline ?? ""} />
-      <IconButtonRow
-        links={toSiteLinks({
-          email: about?.email ?? null,
-          githubUrl: about?.githubUrl ?? null,
-          linkedinUrl: about?.linkedinUrl ?? null,
-          resumeUrl: about?.resumeUrl ?? null,
-        })}
-      />
-    </div>
+    <IdentityCard name={about?.name ?? ""} headline={about?.headline ?? ""} />
   );
 }

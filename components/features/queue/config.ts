@@ -33,6 +33,18 @@ export type QueueConfig = {
   direction: number;
   /** When true a card keeps its piece's shape (4:5 or 3:2); when false every card is 4:5. */
   honourOrientation: boolean;
+  /** Camera perspective distance on narrow screens, in card heights. */
+  mobilePerspective: number;
+  /** Card height on narrow screens, as a share of the viewport height. */
+  mobileCardHeight: number;
+  /** Static Y rotation of every card under reduced motion, in degrees. */
+  reducedTilt: number;
+  /** Static slope of every card's top and bottom edges, in degrees; positive tips the right side down. */
+  skewY: number;
+  /** Camera position across the screen, as a share of the viewport width (0 left, 1 right). */
+  cameraX: number;
+  /** Camera position down the screen, as a share of the viewport height (0 top, 1 bottom). */
+  cameraY: number;
   /** Auto-scroll speed in cards per second. */
   driftSpeed: number;
   /** Auto-scroll direction: 1 moves cards from far to near (right to left), -1 reverses it. */
@@ -52,21 +64,27 @@ export type QueueConfig = {
 };
 
 export const queueConfig: QueueConfig = {
-  renderBefore: 3,
-  renderAfter: 9,
-  cardHeight: 0.55,
-  spacing: 0.55,
-  angle: 28,
-  perspective: 3,
-  rotateY: -28,
-  depthStep: 0.35,
+  renderBefore: 6,
+  renderAfter: 7,
+  cardHeight: 0.34,
+  spacing: 0.52,
+  angle: 37,
+  perspective: 6,
+  rotateY: -20,
+  depthStep: 0.12,
   depthCurve: "linear",
-  scaleFalloff: 0.06,
-  minScale: 0.35,
-  fadeFalloff: 0.07,
+  scaleFalloff: 0.015,
+  minScale: 0.6,
+  fadeFalloff: 0.01,
   rotateFalloff: 0,
   direction: 1,
-  honourOrientation: false,
+  honourOrientation: true,
+  mobilePerspective: 4,
+  mobileCardHeight: 0.26,
+  reducedTilt: -6,
+  skewY: 13,
+  cameraX: 0.5,
+  cameraY: 0.5,
   driftSpeed: 0.25,
   driftDirection: 1,
   friction: 3,
