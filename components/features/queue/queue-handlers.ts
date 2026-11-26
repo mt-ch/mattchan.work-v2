@@ -5,7 +5,7 @@ import { pxToCards } from "./queue-input";
 import type { QueueControls } from "./use-queue-position";
 
 /** What currently holds the drift. */
-export type Holds = { pressed: boolean; hovering: boolean; focused: boolean };
+type Holds = { pressed: boolean; hovering: boolean; focused: boolean };
 
 /**
  * Creates the wheel, key, hover and focus handlers of the Queue.
@@ -16,7 +16,7 @@ export type Holds = { pressed: boolean; hovering: boolean; focused: boolean };
  * @param read - Returns the live config and viewport height.
  * @returns The handlers.
  */
-export function createHandlers(
+function createHandlers(
   controls: QueueControls,
   holds: Holds,
   sync: () => void,

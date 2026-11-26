@@ -3,7 +3,6 @@ export { urlFor } from "./image";
 export {
   getOtherProjects,
   getPlaygroundPieces,
-  getPlaygroundProjects,
   getProject,
   getProjects,
   getProjectSlugs,
