@@ -165,6 +165,7 @@ describe("layoutQueue", () => {
         .sort((a, b) => Number(a.key) - Number(b.key))
         .map((c) => c.z);
     const focusAt = queueConfig.renderBefore;
+    const last = queueConfig.renderAfter;
 
     it("keeps the focus card at z 0 on every curve", () => {
       for (const curve of ["linear", "ease", "arc"] as const) {
@@ -183,7 +184,7 @@ describe("layoutQueue", () => {
     it("ease steps back less per card the further away", () => {
       const z = zs("ease");
       const near = z[focusAt + 1] - z[focusAt + 2];
-      const far = z[focusAt + 8] - z[focusAt + 9];
+      const far = z[focusAt + last - 1] - z[focusAt + last];
 
       expect(far).toBeGreaterThan(0);
       expect(far).toBeLessThan(near);
@@ -192,7 +193,7 @@ describe("layoutQueue", () => {
     it("arc steps back more per card the further away, and bows near cards back", () => {
       const z = zs("arc");
       const near = z[focusAt + 1] - z[focusAt + 2];
-      const far = z[focusAt + 8] - z[focusAt + 9];
+      const far = z[focusAt + last - 1] - z[focusAt + last];
 
       expect(far).toBeGreaterThan(near);
       expect(z[focusAt - 1]).toBeLessThan(0);
@@ -206,5 +207,16 @@ describe("layoutQueue", () => {
     it("falls back to linear for an unknown curve", () => {
       expect(zs("bogus")).toEqual(zs("linear"));
     });
+  });
+
+  it("slopes every card's edges by the static skewY, mirrored with direction", () => {
+    const skewed = (direction: number) =>
+      layoutQueue({
+        ...base,
+        config: { ...queueConfig, skewY: 13, direction },
+      });
+
+    expect(skewed(1).every((card) => card.skewY === 13)).toBe(true);
+    expect(skewed(-1).every((card) => card.skewY === -13)).toBe(true);
   });
 });

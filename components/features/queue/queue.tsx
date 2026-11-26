@@ -120,7 +120,7 @@ function QueueItem({
         marginTop: -card.height / 2,
         opacity: card.opacity,
         zIndex: 1000 - card.depthRank,
-        transform: `translate3d(${card.x}px, ${card.y}px, ${card.z}px) rotateY(${card.rotateY}deg) skewX(${card.skew}deg) scale(${card.scale})`,
+        transform: `translate3d(${card.x}px, ${card.y}px, ${card.z}px) skewY(${card.skewY}deg) rotateY(${card.rotateY}deg) skewX(${card.skew}deg) scale(${card.scale})`,
       }}
     >
       <Image
@@ -167,6 +167,7 @@ function QueueFan({
       className="absolute inset-0"
       style={{
         perspective: `${config.perspective * height * config.cardHeight}px`,
+        perspectiveOrigin: `${config.cameraX * 100}% ${config.cameraY * 100}%`,
         transformStyle: "preserve-3d",
       }}
     >

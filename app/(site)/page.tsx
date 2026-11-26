@@ -10,6 +10,7 @@ import { Queue } from "@/components/features/queue/queue";
 import { getAbout, getPlaygroundPieces } from "@/lib/sanity";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { resolveSeo, type SeoObject } from "@/lib/seo/resolveSeo";
+import { AboutIdentity } from "@/components/features/about-identity";
 
 /** Height in px the card images are cropped to; next/image trims it per device. */
 const CARD_IMAGE_HEIGHT = 1200;
@@ -55,6 +56,9 @@ export default async function HomePage() {
 
   return (
     <main>
+      <aside className="relative col-span-12 flex flex-col gap-4xl lg:sticky lg:top-0 lg:order-2 lg:col-span-4 lg:h-dvh lg:shrink-0 lg:justify-between lg:self-start lg:py-sm">
+        <AboutIdentity about={about} />
+      </aside>
       <Queue
         pieces={pieces}
         heading={name ? `${name}: selected work` : "Selected work"}
