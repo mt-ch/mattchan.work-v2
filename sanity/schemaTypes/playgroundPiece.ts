@@ -1,4 +1,5 @@
 // Third-party libraries
+import { orderRankField } from "@sanity/orderable-document-list";
 import { defineField, defineType } from "sanity";
 
 export const playgroundPiece = defineType({
@@ -6,6 +7,8 @@ export const playgroundPiece = defineType({
   title: "Playground piece",
   type: "document",
   fields: [
+    // Hidden rank that the Studio's drag-and-drop list writes; new pieces go last
+    orderRankField({ type: "playgroundPiece", newItemPosition: "after" }),
     defineField({
       name: "image",
       title: "Image",
