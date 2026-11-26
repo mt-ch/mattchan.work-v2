@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import type { Image } from "sanity";
 
 // Shared modules
-import { toPlaygroundPieces } from "@/components/features/playground/playground-data";
+import { toPlaygroundPieces } from "@/components/features/queue/queue-data";
 import { Queue } from "@/components/features/queue/queue";
 import { getAbout, getPlaygroundPieces } from "@/lib/sanity";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
