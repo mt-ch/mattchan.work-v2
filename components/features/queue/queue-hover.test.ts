@@ -10,20 +10,21 @@ describe("stepHover", () => {
   it("eases up while a card is hovered and the Queue is still", () => {
     const claimed = stepHover({
       ...base,
-      state: { key: null, amount: 0 },
+      state: { key: null, amount: 0, elapsed: 0 },
       hovered: "3",
     });
     const rising = stepHover({ ...base, state: claimed, hovered: "3" });
     const more = stepHover({ ...base, state: rising, hovered: "3" });
 
-    expect(claimed).toEqual({ key: "3", amount: 0 });
+    expect(claimed).toEqual({ key: "3", amount: 0, elapsed: 0 });
+    expect(more.elapsed).toBeCloseTo(0.1);
     expect(rising.amount).toBeGreaterThan(0);
     expect(more.amount).toBeGreaterThan(rising.amount);
     expect(more.amount).toBeLessThan(1);
   });
 
   it("eases down when unhovered, then lets go of the key", () => {
-    let state = { key: "3" as string | null, amount: 1 };
+    let state = { key: "3" as string | null, amount: 1, elapsed: 0 };
     state = stepHover({ ...base, state, hovered: null });
 
     expect(state.key).toBe("3");
@@ -31,14 +32,14 @@ describe("stepHover", () => {
 
     for (let i = 0; i < 100; i++)
       state = stepHover({ ...base, state, hovered: null });
-    expect(state).toEqual({ key: null, amount: 0 });
+    expect(state).toEqual({ key: null, amount: 0, elapsed: 0 });
   });
 
   it("eases down while the Queue is moving", () => {
     const next = stepHover({
       ...base,
       still: false,
-      state: { key: "3", amount: 1 },
+      state: { key: "3", amount: 1, elapsed: 0 },
       hovered: "3",
     });
 
@@ -49,13 +50,13 @@ describe("stepHover", () => {
     const long = stepHover({
       ...base,
       dt: 60,
-      state: { key: "3", amount: 0.5 },
+      state: { key: "3", amount: 0.5, elapsed: 0 },
       hovered: "3",
     });
     const capped = stepHover({
       ...base,
       dt: 0.1,
-      state: { key: "3", amount: 0.5 },
+      state: { key: "3", amount: 0.5, elapsed: 0 },
       hovered: "3",
     });
 
@@ -64,7 +65,7 @@ describe("stepHover", () => {
   });
 
   it("hands over between keys by easing out first, with no jump", () => {
-    let state = { key: "3" as string | null, amount: 1 };
+    let state = { key: "3" as string | null, amount: 1, elapsed: 0 };
     const seen: number[] = [];
 
     for (let i = 0; i < 200; i++) {

@@ -48,7 +48,7 @@ function createCore(config: QueueConfig) {
     holds: false,
     speed: 0,
     hovered: null,
-    hoverState: { key: null, amount: 0 },
+    hoverState: { key: null, amount: 0, elapsed: 0 },
     resumeAt: 0,
     config,
     reduced: false,
@@ -164,7 +164,7 @@ export function useQueuePosition(config: QueueConfig, reduced: boolean) {
   const [{ position, speed, hover }, setReading] = useState({
     position: 0,
     speed: 0,
-    hover: { key: null, amount: 0 } as HoverState,
+    hover: { key: null, amount: 0, elapsed: 0 } as HoverState,
   });
   const [{ core, controls, apply }] = useState(() => createCore(config));
 

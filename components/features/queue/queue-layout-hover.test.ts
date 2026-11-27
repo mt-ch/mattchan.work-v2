@@ -12,18 +12,22 @@ describe("layoutQueue hover", () => {
   const rest = layoutQueue(base);
   const target = rest[3].key;
   const hovered = (amount: number, extra = {}) =>
-    layoutQueue({ ...base, hover: { key: target, amount }, ...extra });
+    layoutQueue({
+      ...base,
+      hover: { key: target, amount, elapsed: 0 },
+      ...extra,
+    });
 
   it("gives today's layout with no hover, amount 0, or effect off", () => {
-    expect(layoutQueue({ ...base, hover: { key: null, amount: 1 } })).toEqual(
-      rest,
-    );
+    expect(
+      layoutQueue({ ...base, hover: { key: null, amount: 1, elapsed: 0 } }),
+    ).toEqual(rest);
     expect(hovered(0)).toEqual(rest);
     expect(
       layoutQueue({
         ...base,
         config: { ...queueConfig, hoverEffect: "off" },
-        hover: { key: target, amount: 1 },
+        hover: { key: target, amount: 1, elapsed: 0 },
       }),
     ).toEqual(rest);
   });
@@ -56,7 +60,7 @@ describe("layoutQueue hover", () => {
     const peeled = layoutQueue({
       ...base,
       config,
-      hover: { key: target, amount: 0.5 },
+      hover: { key: target, amount: 0.5, elapsed: 0 },
     }).find((c) => c.key === target)!;
     const plain = hovered(0.5).find((c) => c.key === target)!;
 
@@ -80,8 +84,8 @@ describe("layoutQueue hover", () => {
   });
 
   it("changes nothing for a key that is not rendered", () => {
-    expect(layoutQueue({ ...base, hover: { key: "nope", amount: 1 } })).toEqual(
-      rest,
-    );
+    expect(
+      layoutQueue({ ...base, hover: { key: "nope", amount: 1, elapsed: 0 } }),
+    ).toEqual(rest);
   });
 });
