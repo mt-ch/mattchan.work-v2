@@ -1,6 +1,10 @@
 // Local modules
 import type { DepthCurve } from "./depth-curve";
 
+/** Hover effects a card can play: none, or Peel (turns to face the camera and comes forward). */
+export const HOVER_EFFECTS = ["off", "peel"] as const;
+export type HoverEffect = (typeof HOVER_EFFECTS)[number];
+
 /** Every tunable value of the Queue. The code defaults are the source of truth. */
 export type QueueConfig = {
   /** Cards rendered nearer than the focus card. */
@@ -61,6 +65,12 @@ export type QueueConfig = {
   resumeDelay: number;
   /** How fast the drift eases back in once resumed, per second; higher is quicker. */
   resumeRate: number;
+  /** Which effect the hovered or focused card plays. */
+  hoverEffect: HoverEffect;
+  /** How far the effect goes, 0 (none) to 1 (full); Peel turns the card this share of the way to face the camera. */
+  hoverStrength: number;
+  /** How fast the hover effect eases in and out, per second; higher is quicker. */
+  hoverRate: number;
 };
 
 export const queueConfig: QueueConfig = {
@@ -93,4 +103,7 @@ export const queueConfig: QueueConfig = {
   velocitySpread: 0.15,
   resumeDelay: 1.2,
   resumeRate: 2,
+  hoverEffect: "peel",
+  hoverStrength: 1,
+  hoverRate: 8,
 };
