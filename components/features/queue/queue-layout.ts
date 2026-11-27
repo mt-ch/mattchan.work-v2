@@ -3,6 +3,13 @@ import type { Orientation } from "./orientation";
 import { tileWidthFor } from "./orientation";
 import type { QueueConfig } from "./config";
 import { curveDepth } from "./depth-curve";
+import type { HoverState } from "./queue-hover";
+
+/** How far Peel brings a card forward at full strength, in card heights. */
+export const PEEL_LIFT = 0.25;
+
+/** Brightness added to the hovered card at full strength under reduced motion. */
+export const REDUCED_BRIGHTNESS = 0.2;
 
 /** Aspect ratio (width ÷ height) of every Queue card: 4:5 portrait. */
 export const CARD_RATIO = 4 / 5;
@@ -27,6 +34,8 @@ export type QueueCard = {
   skewY: number;
   scale: number;
   opacity: number;
+  /** Brightness multiplier; 1 is untouched. Only the reduced-motion hover changes it. */
+  brightness: number;
   /** Cards ahead of this one, nearest first: 0 for the front-most card. */
   depthRank: number;
   /** True for the single card at the focus point. */
@@ -149,6 +158,59 @@ function trackPoint(config: QueueConfig, along: number) {
 }
 
 /**
+ * Applies the hover effect to the hovered card only; every other card, and the
+ * card's slot on the track, are left as they are.
+ *
+ * @param card - A laid-out card.
+ * @param hover - The hovered card's key and effect amount, when there is one.
+ * @param config - Queue config.
+ * @param reduced - When true the effect is a brightness change only.
+ * @returns The card, changed if it is the hovered one.
+ */
+function applyHover(
+  card: QueueCard,
+  hover: HoverState | undefined,
+  config: QueueConfig,
+  reduced: boolean,
+): QueueCard {
+  const strength = (hover?.amount ?? 0) * config.hoverStrength;
+  if (config.hoverEffect !== "peel" || card.key !== hover?.key) return card;
+  if (strength <= 0) return card;
+
+  if (reduced) {
+    return { ...card, brightness: 1 + REDUCED_BRIGHTNESS * strength };
+  }
+
+  return {
+    ...card,
+    rotateY: card.rotateY * (1 - strength),
+    z: card.z + PEEL_LIFT * card.height * strength,
+  };
+}
+
+/**
+ * Orders cards nearest first, ranks them by depth, then applies the hover effect.
+ * Ranking comes first so lifting a card never reshuffles the others.
+ *
+ * @param cards - Laid-out cards, unordered.
+ * @param hover - The hovered card's key and effect amount, when there is one.
+ * @param config - Queue config.
+ * @param reduced - When true the hover effect is a brightness change only.
+ * @returns The cards, nearest first.
+ */
+function rankAndHover(
+  cards: QueueCard[],
+  hover: HoverState | undefined,
+  config: QueueConfig,
+  reduced: boolean,
+): QueueCard[] {
+  return cards
+    .sort((a, b) => b.z - a.z)
+    .map((card, rank) => ({ ...card, depthRank: rank }))
+    .map((card) => applyHover(card, hover, config, reduced));
+}
+
+/**
  * Lays out the cards of the Queue: a diagonal fan from far (top-right) to near
  * (bottom-left), cards shrinking and fading with distance from the focus card.
  *
@@ -158,6 +220,8 @@ function trackPoint(config: QueueConfig, along: number) {
  * @param input.position - Scroll position as a fractional card index; the focus card is the nearest integer.
  * @param input.viewport - Viewport size in px.
  * @param input.velocity - Signed scroll speed in cards per second; faster movement skews, rotates and spreads the cards. Defaults to 0.
+ * @param input.hover - The card the hover effect is on and how far it has eased in. Only that card changes; its slot on the track does not.
+ * @param input.reduced - When true the hover effect only brightens the hovered card.
  * @returns The visible cards, nearest first. Empty when there are no pieces.
  */
 export function layoutQueue(input: {
@@ -167,6 +231,8 @@ export function layoutQueue(input: {
   position: number;
   viewport: { width: number; height: number };
   velocity?: number;
+  hover?: HoverState;
+  reduced?: boolean;
 }): QueueCard[] {
   const { count, orientations, config, position, viewport } = input;
   if (count <= 0) return [];
@@ -195,12 +261,11 @@ export function layoutQueue(input: {
       ...tiltFor(config, distance, share),
       scale: Math.max(config.minScale, 1 - distance * config.scaleFalloff),
       opacity: Math.max(0, 1 - distance * config.fadeFalloff),
+      brightness: 1,
       depthRank: 0,
       focus: slot === 0,
     });
   }
 
-  return cards
-    .sort((a, b) => b.z - a.z)
-    .map((card, rank) => ({ ...card, depthRank: rank }));
+  return rankAndHover(cards, input.hover, config, input.reduced ?? false);
 }

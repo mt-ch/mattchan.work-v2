@@ -2,7 +2,7 @@
 import type { Pane } from "tweakpane";
 
 // Local modules
-import { queueConfig, type QueueConfig } from "./config";
+import { HOVER_EFFECTS, queueConfig, type QueueConfig } from "./config";
 import { DEPTH_CURVES } from "./depth-curve";
 import { OVERRIDES_KEY, mergeQueueConfig } from "./config-overrides";
 
@@ -33,6 +33,8 @@ const RANGES: Partial<Record<keyof QueueConfig, Range>> = {
   velocitySpread: { min: 0, max: 1, step: 0.01 },
   resumeDelay: { min: 0, max: 5, step: 0.1 },
   resumeRate: { min: 0.2, max: 10, step: 0.1 },
+  hoverStrength: { min: 0, max: 1, step: 0.01 },
+  hoverRate: { min: 0.5, max: 30, step: 0.5 },
 };
 
 /**
@@ -49,6 +51,12 @@ function addBindings(pane: Pane, config: QueueConfig) {
   pane.addBinding(config, "depthCurve", {
     label: "depth curve",
     options: Object.fromEntries(DEPTH_CURVES.map((curve) => [curve, curve])),
+  });
+  pane.addBinding(config, "hoverEffect", {
+    label: "hover effect",
+    options: Object.fromEntries(
+      HOVER_EFFECTS.map((effect) => [effect, effect]),
+    ),
   });
   pane.addBinding(config, "direction", {
     options: { "Far at top-right": 1, "Far at top-left": -1 },

@@ -13,6 +13,7 @@ import { useMotionAllowed } from "@/lib/motion/use-motion-allowed";
 // Local modules
 import type { Piece } from "./queue-data";
 import type { QueueConfig } from "./config";
+import type { HoverState } from "./queue-hover";
 import { layoutQueue, type QueueCard } from "./queue-layout";
 import { pickQueuePlaying } from "./queue-video";
 import { resolveConfig } from "./resolve-config";
@@ -71,6 +72,8 @@ function useQueueRoot(
  * @param position - Scroll position as a fractional card index.
  * @param velocity - Signed scroll speed in cards per second.
  * @param viewport - Viewport size in px.
+ * @param hover - The card the hover effect is on and how far it has eased in.
+ * @param reduced - True under reduced motion.
  * @returns The visible cards.
  */
 function layoutPieces(
@@ -79,6 +82,8 @@ function layoutPieces(
   position: number,
   velocity: number,
   viewport: { width: number; height: number },
+  hover: HoverState,
+  reduced: boolean,
 ) {
   return layoutQueue({
     count: pieces.length,
@@ -87,7 +92,19 @@ function layoutPieces(
     position,
     velocity,
     viewport,
+    hover,
+    reduced,
   });
+}
+
+/**
+ * The CSS transform that places a card.
+ *
+ * @param card - Where and how to draw the card.
+ * @returns The transform value.
+ */
+function cardTransform(card: QueueCard): string {
+  return `translate3d(${card.x}px, ${card.y}px, ${card.z}px) skewY(${card.skewY}deg) rotateY(${card.rotateY}deg) skewX(${card.skew}deg) scale(${card.scale})`;
 }
 
 /**
@@ -111,6 +128,7 @@ function QueueItem({
     <Link
       href={`/work/${piece.slug}`}
       aria-label={piece.title}
+      data-card-key={card.key}
       draggable={false}
       className="absolute top-1/2 left-1/2 block overflow-hidden rounded-md bg-surface"
       style={{
@@ -119,8 +137,10 @@ function QueueItem({
         marginLeft: -card.width / 2,
         marginTop: -card.height / 2,
         opacity: card.opacity,
+        filter:
+          card.brightness === 1 ? undefined : `brightness(${card.brightness})`,
         zIndex: 1000 - card.depthRank,
-        transform: `translate3d(${card.x}px, ${card.y}px, ${card.z}px) skewY(${card.skewY}deg) rotateY(${card.rotateY}deg) skewX(${card.skew}deg) scale(${card.scale})`,
+        transform: cardTransform(card),
       }}
     >
       <Image
@@ -213,7 +233,10 @@ export function Queue({
 }) {
   const viewport = useViewport();
   const { config, reduced } = useResolvedConfig();
-  const { position, speed, controls } = useQueuePosition(config, reduced);
+  const { position, speed, hover, controls } = useQueuePosition(
+    config,
+    reduced,
+  );
   const root = useQueueRoot(controls, config, viewport.height);
   const cards = layoutPieces(
     pieces,
@@ -221,6 +244,8 @@ export function Queue({
     position,
     reduced ? 0 : speed,
     viewport,
+    hover,
+    reduced,
   );
   const playing = pickQueuePlaying(cards, (i) => Boolean(pieces[i].videoSrc));
 

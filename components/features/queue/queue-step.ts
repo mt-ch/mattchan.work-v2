@@ -2,7 +2,7 @@
 import type { QueueConfig } from "./config";
 
 /** Longest frame the stepper integrates, so resuming a hidden tab never jumps. */
-const MAX_DT = 0.1;
+export const MAX_DT = 0.1;
 
 /** Momentum slower than this, in cards per second, is snapped to rest. */
 const REST_SPEED = 0.001;
@@ -15,7 +15,7 @@ const REST_SPEED = 0.001;
  * @param dt - Seconds to advance.
  * @returns The new share, closer to 1.
  */
-function easeToward(share: number, rate: number, dt: number): number {
+export function easeToward(share: number, rate: number, dt: number): number {
   return 1 - (1 - share) * Math.exp(-rate * dt);
 }
 
