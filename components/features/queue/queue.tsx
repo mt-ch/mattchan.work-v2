@@ -11,7 +11,7 @@ import { useDesktop } from "@/lib/motion/use-desktop";
 import { useMotionAllowed } from "@/lib/motion/use-motion-allowed";
 
 // Local modules
-import type { Piece } from "../playground/playground-data";
+import type { Piece } from "./queue-data";
 import type { QueueConfig } from "./config";
 import { layoutQueue, type QueueCard } from "./queue-layout";
 import { pickQueuePlaying } from "./queue-video";

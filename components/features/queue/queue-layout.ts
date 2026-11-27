@@ -1,6 +1,6 @@
 // Local modules
-import type { Orientation } from "../playground/orientation";
-import { tileWidthFor } from "../playground/orientation";
+import type { Orientation } from "./orientation";
+import { tileWidthFor } from "./orientation";
 import type { QueueConfig } from "./config";
 import { curveDepth } from "./depth-curve";
 

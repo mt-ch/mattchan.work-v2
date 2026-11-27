@@ -115,39 +115,6 @@ export const aboutQuery = defineQuery(`
   }
 `);
 
-export const playgroundProjectsQuery = defineQuery(`
-  *[_type == "project"] | order(order asc) {
-    _id,
-    title,
-    slug,
-    coverImage {
-      ...,
-      "metadata": asset->metadata { lqip, dimensions }
-    },
-    "coverVideoUrl": coverVideo.asset->url,
-    story[] {
-      _key,
-      items[] {
-        _key,
-        _type,
-        _type == "imageCell" => {
-          image {
-            ...,
-            "metadata": asset->metadata { lqip, dimensions }
-          }
-        },
-        _type == "videoCell" => {
-          "videoUrl": video.asset->url,
-          poster {
-            ...,
-            "metadata": asset->metadata { lqip, dimensions }
-          }
-        }
-      }
-    }
-  }
-`);
-
 export const playgroundPiecesQuery = defineQuery(`
   *[
     _type == "playgroundPiece" &&
