@@ -13,11 +13,11 @@ export function Availability({
   children: React.ReactNode;
 }) {
   return (
-    <p className="flex items-center gap-xs text-small text-foreground">
+    <p className="type-mono-caption flex items-center justify-end gap-xs text-foreground">
       <span
         aria-hidden
         data-available={isAvailable}
-        className="size-2.5 rounded-full bg-muted data-[available=true]:bg-green-500"
+        className="size-2 rounded-full bg-muted data-[available=true]:bg-green-500"
       />
       {children}
     </p>
