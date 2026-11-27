@@ -1,8 +1,8 @@
 // Local modules
 import type { DepthCurve } from "./depth-curve";
 
-/** Hover effects a card can play: none, or Peel (turns to face the camera and comes forward). */
-export const HOVER_EFFECTS = ["off", "peel"] as const;
+/** Hover effects a card can play: none, Peel (turns to face the camera and comes forward) or Ripple (lifts and sends a wave through its neighbours). */
+export const HOVER_EFFECTS = ["off", "peel", "ripple"] as const;
 export type HoverEffect = (typeof HOVER_EFFECTS)[number];
 
 /** Every tunable value of the Queue. The code defaults are the source of truth. */
@@ -71,6 +71,8 @@ export type QueueConfig = {
   hoverStrength: number;
   /** How fast the hover effect eases in and out, per second; higher is quicker. */
   hoverRate: number;
+  /** How many cards either side of the hovered one a Ripple reaches; the wave weakens with distance. */
+  hoverReach: number;
 };
 
 export const queueConfig: QueueConfig = {
@@ -106,4 +108,5 @@ export const queueConfig: QueueConfig = {
   hoverEffect: "peel",
   hoverStrength: 1,
   hoverRate: 8,
+  hoverReach: 2,
 };

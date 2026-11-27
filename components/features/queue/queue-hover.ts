@@ -13,6 +13,8 @@ export type HoverState = {
   key: string | null;
   /** Effect share, 0 (rest) to 1 (full). */
   amount: number;
+  /** Seconds the effect has been on this card, for effects that play over time. */
+  elapsed: number;
 };
 
 /**
@@ -56,7 +58,10 @@ export function stepHover(input: {
     : 1 - easeToward(1 - state.amount, input.rate, dt);
 
   // Once the old card has faded out, the hovered one (if any) takes over
-  if (amount < GONE) return { key: hovered, amount: 0 };
+  if (amount < GONE) return { key: hovered, amount: 0, elapsed: 0 };
 
-  return { key: state.key, amount };
+  // Time runs only while the effect holds the card, so a wave restarts on each hover
+  const elapsed = holdsKey ? state.elapsed + dt : state.elapsed;
+
+  return { key: state.key, amount, elapsed };
 }

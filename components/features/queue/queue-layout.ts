@@ -4,6 +4,7 @@ import { tileWidthFor } from "./orientation";
 import type { QueueConfig } from "./config";
 import { curveDepth } from "./depth-curve";
 import type { HoverState } from "./queue-hover";
+import { rippleOffset } from "./queue-ripple";
 
 /** How far Peel brings a card forward at full strength, in card heights. */
 export const PEEL_LIFT = 0.25;
@@ -174,8 +175,11 @@ function applyHover(
   reduced: boolean,
 ): QueueCard {
   const strength = (hover?.amount ?? 0) * config.hoverStrength;
-  if (config.hoverEffect !== "peel" || card.key !== hover?.key) return card;
-  if (strength <= 0) return card;
+  if (!hover || strength <= 0) return card;
+  if (config.hoverEffect === "ripple") {
+    return rippleCard(card, hover, config, reduced, strength);
+  }
+  if (config.hoverEffect !== "peel" || card.key !== hover.key) return card;
 
   if (reduced) {
     return { ...card, brightness: 1 + REDUCED_BRIGHTNESS * strength };
@@ -186,6 +190,43 @@ function applyHover(
     rotateY: card.rotateY * (1 - strength),
     z: card.z + PEEL_LIFT * card.height * strength,
   };
+}
+
+/**
+ * Applies Ripple to one card: the hovered card lifts, and its neighbours
+ * within reach are pushed by a travelling wave. Under reduced motion only the
+ * hovered card brightens.
+ *
+ * @param card - A laid-out card.
+ * @param hover - The hovered card's key, amount and elapsed time.
+ * @param config - Queue config.
+ * @param reduced - When true the effect is a brightness change only.
+ * @param strength - Hover amount times the config's strength.
+ * @returns The card, changed if the effect reaches it.
+ */
+function rippleCard(
+  card: QueueCard,
+  hover: HoverState,
+  config: QueueConfig,
+  reduced: boolean,
+  strength: number,
+): QueueCard {
+  if (reduced) {
+    if (card.key !== hover.key) return card;
+
+    return { ...card, brightness: 1 + REDUCED_BRIGHTNESS * strength };
+  }
+
+  // Keys are card indices, so their difference is the distance in cards
+  const distance = Math.abs(Number(card.key) - Number(hover.key));
+  const push = rippleOffset({
+    distance,
+    reach: config.hoverReach,
+    elapsed: hover.elapsed,
+  });
+  if (push === 0) return card;
+
+  return { ...card, z: card.z + push * card.height * strength };
 }
 
 /**

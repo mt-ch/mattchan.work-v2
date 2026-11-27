@@ -35,6 +35,7 @@ const RANGES: Partial<Record<keyof QueueConfig, Range>> = {
   resumeRate: { min: 0.2, max: 10, step: 0.1 },
   hoverStrength: { min: 0, max: 1, step: 0.01 },
   hoverRate: { min: 0.5, max: 30, step: 0.5 },
+  hoverReach: { min: 0, max: 6, step: 1 },
 };
 
 /**
