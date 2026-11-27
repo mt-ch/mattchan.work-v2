@@ -11,6 +11,7 @@ import { getAbout, getPlaygroundPieces } from "@/lib/sanity";
 import { buildMetadata } from "@/lib/seo/buildMetadata";
 import { resolveSeo, type SeoObject } from "@/lib/seo/resolveSeo";
 import { AboutIdentity } from "@/components/layout/about-identity";
+import { LandingOverlay } from "@/components/layout/landing-overlay";
 
 /** Height in px the card images are cropped to; next/image trims it per device. */
 const CARD_IMAGE_HEIGHT = 1200;
@@ -52,17 +53,11 @@ export default async function HomePage() {
 
   return (
     <main className="flex min-h-screen grid-rows-2 flex-col justify-between p-sm lg:grid lg:grid-cols-12 lg:gap-sm lg:p-xs">
-      <div className="relative col-span-12 flex flex-col gap-4xl lg:top-0 lg:col-span-4 lg:shrink-0">
+      <div className="pointer-events-none relative z-10 col-span-12 flex flex-col gap-4xl lg:top-0 lg:col-span-4 lg:shrink-0">
         <AboutIdentity about={about} />
       </div>
 
-      <p className="type-mono-caption relative z-10 col-span-2 col-start-11 text-right whitespace-pre-line text-foreground mix-blend-difference">
-        14:55:35 GMT London
-      </p>
-
-      <p className="type-mono-caption relative z-10 col-span-6 col-start-7 row-start-2 self-end text-right whitespace-pre-line text-foreground mix-blend-difference">
-        Available for collaborations or full time roles
-      </p>
+      <LandingOverlay availability={about?.availability} />
       <Queue
         pieces={pieces}
         heading={name ? `${name}: selected work` : "Selected work"}
