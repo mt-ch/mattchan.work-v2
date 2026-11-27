@@ -8,6 +8,9 @@ import type { HoverState } from "./queue-hover";
 /** How far Peel brings a card forward at full strength, in card heights. */
 export const PEEL_LIFT = 0.25;
 
+/** How far Tug slides a card out sideways at full strength, in card heights. */
+export const TUG_DISTANCE = 0.3;
+
 /** Brightness added to the hovered card at full strength under reduced motion. */
 export const REDUCED_BRIGHTNESS = 0.2;
 
@@ -174,17 +177,40 @@ function applyHover(
   reduced: boolean,
 ): QueueCard {
   const strength = (hover?.amount ?? 0) * config.hoverStrength;
-  if (config.hoverEffect !== "peel" || card.key !== hover?.key) return card;
+  if (config.hoverEffect === "off" || card.key !== hover?.key) return card;
   if (strength <= 0) return card;
 
+  // Reduced motion only brightens the card
   if (reduced) {
     return { ...card, brightness: 1 + REDUCED_BRIGHTNESS * strength };
   }
+
+  if (config.hoverEffect === "tug") return tugCard(card, config, strength);
 
   return {
     ...card,
     rotateY: card.rotateY * (1 - strength),
     z: card.z + PEEL_LIFT * card.height * strength,
+  };
+}
+
+/**
+ * Slides a card out sideways, at right angles to the track, keeping its place along it.
+ *
+ * @param card - The hovered card.
+ * @param config - Queue config.
+ * @param strength - Effect strength, 0 to 1.
+ * @returns The card moved across the track.
+ */
+function tugCard(card: QueueCard, config: QueueConfig, strength: number) {
+  const angle = (config.angle * Math.PI) / 180;
+  const direction = config.direction < 0 ? -1 : 1;
+  const distance = TUG_DISTANCE * card.height * strength;
+
+  return {
+    ...card,
+    x: card.x + direction * distance * Math.sin(angle),
+    y: card.y + distance * Math.cos(angle),
   };
 }
 
